@@ -1,0 +1,60 @@
+/* Container cho header */
+.header {
+  display: flex;
+  /*position: fixed; /* Cố định header ở đầu trang */
+  align-items: center;
+  justify-content: space-between; /* Đảm bảo khoảng cách giữa phần bên trái và bên phải */
+  padding: 20px;
+  background-color: #ffffff; /* Màu nền cho header */
+}
+
+/* Phần bên trái bao gồm nút menu và bộ số coin */
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+/* Container cho nút menu */
+.menusetting-container {
+  margin-right: 10px; /* Khoảng cách giữa menu và bộ coin */
+}
+
+/* Style cho icon menu */
+.menu-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Coins container với nền đen và các góc bo tròn */
+.coins {
+  display: flex;
+  align-items: center;
+  background-color: black;
+  border-radius: 12px;
+  padding: 4px 10px;
+  color: white;
+}
+
+/* Style cho icon coin */
+.coin-icon {
+  margin-right: 10px; /* Khoảng cách giữa icon và số */
+  width: 24px;
+  height: 24px;
+}
+
+/* Style cho số trong coins container */
+.coins span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Container cho nút chat (nằm bên phải) */
+.chat-container {
+  margin-left: 20px; /* Khoảng cách giữa chat và phần bên trái */
+}
+
+/* Style cho icon chat */
+.chat-icon {
+  width: 28px;
+  height: 28px;
+}

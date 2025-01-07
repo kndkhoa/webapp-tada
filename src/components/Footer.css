@@ -1,0 +1,45 @@
+.footer {
+  display: flex;
+  justify-content: space-around; /* Căn đều các nút */
+  background-color: #f8f9fa; /* Màu nền */
+  padding: 10px 0;
+  border-top: 1px solid #e0e0e0; /* Đường kẻ trên cùng */
+}
+
+.footer-button {
+  display: flex;
+  flex-direction: column; /* Sắp xếp theo chiều dọc */
+  align-items: center;
+  text-decoration: none;
+  color: #333; /* Màu chữ */
+  font-size: 14px;
+}
+
+.footer-button:hover {
+  color: #007bff; /* Màu chữ khi hover */
+  font-weight: bold;
+}
+
+.icon {
+  width: 40px; /* Kích thước icon */
+  height: 40px;
+}
+
+.footer-text {
+  margin-top: 5px; /* Khoảng cách giữa icon và chữ */
+  font-size: 14px; /* Kích thước chữ */
+}
+
+/* Đặt footer cố định */
+.footer {
+  position: fixed; /* Cố định footer */
+  bottom: 0; /* Nằm ở cuối màn hình */
+  left: 0; /* Căn trái */
+  width: 100%; /* Chiếm toàn bộ chiều ngang màn hình */
+  background-color: #ffffff; /* Màu nền (tùy chỉnh) */
+  color: white; /* Màu chữ */
+  text-align: center; /* Căn giữa chữ */
+  padding: 10px 0; /* Khoảng cách trên-dưới */
+  z-index: 1000; /* Đảm bảo footer luôn trên cùng */
+  border-top: 1px solid #e0e0e0; /* Đường viền trên */
+}
