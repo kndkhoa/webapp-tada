@@ -1,23 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom'; 
+import Header from "../components/Header";
+import QuizCard from "../components/QuizCard";
+import News from "../components/News";
+import Footer from "../components/Footer";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/swiper-bundle.css';
+import "./Home.css";
+import avatar from '../components/assets/avatar.gif';
 
-const Home = () => {
-  const [loadingQuiz, setLoadingQuiz] = useState(true);
+function Home() {
+  const [activeTab, setActiveTab] = useState(1);
+  const [announText, setAnnounText] = useState("");
+  const [currentAnnounIndex, setCurrentAnnounIndex] = useState(0);
   const [quizData, setQuizData] = useState([]);
-  const [loadingNews, setLoadingNews] = useState(true);
   const [newsData, setNewsData] = useState([]);
-  const [error, setError] = useState(null);
+  const [announData, setAnnounData] = useState([]);
+  const [loadingQuiz, setLoadingQuiz] = useState(true);
+  const [loadingNews, setLoadingNews] = useState(true);
+  const [error, setError] = useState("");
 
-  // API Key lấy từ biến môi trường
-  const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
+  const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";  // API key từ biến môi trường
+  
+  const navigate = useNavigate(); // Khai báo navigate
 
-  // Fetch Quiz Data
   useEffect(() => {
+    // Fetch Quiz Data
     const fetchQuizData = async () => {
       try {
         const response = await fetch('http://admin.tducoin.com/api/quiz', {
           method: 'GET',
           headers: {
-            'Accept: application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
             'x-api-key': apiKey,  // Sử dụng API key từ môi trường
           },
@@ -36,17 +50,13 @@ const Home = () => {
       }
     };
 
-    fetchQuizData();
-  }, []);  // Không cần apiKey trong dependency vì nó là cố định
-
-  // Fetch News Data
-  useEffect(() => {
+    // Fetch News Data
     const fetchNewsData = async () => {
       try {
         const response = await fetch('http://admin.tducoin.com/api/news', {
           method: 'GET',
           headers: {
-             'Accept: application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
             'x-api-key': apiKey,  // Sử dụng API key từ môi trường
           },
@@ -65,6 +75,7 @@ const Home = () => {
       }
     };
 
+    fetchQuizData();
     fetchNewsData();
   }, []);  // Không cần apiKey trong dependency vì nó là cố định
 
@@ -76,35 +87,85 @@ const Home = () => {
     return <div>{error}</div>;
   }
 
-  return (
-    <div>
-      <h1>TESTING.....</h1>
-      <ul>
-        {quizData.map((quiz, index) => (
-          <li key={index}>{quiz.title}</li>
-        ))}
-      </ul>
+  const filtereditemzes = quizData.filter((item) => item.highlight === activeTab);
+  const filteredNews = newsData;
 
-      <h1>Tin Tức</h1>
-      <ul>
-        {newsData.map((news, index) => (
-          <div key={item.id} onClick={() => handleNewsClick(item.id, 'userID')}>
-                <News
-                    title={item.title}
-                    description={item.description}
-                    banner={item.banner}
-                    heartValue={item.heart}
-                    commentvalue={item.comment}
-                    coinactive={item.coinactive}
-                    author={item.name}
-                    created_at={item.created_at}
-                    status={item.status}
-                />
-              </div>
-        ))}
-      </ul>
+  const navigateToDetail = (id, dataType, menu) => {
+    if (menu === 'news') {
+      navigate(`/news/${id}`);
+    } else if (menu === 'quiz') {
+      navigate(`/quiz/${id}?${dataType}`);
+    }
+  };
+
+  return (
+    <div className="home">
+      <Header />
+      <div className="rectangle-container">
+        <div className="home-circle">
+          <img src={avatar} alt="Gift Icon" />
+        </div>
+        <div className="rectangle">
+          <div className="rectangle-text">
+            {announText}
+          </div>
+        </div>
+      </div>
+      <main className="content-wrapper">
+        <h2 className="title">Nổi bật</h2>
+        <Swiper
+          spaceBetween={20}
+          slidesPerView={1}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true,
+            type: 'bullets',
+          }}
+        >
+          {filtereditemzes.map((item) => (
+            <SwiperSlide key={item.id} onClick={() => navigateToDetail(item.id, item.dataType, item.menu)}>
+              <QuizCard
+                title={item.title}
+                description={item.description}
+                pic={item.pic}
+                value={item.value}
+                timer={item.timer}
+                avatar1={item.avatar1}
+                avatar2={item.avatar2}
+                avatar3={item.avatar3}
+                avatar4={item.avatar4}
+                members={item.members}
+                completed={item.completed}
+                gift_title={item.gift_title}
+                status={item.status}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <div className="dynamic-content">
+          <h2 className="title">Tin tức mới</h2>
+        </div>
+        <div>
+          {filteredNews.map(item => (
+            <div key={item.id} onClick={() => navigateToDetail(item.id, item.dataType, item.menu)}>
+              <News
+                title={item.title}
+                description={item.description}
+                pic={item.pic}
+                heartValue={item.heartValue}
+                commentValue={item.commentValue}
+                coinactive={item.coinactive}
+                name={item.name}
+                time={item.time}
+                status={item.status}
+              />
+            </div>
+          ))}
+        </div>
+      </main>
+      <Footer />
     </div>
   );
-};
+}
 
 export default Home;
