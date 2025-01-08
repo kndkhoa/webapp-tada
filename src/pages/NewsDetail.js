@@ -50,7 +50,7 @@ function NewsDetail() {
   const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(news.title)}`;
 
   // URL dẫn đến kênh Telegram
-  const telegramChannelUrl = "https://t.me/tadaup"; // Thay "your_channel" bằng tên kênh Telegram của anh
+  const telegramChannelUrl = "https://t.me/tadaup"; 
 
   return (
     <div className="news-detail-container">
