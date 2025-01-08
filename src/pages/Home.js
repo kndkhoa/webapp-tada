@@ -86,7 +86,19 @@ const Home = () => {
       <h1>Tin Tức</h1>
       <ul>
         {newsData.map((news, index) => (
-          <li key={index}>{news.title}</li>
+          <div key={item.id} onClick={() => handleNewsClick(item.id, 'userID')}>
+                <News
+                    title={item.title}
+                    description={item.description}
+                    banner={item.banner}
+                    heartValue={item.heart}
+                    commentvalue={item.comment}
+                    coinactive={item.coinactive}
+                    author={item.name}
+                    created_at={item.created_at}
+                    status={item.status}
+                />
+              </div>
         ))}
       </ul>
     </div>
