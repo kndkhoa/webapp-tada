@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await fetch('https://admin.tducoin.com/api/quiz', {
+        const response = await fetch('http://admin.tducoin.com/api/quiz', {
           method: 'GET',
           headers: {
             'x-api-key': apiKey,  // Sử dụng API key từ môi trường
@@ -42,7 +42,7 @@ const Home = () => {
   useEffect(() => {
     const fetchNewsData = async () => {
       try {
-        const response = await fetch('https://admin.tducoin.com/api/news', {
+        const response = await fetch('http://admin.tducoin.com/api/news', {
           method: 'GET',
           headers: {
             'x-api-key': apiKey,  // Sử dụng API key từ môi trường
