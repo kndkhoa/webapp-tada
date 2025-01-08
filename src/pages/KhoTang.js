@@ -100,7 +100,7 @@ function KhoTang() {
 
         {dataType === 'news' && (
           <div className="filters-container">
-            <div className="dataType-filter">
+            <div className="catalogue-filter">
               <div 
                 className={`filter-item ${activedataType === 'All' ? 'active' : ''}`} 
                 onClick={() => handledataTypeClick('All')}
@@ -131,27 +131,7 @@ function KhoTang() {
               >
                 CFD
               </div>
-            </div>
-            <div className="catalogue-filter">
-              <div 
-                className={`filter-item ${activeCatalogue === 'All' ? 'active' : ''}`} 
-                onClick={() => handleCatalogueClick('All')}
-              >
-                All
-              </div>
-              <div 
-                className={`filter-item ${activeCatalogue === 'Crypto' ? 'active' : ''}`} 
-                onClick={() => handleCatalogueClick('Crypto')}
-              >
-                Crypto
-              </div>
-              <div 
-                className={`filter-item ${activeCatalogue === 'Forex' ? 'active' : ''}`} 
-                onClick={() => handleCatalogueClick('Forex')}
-              >
-                Forex
-              </div>
-            </div>
+            </div>           
           </div>
         )}
 
