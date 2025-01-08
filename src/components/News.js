@@ -6,15 +6,15 @@ import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
 
-const News = ({ id, dataType, title, pic, description, coinactive, heartValue, commentValue, name, time, status }) => {
+const News = ({ id, title, banner, description, coinactive, heartValue, commentValue, author, created_at, status }) => {
   return (
     <div className="news">
       <div className="news-content">
         <h2>{title}</h2>
-        <p className="name-time">{name} - {time}</p>
+        <p className="name-time">{author} - {created_at}</p>
         <p>{description}</p>
         <div className="news-pic-container">
-          <img src={pic} alt="Pic" className="news-pic" />
+          <img src={banner} alt="Pic" className="news-pic" />
 
           {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
           {status === 1 ? (
