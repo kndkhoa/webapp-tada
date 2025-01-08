@@ -8,7 +8,7 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   // API Key lấy từ biến môi trường
-  const apiKey = process.env.REACT_APP_API_KEY;
+  const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
 
   // Fetch Quiz Data
   useEffect(() => {
