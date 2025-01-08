@@ -30,7 +30,7 @@ function KhoTang() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://admin.tadducoin.com/api/news", {
+        const response = await fetch("http://admin.tducoin.com/api/news", {
           method: "GET",
           headers: {
             "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
