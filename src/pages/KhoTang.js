@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import Header from "../components/Header";
 import News from "../components/News";
-import TadaTV from "../components/TadaTV";
-import Course from "../components/Course";
 import Footer from "../components/Footer";
 import "./KhoTang.css";
 
@@ -17,13 +15,13 @@ function KhoTang() {
 
   const navigate = useNavigate();
 
-  const handleNewsClick = (id) => {
+  const handleNewsClick = (newsId, userId) => {
     if (dataType === 'news') {
-      navigate(`/news/${id}`);
+      navigate(`/news/${newsId}`, { state: { userId } });  // Truyền id bài viết và id người dùng vào route
     } else if (dataType === 'tadatv') {
-      navigate(`/tadatv/${id}`);
+      navigate(`/tadatv/${newsId}`, { state: { userId } });
     } else if (dataType === 'course') {
-      navigate(`/course/${id}`);
+      navigate(`/course/${newsId}`, { state: { userId } });
     }
   };
 
@@ -131,17 +129,9 @@ function KhoTang() {
             <p>Loading...</p>  // Hiển thị khi đang tải dữ liệu
           ) : (
             filteredData.map(item => (
-              <div key={item.id} onClick={() => handleNewsClick(item.id)}>
+              <div key={item.id} onClick={() => handleNewsClick(item.id, 'userID')}>
                 <News
-                  title={item.title}
-                  description={item.description}
-                  pic={item.pic}
-                  heartValue={item.heartValue}
-                  commentValue={item.commentValue}
-                  coinactive={item.coinactive}
-                  name={item.name}
-                  time={item.time}
-                  status={item.status}
+                  id={item.id}  // Truyền id của bài viết vào component
                 />
               </div>
             ))
