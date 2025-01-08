@@ -79,7 +79,7 @@ const Home = () => {
       <h1>Dữ liệu Quiz</h1>
       <ul>
         {quizData.map((quiz, index) => (
-          <li key={index}>{quiz.title}</li>
+          <li key={index}>{quiz}</li>
         ))}
       </ul>
 
