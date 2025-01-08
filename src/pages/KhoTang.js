@@ -131,7 +131,15 @@ function KhoTang() {
             filteredData.map(item => (
               <div key={item.id} onClick={() => handleNewsClick(item.id, 'userID')}>
                 <News
-                  id={item.id}  // Truyền id của bài viết vào component
+                    title={item.title}
+                    description={item.description}
+                    banner={item.banner}
+                    heartValue={item.heart}
+                    commentvalue={item.comment}
+                    coinactive={item.coinactive}
+                    author={item.name}
+                    created_at={item.created_at}
+                    status={item.status}
                 />
               </div>
             ))
