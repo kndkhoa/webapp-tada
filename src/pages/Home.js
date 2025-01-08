@@ -36,7 +36,7 @@ const Home = () => {
     };
 
     fetchQuizData();
-  }, [apiKey]);  // Chạy khi apiKey thay đổi
+  }, []);  // Không cần apiKey trong dependency vì nó là cố định
 
   // Fetch News Data
   useEffect(() => {
@@ -64,7 +64,7 @@ const Home = () => {
     };
 
     fetchNewsData();
-  }, [apiKey]);  // Chạy khi apiKey thay đổi
+  }, []);  // Không cần apiKey trong dependency vì nó là cố định
 
   if (loadingQuiz || loadingNews) {
     return <div>Đang tải dữ liệu...</div>;
@@ -79,18 +79,18 @@ const Home = () => {
       <h1>Dữ liệu Quiz</h1>
       <ul>
         {quizData.map((quiz, index) => (
-          <li key={index}>{quiz}</li>
+          <li key={index}>{quiz.title}</li>
         ))}
       </ul>
 
       <h1>Tin Tức</h1>
       <ul>
         {newsData.map((news, index) => (
-          <li key={index}>{news}</li>
+          <li key={index}>{news.title}</li>
         ))}
       </ul>
     </div>
   );
 };
 
-export default Hone;
+export default Home;
