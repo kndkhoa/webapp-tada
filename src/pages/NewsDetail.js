@@ -67,7 +67,7 @@ function NewsDetail() {
       <div className="news-detail-content">
         <h2>{news.title}</h2>
         <div className="name-time-container">
-          <p className="name-time">{news.name} - {news.time}</p>
+          <p className="name-time">{news.author} - {news.created_at}</p>
           <div className="share-icon-news">
             <a href={telegramShareUrl} target="_blank" rel="noopener noreferrer" className="share-link">
               <span>Chia sẻ</span>
