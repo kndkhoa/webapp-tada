@@ -9,15 +9,16 @@ import "./KhoTang.css";
 function KhoTang() {
   const [activeTab, setActiveTab] = useState('tintuc');
   const [activedataType, setActivedataType] = useState('All');
+  const [activeCatalogue, setActiveCatalogue] = useState('All');
   const [dataType, setDataType] = useState('news');
-  const [newsData, setNewsData] = useState([]);  // Dữ liệu từ API
-  const [loading, setLoading] = useState(true);  // Biến để kiểm tra trạng thái loading
+  const [newsData, setNewsData] = useState([]); // Dữ liệu từ API
+  const [loading, setLoading] = useState(true); // Trạng thái loading
 
   const navigate = useNavigate();
 
   const handleNewsClick = (newsId, userId) => {
     if (dataType === 'news') {
-      navigate(`/news/${newsId}`, { state: { userId } });  // Truyền id bài viết và id người dùng vào route
+      navigate(`/news/${newsId}`, { state: { userId } }); // Chuyển hướng đến route Tin tức
     } else if (dataType === 'tadatv') {
       navigate(`/tadatv/${newsId}`, { state: { userId } });
     } else if (dataType === 'course') {
@@ -31,39 +32,45 @@ function KhoTang() {
         const response = await fetch("http://admin.tducoin.com/api/news", {
           method: "GET",
           headers: {
-            "x-api-key": process.env.REACT_APP_API_KEY,  // Lấy API key từ môi trường
+            "x-api-key": process.env.REACT_APP_API_KEY,
             "Content-Type": "application/json",
           },
         });
 
         if (response.ok) {
           const data = await response.json();
-          setNewsData(data);  // Lưu dữ liệu API vào state
+          setNewsData(data); // Lưu dữ liệu API vào state
         } else {
           console.error("Error fetching data:", response.statusText);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoading(false);  // Đánh dấu là đã hoàn thành việc fetch dữ liệu
+        setLoading(false); // Kết thúc trạng thái loading
       }
     };
 
     fetchData();
-  }, []);  // Chỉ chạy một lần khi component mount
+  }, []); // Chạy khi component mount
 
   const handleTabClick = (tab, type) => {
     setActiveTab(tab);
     setDataType(type);
     setActivedataType('All');
+    setActiveCatalogue('All');
   };
 
   const handledataTypeClick = (dataType) => {
     setActivedataType(dataType);
   };
 
-  const filteredData = (dataType === 'news' ? newsData : []).filter(item =>
-    activedataType === 'All' || item.dataType === activedataType
+  const handleCatalogueClick = (catalogue) => {
+    setActiveCatalogue(catalogue);
+  };
+
+  const filteredData = newsData.filter(item => 
+    (activedataType === 'All' || item.dataType === activedataType) &&
+    (activeCatalogue === 'All' || item.catalogue === activeCatalogue)
   );
 
   return (
@@ -87,59 +94,83 @@ function KhoTang() {
             className={`btn_khoahoc ${activeTab === 'khoahoc' ? 'active' : ''}`}
             onClick={() => handleTabClick('khoahoc', 'course')}
           >
-            Khóa học
+            Khóa học
           </button>
         </div>
+
         {dataType === 'news' && (
-          <div className="menunews-container">
-            <div 
-              className={`menunews-item ${activedataType === 'All' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('All')}
-            >
-              All
+          <div className="filters-container">
+            <div className="dataType-filter">
+              <div 
+                className={`filter-item ${activedataType === 'All' ? 'active' : ''}`} 
+                onClick={() => handledataTypeClick('All')}
+              >
+                All
+              </div>
+              <div 
+                className={`filter-item ${activedataType === 'Crypto' ? 'active' : ''}`} 
+                onClick={() => handledataTypeClick('Crypto')}
+              >
+                Crypto
+              </div>
+              <div 
+                className={`filter-item ${activedataType === 'Forex' ? 'active' : ''}`} 
+                onClick={() => handledataTypeClick('Forex')}
+              >
+                Forex
+              </div>
+              <div 
+                className={`filter-item ${activedataType === 'Goods' ? 'active' : ''}`} 
+                onClick={() => handledataTypeClick('Goods')}
+              >
+                Goods
+              </div>
+              <div 
+                className={`filter-item ${activedataType === 'CFD' ? 'active' : ''}`} 
+                onClick={() => handledataTypeClick('CFD')}
+              >
+                CFD
+              </div>
             </div>
-            <div 
-              className={`menunews-item ${activedataType === 'Crypto' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('Crypto')}
-            >
-              Crypto
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'Forex' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('Forex')}
-            >
-              Forex
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'Goods' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('Goods')}
-            >
-              Goods
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'CFD' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('CFD')}
-            >
-              CFD
+            <div className="catalogue-filter">
+              <div 
+                className={`filter-item ${activeCatalogue === 'All' ? 'active' : ''}`} 
+                onClick={() => handleCatalogueClick('All')}
+              >
+                All
+              </div>
+              <div 
+                className={`filter-item ${activeCatalogue === 'Crypto' ? 'active' : ''}`} 
+                onClick={() => handleCatalogueClick('Crypto')}
+              >
+                Crypto
+              </div>
+              <div 
+                className={`filter-item ${activeCatalogue === 'Forex' ? 'active' : ''}`} 
+                onClick={() => handleCatalogueClick('Forex')}
+              >
+                Forex
+              </div>
             </div>
           </div>
         )}
+
         <div className="content-container">
           {loading ? (
-            <p>Loading...</p>  // Hiển thị khi đang tải dữ liệu
+            <p>Loading...</p> // Hiển thị khi đang tải
           ) : (
             filteredData.map(item => (
               <div key={item.id} onClick={() => handleNewsClick(item.id, 'userID')}>
                 <News
-                    title={item.title}
-                    description={item.description}
-                    banner={item.banner}
-                    heartValue={item.heart}
-                    commentvalue={item.comment}
-                    coinactive={item.coinactive}
-                    author={item.name}
-                    created_at={item.created_at}
-                    status={item.status}
+                  title={item.title}
+                  description={item.description}
+                  banner={item.banner}
+                  heartValue={item.heart}
+                  commentvalue={item.comment}
+                  coinactive={item.coinactive}
+                  author={item.name}
+                  created_at={item.created_at}
+                  status={item.status}
                 />
               </div>
             ))
