@@ -17,8 +17,9 @@ const Home = () => {
         const response = await fetch('http://admin.tducoin.com/api/quiz', {
           method: 'GET',
           headers: {
-            'x-api-key': apiKey,  // Sử dụng API key từ môi trường
+            'Accept: application/json',
             'Content-Type': 'application/json',
+            'x-api-key': apiKey,  // Sử dụng API key từ môi trường
           },
         });
 
@@ -29,7 +30,7 @@ const Home = () => {
           setError("Không thể lấy dữ liệu quiz.");
         }
       } catch (error) {
-        setError("Lỗi kết nối với API.");
+        setError("Lỗi kết nối với API Quiz.");
       } finally {
         setLoadingQuiz(false);
       }
@@ -45,8 +46,9 @@ const Home = () => {
         const response = await fetch('http://admin.tducoin.com/api/news', {
           method: 'GET',
           headers: {
-            'x-api-key': apiKey,  // Sử dụng API key từ môi trường
+             'Accept: application/json',
             'Content-Type': 'application/json',
+            'x-api-key': apiKey,  // Sử dụng API key từ môi trường
           },
         });
 
@@ -57,7 +59,7 @@ const Home = () => {
           setError("Không thể lấy dữ liệu tin tức.");
         }
       } catch (error) {
-        setError("Lỗi kết nối với API.");
+        setError("Lỗi kết nối với API News.");
       } finally {
         setLoadingNews(false);
       }
