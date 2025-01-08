@@ -76,7 +76,7 @@ const Home = () => {
 
   return (
     <div>
-      <h1>Dữ liệu Quiz</h1>
+      <h1>TESTING.....</h1>
       <ul>
         {quizData.map((quiz, index) => (
           <li key={index}>{quiz.title}</li>
