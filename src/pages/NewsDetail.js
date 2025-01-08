@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './NewsDetail.css'; // Import CSS
 import sharingIcon from '../components/assets/icons/sharing.png';
@@ -6,26 +6,44 @@ import backIcon from '../components/assets/icons/back.png';
 import socialIcon from '../components/assets/icons/social.png';  // Import icon
 
 function NewsDetail() {
-  const { id } = useParams();
+  const { id } = useParams(); // Lấy id từ URL
+  const [news, setNews] = useState(null); // State lưu dữ liệu bài viết
+  const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
 
-  // Danh sách dữ liệu bài viết
-  const newsData = [
-    {
-      id: 1,
-      dataType: "Crypto",
-      title: "MicroStrategy dùng 561 triệu USD để mua thêm 5.262 BTC",
-      description: "Tối ngày 23/12/2024, công ty đại chúng MicroStrategy tuyên bố trong 1 tuần vừa qua đã dùng 561 triệu USD tiền mặt để mua thêm 5.262 Bitcoin, với mức giá trung bình 106.662 USD cho mỗi đồng. Giao dịch mua Bitcoin mới nhất của MicroStrategy được thực hiện nhờ khoản tiền bán 1,3 triệu trái phiếu chuyển đổi. Tính đến ngày 23/12, công ty vẫn còn 7,08 tỷ trái phiếu chuyển đổi sẵn sàng để phát hành trong những đợt bán tiếp theo.",
-      pic: 'https://cdn.coin68.com/images/20241223132834-32c0c5c9-ca14-4ace-892f-e2b69197c86e-91.jpg',
-      name: 'An An',
-      time: '15 phút trước'
-    },
-    // Các bài viết khác
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://admin.tducoin.com/api/news/${id}`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': process.env.REACT_APP_API_KEY,
+            'Content-Type': 'application/json',
+          },
+        });
 
-  const news = newsData.find(item => item.id === parseInt(id));
+        if (!response.ok) {
+          throw new Error('Không thể tải dữ liệu');
+        }
+
+        const data = await response.json();
+        setNews(data); // Cập nhật dữ liệu bài viết
+      } catch (error) {
+        console.error('Lỗi:', error);
+        setNews(null); // Nếu có lỗi thì gán lại là null
+      } finally {
+        setLoading(false); // Đã tải xong dữ liệu
+      }
+    };
+
+    fetchData(); // Gọi API khi component được render
+  }, [id]); // Mỗi khi id thay đổi sẽ gọi lại API
+
+  if (loading) {
+    return <div>Đang tải...</div>; // Hiển thị khi đang tải dữ liệu
+  }
 
   if (!news) {
-    return <div>Không tìm thấy bài viết</div>;
+    return <div>Không tìm thấy bài viết</div>; // Nếu không có dữ liệu
   }
 
   // URL chia sẻ trên Telegram
@@ -55,7 +73,7 @@ function NewsDetail() {
               <span>Chia sẻ</span>
               <img src={sharingIcon} alt="Share Icon" className="share-icon" />
             </a>
-        </div>
+          </div>
         </div>
         <p className='content-news'>{news.description}</p>
 
