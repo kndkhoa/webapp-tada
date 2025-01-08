@@ -33,7 +33,7 @@ function KhoTang() {
         const response = await fetch("http://admin.tducoin.com/api/news", {
           method: "GET",
           headers: {
-            "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
+            "x-api-key": process.env.REACT_APP_API_KEY,  // Lấy API key từ môi trường
             "Content-Type": "application/json",
           },
         });
