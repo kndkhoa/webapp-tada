@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate, useParams } from 'react-router-dom'; 
 import Header from "../components/Header";
 import QuizCard from "../components/QuizCard";
 import News from "../components/News";
@@ -15,13 +15,14 @@ function Home() {
   const [currentAnnounIndex, setCurrentAnnounIndex] = useState(0);
   const [quizData, setQuizData] = useState([]);
   const [newsData, setNewsData] = useState([]);
-  const [announData, setAnnounData] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);  // Thêm state để lưu thông tin người dùng
   const [loadingQuiz, setLoadingQuiz] = useState(true);
   const [loadingNews, setLoadingNews] = useState(true);
+  const [loadingUserInfo, setLoadingUserInfo] = useState(true);  // Thêm state cho loading user info
   const [error, setError] = useState("");
 
   const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";  // API key từ biến môi trường
-  
+  const { userId } = useParams();  // Lấy userId từ URL
   const navigate = useNavigate(); // Khai báo navigate
 
   useEffect(() => {
@@ -75,11 +76,40 @@ function Home() {
       }
     };
 
+    // Fetch User Info Data
+    const fetchUserInfo = async () => {
+      if (!userId) return;  // Nếu không có userId thì không thực hiện gọi API
+
+      try {
+        const response = await fetch(`http://admin.tducoin.com/api/user/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,  // Sử dụng API key từ môi trường
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserInfo(data);
+        } else {
+          setError("Không thể lấy thông tin người dùng.");
+        }
+      } catch (error) {
+        setError("Lỗi kết nối với API thông tin người dùng.");
+      } finally {
+        setLoadingUserInfo(false);
+      }
+    };
+
     fetchQuizData();
     fetchNewsData();
-  }, []);  // Không cần apiKey trong dependency vì nó là cố định
+    fetchUserInfo();  // Gọi API lấy thông tin người dùng
 
-  if (loadingQuiz || loadingNews) {
+  }, [userId]);  // Gọi lại API khi userId thay đổi
+
+  if (loadingQuiz || loadingNews || loadingUserInfo) {
     return <div>Đang tải dữ liệu...</div>;
   }
 
@@ -112,6 +142,17 @@ function Home() {
         </div>
       </div>
       <main className="content-wrapper">
+        <h2 className="title">Thông tin người dùng</h2>
+        {userInfo ? (
+          <div>
+            <h3>{userInfo.name}</h3>
+            <p>{userInfo.email}</p>
+            <p>{userInfo.phone}</p>
+            {/* Hiển thị các thông tin khác của người dùng */}
+          </div>
+        ) : (
+          <div>Không tìm thấy thông tin người dùng.</div>
+        )}
         <h2 className="title">Nổi bật</h2>
         <Swiper
           spaceBetween={20}
