@@ -10,7 +10,7 @@ const handleStartQuiz = () => {
     return;
   }
 
-  const path = `/quizstarting/${quiz.id}?dataType=${quiz.dataType}`;
+  const path = `/quizstarting/${quiz.id}?collection_id=${quiz.collection_id}`;
   console.log('Navigating to:', path); // Debug URL
   navigate(path);
 };
@@ -38,6 +38,7 @@ const handleStartQuiz = () => {
           border: 'none',
           borderRadius: '12px',
           fontSize: '14px',
+          fontWeight: 'bold',
           width: 'auto',  // Chỉnh lại chiều rộng tự động
           textAlign: 'center',
         }}

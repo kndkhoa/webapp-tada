@@ -1,23 +1,21 @@
 import React from "react";
-import coinIcon from "./assets/icons/coin-header.png"; // Import icon coin
-import menuIcon from "./assets/icons/menu.png"; // Import icon menu
-import chatIcon from "./assets/icons/chat.png"; // Import icon chat
-import { Link } from "react-router-dom"; // Import Link để điều hướng
+import coinIcon from "./assets/icons/coin-header.png";
+import menuIcon from "./assets/icons/menu.png";
+import chatIcon from "./assets/icons/chat.png";
+import { Link } from "react-router-dom";
 import "./Header.css";
 
-const Header = () => {
-  const userId = 1; // Giả sử ID người dùng là 123. Bạn có thể thay đổi hoặc lấy từ state/props.
-
+const Header = ({ walletAC, userId }) => {
   return (
     <header className="header">
       <div className="left-section">
-        {/* Điều hướng đến trang Setting theo ID */}
+        {/* Điều hướng đến trang Setting theo userId */}
         <Link to={`/setting/${userId}`} className="menusetting-container">
           <img src={menuIcon} alt="Menu" className="menu-icon" />
         </Link>
         <div className="coins">
           <img src={coinIcon} alt="Coin" className="coin-icon" />
-          <span>8050</span>
+          <span>{walletAC}</span> {/* Hiển thị wallet_AC từ props */}
         </div>
       </div>
       <div className="chat-container">

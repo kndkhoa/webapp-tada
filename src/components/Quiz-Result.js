@@ -3,8 +3,15 @@ import './Quiz-Result.css'; // Đảm bảo đã thêm CSS cho phần tử
 import { useNavigate } from 'react-router-dom'; // Import useNavigate từ react-router-dom
 import targetIcon from '../components/assets/icons/target.png'; // Đảm bảo đường dẫn đúng
 
-function QuizResult({ quiz }) {
+function QuizResult({ score, correctAnswers, totalQuestions  }) {
   const navigate = useNavigate(); // Khởi tạo hàm navigate
+  // Hàm định dạng thời gian từ ms sang "mm : ss : ms"
+  const formatTime = (time) => {
+    const minutes = String(Math.floor(time / 60000)).padStart(2, '0');
+    const seconds = String(Math.floor((time % 60000) / 1000)).padStart(2, '0');
+    const milliseconds = String(time % 1000).padStart(3, '0');
+    return `${minutes} : ${seconds} : ${milliseconds}`;
+  };
 
   return (
     <div className="quiz-result-container">
@@ -14,7 +21,7 @@ function QuizResult({ quiz }) {
             <img src={targetIcon} alt="icon" className="result-icon" />
           </div>
           <div className="quiz-result-correct-answers">
-            <span>{quiz.correctAnswers}</span> Câu trả lời đúng
+            <span>{correctAnswers}/{totalQuestions}</span> Câu trả lời đúng
           </div>
         </div>
       </div>
@@ -24,7 +31,7 @@ function QuizResult({ quiz }) {
       </div>
 
       <div className="quiz-result-time-completion">
-        {quiz.resultTime}
+        {formatTime(score)}
       </div>
     </div>
   );

@@ -97,3 +97,15 @@
   left: 50%;  /* Đặt chữ vào giữa thanh */
   top: -25px;  /* Đẩy chữ lên trên thanh */
 }
+
+.status-text-complete {
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+  color: #186ECC;
+  background-color: #ffffff; /* Màu nền cho trạng thái hoàn thành */
+  padding: 2px 6px;
+  border-radius: 8px;
+  top: -25px; /* Đẩy chữ lên trên */
+  white-space: nowrap;
+}

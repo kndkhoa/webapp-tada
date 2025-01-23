@@ -7,7 +7,12 @@ import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
 import clipIcon from './assets/icons/clip.png';
 
-const TadaTV = ({  id, category, title, pic, description, coinactive, heartValue, commentValue, name, time, status }) => {
+
+const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, time, status, clip }) => {
+  // Giả sử đường dẫn gốc tới thư mục ảnh là 'https://example.com/storage/'
+  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const picUrl = `${BASE_URL}${pic}`;
+
   return (
     <div className="tadatv">     
       <div className="tadatv-content">
@@ -15,12 +20,13 @@ const TadaTV = ({  id, category, title, pic, description, coinactive, heartValue
         <p className="name-time">{name} - {time}</p>
         <p>{description}</p>
         <div className="tadatv-pic-container">
-          <img src={pic} alt="Pic" className="tadatv-pic" />
+          {/* Đảm bảo đường dẫn ảnh hợp lý */}
+          <img src={picUrl} alt="Pic" className="tadatv-pic" />
           {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
           {status === 1 ? (
             <div className="coin-active">
               <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
-              <span>{coinactive} điểm</span>
+              <span>{ac} điểm</span>
             </div>
           ) : (
             <div className="done">
@@ -56,5 +62,6 @@ const TadaTV = ({  id, category, title, pic, description, coinactive, heartValue
     </div>
   );
 };
+
 
 export default TadaTV;

@@ -4,7 +4,7 @@
   /*position: fixed; /* Cố định header ở đầu trang */
   align-items: center;
   justify-content: space-between; /* Đảm bảo khoảng cách giữa phần bên trái và bên phải */
-  padding: 20px;
+  padding: 10px;
   background-color: #ffffff; /* Màu nền cho header */
 }
 
@@ -16,13 +16,13 @@
 
 /* Container cho nút menu */
 .menusetting-container {
-  margin-right: 10px; /* Khoảng cách giữa menu và bộ coin */
+  margin-right: 15px; /* Khoảng cách giữa menu và bộ coin */
 }
 
 /* Style cho icon menu */
 .menu-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 /* Coins container với nền đen và các góc bo tròn */
@@ -31,20 +31,20 @@
   align-items: center;
   background-color: black;
   border-radius: 12px;
-  padding: 4px 10px;
+  padding: 3px 12px;
   color: white;
 }
 
 /* Style cho icon coin */
 .coin-icon {
   margin-right: 10px; /* Khoảng cách giữa icon và số */
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 /* Style cho số trong coins container */
 .coins span {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
 }
 

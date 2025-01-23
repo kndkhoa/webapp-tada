@@ -21,7 +21,7 @@ const handleStartQuiz = () => {
       backgroundColor: 'white', 
       position: 'fixed', 
       bottom: 2,
-      left: 0, 
+      left: 0,
       width: '100%', 
       padding: '10px', 
       display: 'flex', 
@@ -38,6 +38,7 @@ const handleStartQuiz = () => {
           border: 'none',
           borderRadius: '12px',
           fontSize: '14px',
+          fontWeight:'bold',
           width: 'auto',  // Chỉnh lại chiều rộng tự động
           textAlign: 'center',
         }}

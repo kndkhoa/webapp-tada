@@ -4,24 +4,47 @@ import usdtIcon from './assets/icons/usdt.png';
 import timerIcon from './assets/icons/timer.png';
 import doneIcon from './assets/icons/done.png';
 
-const QuizCard = ({ id, dataType, title, pic, description, value, timer, avatar1, avatar2, avatar3, avatar4, members, gift_title, status }) => {
+const QuizCard = ({ 
+  id, 
+  dataType,
+  title, 
+  pic, 
+  description, 
+  prizeValue, 
+  done_at, 
+  topCompleters, // Truyền danh sách topCompleters
+  members, 
+  gift_title, 
+  status, 
+  created_at 
+}) => {
+  // Tính toán số ngày còn lại hoặc đã qua
+  const currentDate = new Date();
+  const createdDate = new Date(created_at);
+  const daysElapsed = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24));
+  const daysLeft = done_at - daysElapsed;
+
+  // Thêm tiền tố vào link ảnh
+  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const picUrl = `${BASE_URL}${pic}`;
+
   return (
     <div className="quiz-card">
       <div className="pic-container">
-        <img src={pic} alt="Quiz Pic" className="quiz-pic" />
+        <img src={picUrl} alt="Quiz Pic" className="quiz-pic" />
 
-        {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
+        {/* Hiển thị nội dung dựa vào status */}
         {status === 1 ? (
-             <div className="time-left">
-             <img src={timerIcon} alt="Timer Icon" className="timer-icon" />
-             <span>{timer}</span>
-           </div>
-          ) : (
-            <div className="done">
-              <img src={doneIcon} alt="Done Icon" className="done-icon" />
-              <span>Đã hoàn thành</span>
-            </div>
-          )}
+          <div className="time-left">
+            <img src={timerIcon} alt="Timer Icon" className="timer-icon" />
+            <span>Kết thúc trong {daysLeft > 0 ? `${daysLeft} ngày` : "hôm nay"}</span>
+          </div>
+        ) : (
+          <div className="done">
+            <img src={doneIcon} alt="Done Icon" className="done-icon" />
+            <span>Đã hoàn thành</span>
+          </div>
+        )}
       </div>
       <div className="quiz-content">
         <h2>{title}</h2>
@@ -31,17 +54,24 @@ const QuizCard = ({ id, dataType, title, pic, description, value, timer, avatar1
             <span className="total">{gift_title}</span>
             <span className="value-icon">
               <img src={usdtIcon} alt="USDT Icon" className="usdt-icon" />
-              {value} USDT
+              {prizeValue} USDT
             </span>
           </div>
           <div className="players">
             <div className="avatar-container">
-              <div className="avatar" style={{ backgroundImage: `url(${avatar1})` }}></div>
-              <div className="avatar" style={{ backgroundImage: `url(${avatar2})` }}></div>
-              <div className="avatar" style={{ backgroundImage: `url(${avatar3})` }}></div>
-              <div className="avatar" style={{ backgroundImage: `url(${avatar4})` }}></div>
+              {/* Hiển thị avatar từ topCompleters */}
+              {topCompleters &&
+                topCompleters.slice(0, 4).map((member, index) => (
+                  <div
+                    key={index}
+                    className="avatar"
+                    style={{
+                      backgroundImage: `url(${BASE_URL}${member.avatar})`
+                    }}
+                  ></div>
+                ))}
             </div>
-            {members}
+            + {members}
           </div>
         </div>
       </div>

@@ -74,15 +74,15 @@
     align-items: center;
     background-color: black;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 20px;
     color: white;
     margin-top: 15px;
     margin-bottom: 10px;
   }
   
   .result-card-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     margin-right: 10px;
   }
   
