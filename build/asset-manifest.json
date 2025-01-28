@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.26adfea1.css",
-    "main.js": "/static/js/main.ba4ebdbb.js",
+    "main.css": "/static/css/main.999909cd.css",
+    "main.js": "/static/js/main.9de77fee.js",
     "static/media/avatar.gif": "/static/media/avatar.17e7b2305bc169b51447.gif",
     "static/media/bg-setting.jpg": "/static/media/bg-setting.75575b57c259a7c85035.jpg",
     "static/media/bg.jpg": "/static/media/bg.baa36ec089fdc8db9314.jpg",
@@ -15,15 +15,16 @@
     "static/media/naptien.png": "/static/media/naptien.e44c07ba86e297a779dd.png",
     "static/media/tdu.png": "/static/media/tdu.cd00141b97d4f397092f.png",
     "static/media/social.png": "/static/media/social.e6a39a9d783fefc722db.png",
+    "static/media/logoTadaUp.jpg": "/static/media/logoTadaUp.9a1c89062fcb20ba8c90.jpg",
     "static/media/correct-answer.mp3": "/static/media/correct-answer.1dd2eda18e900449e771.mp3",
     "static/media/target.png": "/static/media/target.1571486d1298af462692.png",
     "static/media/back.png": "/static/media/back.cff3fdc9060e5770930f.png",
     "index.html": "/index.html",
-    "main.26adfea1.css.map": "/static/css/main.26adfea1.css.map",
-    "main.ba4ebdbb.js.map": "/static/js/main.ba4ebdbb.js.map"
+    "main.999909cd.css.map": "/static/css/main.999909cd.css.map",
+    "main.9de77fee.js.map": "/static/js/main.9de77fee.js.map"
   },
   "entrypoints": [
-    "static/css/main.26adfea1.css",
-    "static/js/main.ba4ebdbb.js"
+    "static/css/main.999909cd.css",
+    "static/js/main.9de77fee.js"
   ]
 }

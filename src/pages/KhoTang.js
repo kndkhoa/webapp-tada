@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Đảm bảo đã nhập useNavigate
+import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Header from "../components/Header";
 import News from "../components/News";
@@ -9,233 +10,180 @@ import Footer from "../components/Footer";
 import "./KhoTang.css";
 
 function KhoTang() {
-  const [activeTab, setActiveTab] = useState('tintuc'); // Tab đang chọn
-  const [activedataType, setActivedataType] = useState('All'); // Loại dữ liệu đang chọn
-  const [dataType, setDataType] = useState('news'); // Loại dữ liệu: news, tv, khoahoc
+  const [activeTab, setActiveTab] = useState("tintuc"); // Tab hiện tại
+  const [activeCatalogue, setActiveCatalogue] = useState("All"); // Loại tin tức (Crypto, Forex,...)
+  const [dataType, setDataType] = useState("Tin tức"); // Kiểu dữ liệu (Tin tức, TadaTV, Courses)
+  const [allData, setAllData] = useState([]); // Dữ liệu API
+  const [loading, setLoading] = useState(true); // Trạng thái loading
+  const [userData, setUserData] = useState(null);
 
-  const navigate = useNavigate(); // Khai báo navigate
+  const navigate = useNavigate();
+  const [direction, setDirection] = useState(1); // Hướng trượt
 
-  const handleNewsClick = (id) => {
-    if (dataType === 'news') {
-      navigate(`/news/${id}`);
-    } else if (dataType === 'tadatv') {
-      navigate(`/tadatv/${id}`);
-    } else if (dataType === 'course') {
-      navigate(`/course/${id}`);
+  const handleItemClick = (Id, userId) => {
+    navigate(`/${dataType}/${Id}`, { state: { userId } });
+  };
+
+  // Lấy dữ liệu từ sessionStorage
+  useEffect(() => {
+    const cachedUserData = sessionStorage.getItem("userData");
+    const cachedNewsData = sessionStorage.getItem("newsData");
+    const cachedCourseData = sessionStorage.getItem("courseData");
+
+    if (cachedUserData) {
+      setUserData(JSON.parse(cachedUserData));
+    } else {
+      console.error("No user data found in sessionStorage!");
+      return;
     }
-  };
 
-  // Dữ liệu ví dụ cho news, tv, khoahoc
-  const newsData = [
-    {
-      id: 1,
-      dataType: "Crypto",
-      title: "Theoriq là gì? Cơ sở hạ tầng cho multi-Agent AI",
-      pic: "https://cdn.coin68.com/images/20241221081959-53d146c4-4bfd-4a4b-a865-01ac5fcbcf2e-68.jpg",
-      description: "Theoriq là giao thức phi tập trung kết hợp giữa trí tuệ nhân tạo và công nghệ blockchain để xây dựng một hệ sinh thái...",
-      heartValue: 7830,
-      commentValue: 18830,
-      coinactive: 50,
-      name: 'An An',
-      time: '26 phút trước',
-      status: 1
-    },
-    {
-      id: 2,
-      dataType: "Goods",
-      title: "Hàng loạt công ty crypto quyên góp triệu USD để tài trợ cho lễ nhậm chức của Trump",
-      pic: "https://cdn.coin68.com/images/20241221032554-d96e3d78-56ae-4706-81d5-d93fba061bcb-11.jpg",
-      description: "Kraken, Ripple, Ondo Finance, Coinbase, Moonpay quyên...",
-      heartValue: 8530,
-      commentValue: 64232,
-      coinactive: 50,
-      name: 'An An',
-      time: '18 giờ trước',
-      status: 0
-    },
-    {
-      id: 3,
-      dataType: "Forex",
-      title: "Forex market update: Key trends to watch",
-      pic: "https://cdn.coin68.com/images/20241219143415-cf8f85e4-ab02-47f2-9f91-b8a4b9ed5005-145.jpg",
-      description: "Overview of the latest trends in the forex market.",
-      heartValue: 6200,
-      commentValue: 2534,
-      coinactive: 50,
-      status: 0,
-      name: 'An An',
-      time: '19 giờ trước',
-    },
-  ];
+    let data = [];
+    if (dataType === "Tin tức") {
+      data = JSON.parse(cachedNewsData || "[]");
+    } else if (dataType === "TadaTV") {
+      data = JSON.parse(cachedNewsData || "[]").filter(item => item.dataType === "TadaTV");
+    } else if (dataType === "Courses") {
+      data = JSON.parse(cachedCourseData || "[]");
+    }
 
-  const tvData = [
-    { id: 1, 
-      dataType: 'CFD', 
-      title: 'BTC sập hầm sau khi Fed giảm lãi suất, Powell khẳng định Fed không thể sở hữu Bitcoin', 
-      pic: 'https://cdn.coin68.com/images/20241219015205-2006ec6a-402f-4037-ba89-756aa38117b4-74.jpg',
-      heartValue:'1467',
-      commentValue:'46347',
-      coinactive:'100',
-      name: 'An An',
-      time: '25 phút trước',
-      status: 1
-    },
-    { id: 2, 
-      dataType: 'Crypto', 
-      title: 'Loạt token pump-dump sau sự cố Binance đăng nhầm link Telegram', 
-      pic: 'https://cdn.coin68.com/images/20241218082732-8da08f5f-bfb6-4205-9787-6c3b1f422c81-198.jpg',
-      heartValue:'1467',
-      commentValue:'46347',
-      coinactive:'100',
-      name: 'An An',
-      time: '1 ngày trước',
-      status: 0
-    },
-  ];
+    setAllData(data);
+    setLoading(false);
+  }, [dataType]);
 
-  const courseData = [
-    { id: 1,
-      title: 'AI for Beginners', 
-      description: 'Các bot giao dịch có thể tự động hóa giao dịch tiền điện tử của bạn để tận dụng tối đa thị trường tiền điện tử đầy biến động 24/7.',
-      pic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQEur4Oy_QsyYwm1mwsKF9O553Fn8RQxImvg&s',
-      coinactive:'250',
-      completion:'40',
-      status: 1
-    },
-    { id: 2,
-      title: 'Bồi dưỡng kiến thức quản lý kinh tế và tài chính', 
-      description: 'Mở và quản lý tài khoản, kiểm soát chi ngân sách nhà nước qua Kho bạc. – Tài chính các đơn vị có sử dụng kinh phí ngân sách nhà nước và đơn',
-      pic: 'https://i.ytimg.com/vi/FFuYA55Ga7s/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBrLO-V3cRgHrE1kPwnLTmDvs5z6A',
-      coinactive:'250',
-      completion:'80',
-      status: 0
-    },
-  ];
-
-  const handleTabClick = (tab, type) => {
-    setActiveTab(tab);
-    setDataType(type);
-    setActivedataType('All'); // Reset dataType khi đổi tab
-  };
-
-  const handledataTypeClick = (dataType) => {
-    setActivedataType(dataType);
-  };
-
-  const filteredData = (dataType === 'news' ? newsData : (dataType === 'tadatv' ? tvData : courseData)).filter(item =>
-    activedataType === 'All' || item.dataType === activedataType
+  const newsStatusMap = useMemo(
+    () => new Map(userData?.news_reads?.map((read) => [read.news_id, true])),
+    [userData]
   );
+
+  // Lọc dữ liệu hiển thị theo dataType và catalogue
+  const filteredData = allData.filter(item =>
+    (dataType === "All" || item.dataType === dataType) &&
+    (activeCatalogue === "All" || item.catalogues === activeCatalogue)
+  );
+
+  // Đổi tab (news, tadatv, course)
+  const handleTabClick = (tab, type) => {
+    setDirection(type === "Tin tức" ? 1 : -1); // Xác định hướng trượt
+    setActiveTab(tab);
+    setDataType(type); // "Tin tức", "TadaTV", hoặc "Courses"
+    setActiveCatalogue("All"); // Reset catalogue khi đổi tab
+  };
+
+  const tabVariants = {
+    initial: (direction) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      position: "absolute",
+    }),
+    animate: {
+      x: 0,
+      position: "relative",
+      transition: { duration: 0.5, ease: "easeInOut" },
+    },
+    exit: (direction) => ({
+      x: direction < 0 ? "100%" : "-100%",
+      position: "absolute",
+      transition: { duration: 0.5, ease: "easeInOut" },
+    }),
+  };
+
+  if (!userData) {
+    return <p>Đang tải dữ liệu...</p>;
+  }
 
   return (
     <div className="App">
-      <Header />
+      <Header walletAC={userData.wallet_AC} userId={userData.userID} />
       <main>
+        {/* Tab Menu */}
         <div className="tab-menu">
           <button
-            className={`btn_tintuc ${activeTab === 'tintuc' ? 'active' : ''}`}
-            onClick={() => handleTabClick('tintuc', 'news')}
+            className={`btn_tintuc ${activeTab === "tintuc" ? "active" : ""}`}
+            onClick={() => handleTabClick("tintuc", "Tin tức")}
           >
             Tin tức
           </button>
           <button
-            className={`btn_tadatv ${activeTab === 'tadatv' ? 'active' : ''}`}
-            onClick={() => handleTabClick('tadatv', 'tadatv')}
+            className={`btn_tadatv ${activeTab === "tadatv" ? "active" : ""}`}
+            onClick={() => handleTabClick("tadatv", "TadaTV")}
           >
             TadaTV
           </button>
           <button
-            className={`btn_khoahoc ${activeTab === 'khoahoc' ? 'active' : ''}`}
-            onClick={() => handleTabClick('khoahoc', 'course')}
+            className={`btn_khoahoc ${activeTab === "khoahoc" ? "active" : ""}`}
+            onClick={() => handleTabClick("khoahoc", "Courses")}
           >
             Khóa học
           </button>
         </div>
-        {(dataType === 'news' || dataType === 'tadatv') && (
-          <div className="menunews-container">
-            <div 
-              className={`menunews-item ${activedataType === 'All' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('All')}
-            >
-              All
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'Crypto' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('Crypto')}
-            >
-              Crypto
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'Forex' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('Forex')}
-            >
-              Forex
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'Goods' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('Goods')}
-            >
-              Goods
-            </div>
-            <div 
-              className={`menunews-item ${activedataType === 'CFD' ? 'active' : ''}`} 
-              onClick={() => handledataTypeClick('CFD')}
-            >
-              CFD
-            </div>
-          </div>
-        )}
+
+        {/* Nội dung thay đổi theo tab */}
         <div className="content-container">
-          {filteredData.map(item => {
-            if (dataType === 'news') {
-              return (
-                <div key={item.id} onClick={() => handleNewsClick(item.id)}>
-                  <News
-                    title={item.title}
-                    description={item.description}
-                    pic={item.pic}
-                    heartValue={item.heartValue}
-                    commentValue={item.commentValue}
-                    coinactive={item.coinactive}
-                    name={item.name}
-                    time={item.time}
-                    status={item.status}
-                  />
-                </div>
-              );
-            } else if (dataType === 'tadatv') {
-              return (
-                <div key={item.id} onClick={() => handleNewsClick(item.id)}>
-                 <TadaTV
-                  key={item.id}
-                  title={item.title}
-                  description={item.description}
-                  pic={item.pic}
-                  heartValue={item.heartValue}
-                  commentValue={item.commentValue}
-                  coinactive={item.coinactive}
-                  name={item.name}
-                  time={item.time}
-                  status={item.status}
-                />
-                </div>                
-              );
-            } else if (dataType === 'course') {
-              return (
-                <div key={item.id} onClick={() => handleNewsClick(item.id)}>
-                 <Course
-                  key={item.id}
-                  title={item.title}
-                  description={item.description}
-                  pic={item.pic}
-                  coinactive={item.coinactive}
-                  completion={item.completion}
-                  status={item.status}
-                />
-                </div>                  
-              );
-            }
-            return null;
-          })}
+          <AnimatePresence exitBeforeEnter custom={direction}>
+            <motion.div
+              key={activeTab} // Mỗi tab có một key khác nhau
+              custom={direction}
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="tab-content"
+            >
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                filteredData.map(item => {
+                  if (item.dataType === "Tin tức") {
+                    return (
+                      <div key={item.id} onClick={() => handleItemClick(item.id)}>
+                        <News
+                          title={item.title}
+                          description={item.description}
+                          banner={item.banner}
+                          heartValue={item.heart}
+                          commentValue={item.comment}
+                          ac={item.ac}
+                          author={item.author}
+                          created_at={item.created_at}
+                          status={newsStatusMap.has(item.id) ? 0 : 1}
+                        />
+                      </div>
+                    );
+                  } else if (item.dataType === "TadaTV") {
+                    return (
+                      <div key={item.id} onClick={() => handleItemClick(item.id)}>
+                        <TadaTV
+                          title={item.title}
+                          description={item.description}
+                          pic={item.banner}
+                          heartValue={item.heart}
+                          commentValue={item.comment}
+                          clip={item.clip}
+                          ac={item.ac}
+                          name={item.author}
+                          time={item.created_at}
+                          status={newsStatusMap.has(item.id) ? 0 : 1}
+                        />
+                      </div>
+                    );
+                  } else if (item.dataType === "Courses") {
+                    return (
+                      <div key={item.id} onClick={() => handleItemClick(item.id)}>
+                        <Course
+                          title={item.title}
+                          description={item.description}
+                          banner={item.banner}
+                          ac={item.ac}
+                          completion={item.completion}
+                          status={1}
+                        />
+                      </div>
+                    );
+                  }
+                  return null;
+                })
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
       <Footer />

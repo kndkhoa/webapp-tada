@@ -1,6 +1,7 @@
+// src/components/QuizStarting.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import questions from '../components/questions'; // Import danh sách câu hỏi
+import useQuestions from '../components/questions'; // Import custom Hook
 import coinIcon from '../components/assets/icons/coin-header.png'; // Import icon coin
 import './QuizStarting.css'; // Import CSS
 import ResultCard from '../components/ResultCard'; // Import ResultCard component
@@ -10,9 +11,10 @@ import correctSound from '../components/assets/sounds/correct-answer.mp3';
 import incorrectSound from '../components/assets/sounds/incorrect-answer.mp3';
 
 const QuizStarting = () => {
-  const { id } = useParams(); // Lấy id từ URL
-  const [searchParams] = useSearchParams();
-  const dataType = searchParams.get('dataType'); // Lấy dataType từ query string
+  const { id } = useParams(); // Lấy quiz.id từ URL
+  const [quiz] = useSearchParams(); // Lấy tham số từ URL
+  const collection_id = quiz.get('collection_id'); // Lấy collection_id từ URL
+  const { questions, loading, error } = useQuestions(collection_id); // Gọi custom Hook với collection_id
 
   const [selectedAnswer, setSelectedAnswer] = useState(null); // Đáp án được chọn
   const [questionNumber, setQuestionNumber] = useState(0); // Câu hỏi hiện tại (index)
@@ -20,9 +22,6 @@ const QuizStarting = () => {
   const [isSubmitted, setIsSubmitted] = useState(false); // Trạng thái đã kiểm tra
   const [quizCompleted, setQuizCompleted] = useState(false); // Trạng thái hoàn thành bài thi
   const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // Số câu đúng
-
-  const totalQuestions = questions.length; // Tổng số câu hỏi
-
   const [timer, setTimer] = useState(0); // Tổng thời gian (ms)
   const timerRef = useRef(null); // Dùng để lưu tham chiếu đến interval
 
@@ -58,11 +57,11 @@ const QuizStarting = () => {
   };
 
   useEffect(() => {
-    if (isSubmitted !== null) {
+    if (isSubmitted) {
       if (isCorrect) {
         playSound(correctSound);
-        setCorrectAnswersCount((prev) => prev + 1); // Tăng số câu đúng
-      } else if (isCorrect === false) {
+        setCorrectAnswersCount((prev) => prev + 1); // Tăng số câu đúng khi đúng
+      } else {
         playSound(incorrectSound);
         // Hiệu ứng rung
         if ('vibrate' in navigator) {
@@ -70,7 +69,7 @@ const QuizStarting = () => {
         }
       }
     }
-  }, [isSubmitted, isCorrect]);
+  }, [isSubmitted]);
 
   const handleAnswerClick = (answer) => {
     if (!isSubmitted) {
@@ -80,37 +79,36 @@ const QuizStarting = () => {
 
   const handleSubmit = () => {
     if (!isSubmitted) {
-      // Tạm dừng đồng hồ khi nhấn "Kiểm tra"
       pauseTimer();
-      // Kiểm tra đáp án
       const correctAnswer = questions[questionNumber].correctAnswer;
       const result = selectedAnswer === correctAnswer;
       setIsCorrect(result);
-      setIsSubmitted(true); // Đánh dấu đã kiểm tra
-  
-      // Kiểm tra nếu đang ở câu cuối cùng, hiển thị kết quả ngay lập tức
-      if (questionNumber === totalQuestions - 1) {
-        setQuizCompleted(true); // Đánh dấu hoàn thành bài thi
+      setIsSubmitted(true);
+
+      if (questionNumber === questions.length - 1) {
+        setQuizCompleted(true);
       }
     } else {
-      // Chuyển sang câu tiếp theo hoặc hoàn thành bài thi
-      if (questionNumber < totalQuestions - 1) {
+      if (questionNumber < questions.length - 1) {
         setQuestionNumber((prev) => prev + 1);
-        setSelectedAnswer(null); // Reset đáp án
-        setIsCorrect(null); // Reset kết quả
-        setIsSubmitted(false); // Reset trạng thái
-        startTimer(); // Tiếp tục đếm thời gian
+        setSelectedAnswer(null);
+        setIsCorrect(null);
+        setIsSubmitted(false);
+        startTimer();
       } else {
-        pauseTimer(); // Kết thúc đếm giờ
-        setQuizCompleted(true); // Đánh dấu hoàn thành bài thi
+        pauseTimer();
+        setQuizCompleted(true);
       }
     }
   };
 
   useEffect(() => {
-    startTimer(); // Bắt đầu đếm giờ khi component mount
-    return () => pauseTimer(); // Dừng đồng hồ khi component unmount
+    startTimer();
+    return () => pauseTimer();
   }, []);
+
+  if (loading) return <div>Loading questions...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="quizstarting-container">
@@ -123,7 +121,7 @@ const QuizStarting = () => {
           </div>
         </div>
         <div className="quizstarting-question-number">
-          Câu {questionNumber + 1} trên tổng {totalQuestions} câu
+          Câu {questionNumber + 1} trên tổng {questions.length} câu
         </div>
       </div>
       <div className="quizstarting-timer-container">
@@ -165,11 +163,10 @@ const QuizStarting = () => {
       {quizCompleted && (
         <div className="quizstarting-result-card">
           <ResultCard
-            id={id}
-            dataType={dataType}
-            timer={formatTime(timer)} // Chỉ truyền thời gian
-            correctAnswersCount={correctAnswersCount} // Truyền số câu đúng vào ResultCard
-            totalQuestions={totalQuestions}
+            quiz_id={id}
+            score={timer} // Truyền thời gian dưới dạng số (ms)
+            correctAnswers={correctAnswersCount} // Truyền số câu đúng vào ResultCard
+            totalQuestions={questions.length}
           />
         </div>
       )}

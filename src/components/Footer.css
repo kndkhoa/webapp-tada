@@ -1,45 +1,50 @@
 .footer {
   display: flex;
-  justify-content: space-around; /* Căn đều các nút */
-  background-color: #f8f9fa; /* Màu nền */
-  padding: 10px 0;
-  border-top: 1px solid #e0e0e0; /* Đường kẻ trên cùng */
+  justify-content: space-around;
+  background-color: #f8f9fa;
+  padding: 8px 0;
+  border-top: 1px solid #e0e0e0;
+
+  /* Giữ nguyên cấu trúc */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 1000;
+
+  /* Thêm chuyển động ẩn/hiện */
+  transition: transform 0.3s ease-in-out;
+}
+
+.footer.hidden {
+  transform: translateY(100%);
+}
+
+.footer.visible {
+  transform: translateY(0);
 }
 
 .footer-button {
   display: flex;
-  flex-direction: column; /* Sắp xếp theo chiều dọc */
+  flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: #333; /* Màu chữ */
-  font-size: 14px;
+  color: #333;
+  font-size: 12.5px;
 }
 
 .footer-button:hover {
-  color: #007bff; /* Màu chữ khi hover */
+  color: #007bff;
   font-weight: bold;
 }
 
 .icon {
-  width: 40px; /* Kích thước icon */
-  height: 40px;
+  width: 32px;
+  height: 32px;
 }
 
 .footer-text {
-  margin-top: 5px; /* Khoảng cách giữa icon và chữ */
-  font-size: 14px; /* Kích thước chữ */
-}
-
-/* Đặt footer cố định */
-.footer {
-  position: fixed; /* Cố định footer */
-  bottom: 0; /* Nằm ở cuối màn hình */
-  left: 0; /* Căn trái */
-  width: 100%; /* Chiếm toàn bộ chiều ngang màn hình */
-  background-color: #ffffff; /* Màu nền (tùy chỉnh) */
-  color: white; /* Màu chữ */
-  text-align: center; /* Căn giữa chữ */
-  padding: 10px 0; /* Khoảng cách trên-dưới */
-  z-index: 1000; /* Đảm bảo footer luôn trên cùng */
-  border-top: 1px solid #e0e0e0; /* Đường viền trên */
+  margin-top: 5px;
+  font-size: 12px;
 }

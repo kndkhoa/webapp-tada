@@ -198,7 +198,8 @@
 .course-progress-container {
   display: flex;
   justify-content: flex-start; /* Canh trái */
-  align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+  flex-direction: column; /* Nội dung trong step hiển thị theo chiều dọc */
+  align-items: flex-start; /* Canh trái */
   gap: 20px; /* Khoảng cách giữa các phần tử */
   flex-wrap: wrap; /* Cho phép các phần tử xuống dòng khi cần */
   margin-top: 2vh; /* Khoảng cách phía trên */
@@ -236,11 +237,12 @@
 
 .course-description {
   font-size: 14px;
-  color: #666;
+  color: #494949;
 }
 
 .course-time {
   font-size: 14px;
+  font-style: italic;
   color: #888;
 }
 

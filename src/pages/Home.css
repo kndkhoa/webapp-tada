@@ -13,12 +13,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 6vh; /* Đặt margin-top theo tỷ lệ của chiều cao màn hình */
+  margin-top: 9vh; /* Đặt margin-top theo tỷ lệ của chiều cao màn hình */
 }
 
 .rectangle {
   width: 90%; /* Chiều ngang full màn hình */
-  height: 15vh;
+  height: 16vh;
   background-color: #186ECC; /* Màu xanh */
   border-radius: 20px; /* Bo góc */
   box-sizing: border-box; /* Tính cả padding và border vào width */
@@ -37,7 +37,7 @@
   background-color: #333333; /* Màu xanh */
   border-radius: 50%; /* Hình tròn */
   position: absolute;
-  top: -5.5vh; /* Đè lên 1/2 biên trên */
+  top: -8vh; /* Đè lên 1/2 biên trên */
   overflow: hidden; /* Khống chế hình ảnh trong không gian hình tròn */
   
 }
@@ -51,7 +51,7 @@
 .rectangle-text {
   margin-top: 50px; /* Để text nằm dưới hình tròn */
   color: white; /* Màu chữ */
-  font-size: 16px;
+  font-size: 14px;
   text-align: center; /* Canh giữa chữ */
   font-style: italic; /* Kiểu chữ nghiêng */
   padding: 0 10px; /* Căn lề 2 bên 5px */

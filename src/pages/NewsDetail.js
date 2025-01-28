@@ -1,38 +1,128 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import './NewsDetail.css'; // Import CSS
-import sharingIcon from '../components/assets/icons/sharing.png';
-import backIcon from '../components/assets/icons/back.png';
-import socialIcon from '../components/assets/icons/social.png';  // Import icon
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import "./NewsDetail.css";
+import sharingIcon from "../components/assets/icons/sharing.png";
+import backIcon from "../components/assets/icons/back.png";
+import socialIcon from "../components/assets/icons/social.png";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function NewsDetail() {
   const { id } = useParams();
 
-  // Danh sách dữ liệu bài viết
-  const newsData = [
-    {
-      id: 1,
-      dataType: "Crypto",
-      title: "MicroStrategy dùng 561 triệu USD để mua thêm 5.262 BTC",
-      description: "Tối ngày 23/12/2024, công ty đại chúng MicroStrategy tuyên bố trong 1 tuần vừa qua đã dùng 561 triệu USD tiền mặt để mua thêm 5.262 Bitcoin, với mức giá trung bình 106.662 USD cho mỗi đồng. Giao dịch mua Bitcoin mới nhất của MicroStrategy được thực hiện nhờ khoản tiền bán 1,3 triệu trái phiếu chuyển đổi. Tính đến ngày 23/12, công ty vẫn còn 7,08 tỷ trái phiếu chuyển đổi sẵn sàng để phát hành trong những đợt bán tiếp theo.",
-      pic: 'https://cdn.coin68.com/images/20241223132834-32c0c5c9-ca14-4ace-892f-e2b69197c86e-91.jpg',
-      name: 'An An',
-      time: '15 phút trước'
-    },
-    // Các bài viết khác
-  ];
+  const [news, setNews] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null);
 
-  const news = newsData.find(item => item.id === parseInt(id));
+  const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
+
+  useEffect(() => {
+    const fetchNewsDetail = async () => {
+      const cachedUserData = sessionStorage.getItem("userData");
+      if (cachedUserData) {
+        setUserData(JSON.parse(cachedUserData));
+      } else {
+        console.error("No user data found in sessionStorage!");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://admin.tducoin.com/api/news/${id}`, {
+          method: "GET",
+          headers: {
+            "x-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Không thể lấy dữ liệu");
+        }
+
+        const data = await response.json();
+        if (data && data.data) {
+          setNews(data.data);
+        } else {
+          setError("Không tìm thấy bài viết");
+        }
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNewsDetail();
+  }, [id]);
+
+  useEffect(() => {
+    const markAsRead = async () => {
+      if (!userData || !userData.news_reads || !id) {
+        console.error("Thiếu dữ liệu user hoặc ID bản tin");
+        return;
+      }
+
+      const hasRead = userData.news_reads.some((read) => read.news_id === parseInt(id, 10));
+
+      if (hasRead) {
+        console.log("User đã đọc bản tin này");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://admin.tducoin.com/api/addbonus/news-read", {
+          method: "POST",
+          headers: {
+            "x-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userData.userID,
+            news_id: id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Không thể ghi nhận bản tin đã đọc");
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          const updatedUserData = {
+            ...userData,
+            news_reads: [...userData.news_reads, { news_id: parseInt(id, 10) }],
+            wallet_AC: result.wallet_AC,
+          };
+          setUserData(updatedUserData);
+          sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
+        } else {
+          console.error("Lỗi cộng điểm:", result.message);
+        }
+      } catch (error) {
+        console.error("Error marking news as read:", error.message);
+      }
+    };
+
+    markAsRead();
+  }, [id, userData]);
+
+  if (loading) {
+    return <ReloadSkeleton />;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   if (!news) {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  // URL chia sẻ trên Telegram
+  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const picUrl = `${BASE_URL}${news.banner}`;
   const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(news.title)}`;
-
-  // URL dẫn đến kênh Telegram
-  const telegramChannelUrl = "https://t.me/tadaup"; // Thay "your_channel" bằng tên kênh Telegram của anh
+  const telegramChannelUrl = "https://t.me/tadaup";
 
   return (
     <div className="news-detail-container">
@@ -40,30 +130,28 @@ function NewsDetail() {
         <button className="backIcon" onClick={() => window.history.back()}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <img
-          src={news.pic}
+        <PreloadImage
+          src={picUrl}
           alt="Banner"
-          className="banner-image"
         />
       </div>
       <div className="news-detail-content">
         <h2>{news.title}</h2>
         <div className="name-time-container">
-          <p className="name-time">{news.name} - {news.time}</p>
+          <p className="name-time">
+            {news.name} - {news.time}
+          </p>
           <div className="share-icon-news">
             <a href={telegramShareUrl} target="_blank" rel="noopener noreferrer" className="share-link">
               <span>Chia sẻ</span>
               <img src={sharingIcon} alt="Share Icon" className="share-icon" />
             </a>
+          </div>
         </div>
-        </div>
-        <p className='content-news'>{news.description}</p>
-
-        {/* Nút dẫn đến kênh Telegram */}
+        <p className="content-news">{news.description}</p>
         <div className="telegram-channel-link">
           <a href={telegramChannelUrl} target="_blank" rel="noopener noreferrer" className="go-to-telegram-button">
-            <img src={socialIcon} alt="Social Icon" className="social-icon" /> {/* Icon */}
-            Kênh thảo luận
+            <img src={socialIcon} alt="Social Icon" className="social-icon" /> Kênh thảo luận
           </a>
         </div>
       </div>

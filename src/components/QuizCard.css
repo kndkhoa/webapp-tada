@@ -64,6 +64,7 @@
 .total {
   font-size: 12px;
   margin: 2px;
+  text-transform: uppercase;
 }
 
 .value-icon {

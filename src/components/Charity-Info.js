@@ -17,14 +17,14 @@ function CharityInfo({ quiz }) {
       <div className="card-title">Thông tin chương trình</div>
       <div className="card-divider"></div>
       <div className="card-content">{quiz.description}</div>
-      {/* Đường phân chia */}
+      {/* Đường phân chia */}''
       <div className="card-divider"></div>
       {/* Phần Button */}
       <div className="card-buttons">
         {/* Button với icon và tiêu đề */}
         <button className="card-button" onClick={handleNavigate}>
           <img src={charityIcon} alt="icon" className="ideas-icon" />
-          <span>{quiz.charitytitle}</span>
+          <span>{quiz.charity_info}</span>
           <img src={nextIcon} alt="arrow" className="arrow-icon" />
         </button>
       </div>

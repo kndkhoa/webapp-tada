@@ -1,19 +1,85 @@
-const questions = [
-  {
-    question: 'Có bao nhiêu người trưởng thành được ước tính đang sống với bệnh béo phì?',
-    answers: ['A. Hơn 890 triệu người lớn', 'B. 8', 'C. 1 tỷ', 'D. 500 triệu'],
-    correctAnswer: 'C. 1 tỷ', // Đáp án đúng
-  },
-  {
-    question: 'Năm nào được xem là năm đầu tiên tổ chức ngày sức khỏe thế giới?',
-    answers: ['A. 1948', 'B. 1950', 'C. 1960', 'D. 1970'],
-    correctAnswer: 'B. 1950', // Đáp án đúng
-  },
-  {
-    question: 'Quốc gia nào có dân số đông nhất thế giới?',
-    answers: ['A. Trung Quốc', 'B. Ấn Độ', 'C. Mỹ', 'D. Indonesia'],
-    correctAnswer: 'A. Trung Quốc', // Đáp án đúng
-  },
-];
+// src/components/questions.js
+import { useState, useEffect } from 'react';
 
-export default questions;
+/**
+ * Hàm xáo trộn mảng sử dụng thuật toán Fisher-Yates
+ * @param {Array} array - Mảng cần xáo trộn
+ * @returns {Array} - Mảng đã được xáo trộn
+ */
+const shuffleArray = (array) => {
+  const shuffled = [...array]; // Tạo một bản sao của mảng để không thay đổi mảng gốc
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+/**
+ * Custom Hook để lấy và xử lý câu hỏi từ API
+ * @param {string} qa_id - ID của bộ câu hỏi
+ * @returns {Object} - Trả về câu hỏi, trạng thái tải và lỗi
+ */
+const useQuestions = (qa_id) => {
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    /**
+     * Hàm lấy dữ liệu câu hỏi từ API
+     */
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch(`http://admin.tducoin.com/api/quiz/qa/${qa_id}`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': 'oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Định dạng dữ liệu nhận được từ API
+          let formattedQuestions = data.data.map((item) => ({
+            question: item.question,
+            answers: [
+              item.incorrectAnswer_1,
+              item.incorrectAnswer_2,
+              item.incorrectAnswer_3,
+              item.correctAnswer,
+            ],
+            correctAnswer: item.correctAnswer,
+          }));
+
+          // Xáo trộn thứ tự các câu hỏi
+          formattedQuestions = shuffleArray(formattedQuestions);
+
+          // Xáo trộn thứ tự các đáp án trong mỗi câu hỏi
+          formattedQuestions = formattedQuestions.map((q) => ({
+            ...q,
+            answers: shuffleArray(q.answers),
+          }));
+
+          setQuestions(formattedQuestions);
+        } else {
+          throw new Error(data.message || 'Failed to fetch questions');
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (qa_id) {
+      fetchQuestions();
+    }
+  }, [qa_id]);
+
+  return { questions, loading, error };
+};
+
+export default useQuestions;

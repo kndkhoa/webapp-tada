@@ -24,7 +24,7 @@ function GiftInfo({ quiz }) {
         {/* Button với icon và tiêu đề */}
         <button className="card-button" onClick={handleNavigate}>
           <img src={giftboxIcon} alt="icon" className="ideas-icon" />
-          <span>{quiz.charitytitle}</span>
+          <span>{quiz.gift_info}</span>
           <img src={nextIcon} alt="arrow" className="arrow-icon" />
         </button>
       </div>

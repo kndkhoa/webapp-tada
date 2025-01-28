@@ -6,21 +6,23 @@ import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
 
-const News = ({ id, dataType, title, pic, description, coinactive, heartValue, commentValue, name, time, status }) => {
+const News = ({ title, banner, description, ac, heartValue, commentValue, author, created_at, status }) => {
+  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const picUrl = `${BASE_URL}${banner}`;
   return (
     <div className="news">
       <div className="news-content">
         <h2>{title}</h2>
-        <p className="name-time">{name} - {time}</p>
+        <p className="name-time">{author} - {created_at}</p>
         <p>{description}</p>
         <div className="news-pic-container">
-          <img src={pic} alt="Pic" className="news-pic" />
+          <img src={picUrl} alt="Pic" className="news-pic" />
 
           {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
           {status === 1 ? (
             <div className="coin-active">
               <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
-              <span>{coinactive} điểm</span>
+              <span>{ac} điểm</span>
             </div>
           ) : (
             <div className="done">

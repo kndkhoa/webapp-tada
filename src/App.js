@@ -1,5 +1,6 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 
 // Import các trang
 import Home from './pages/Home'; 
@@ -14,24 +15,27 @@ import QuizStarting from './pages/QuizStarting';
 import QuaThuongDetail from './pages/QuaThuongDetail';
 import Setting from './pages/Setting';
 
-
 const App = () => {
+  const location = useLocation(); // Lấy thông tin về đường dẫn hiện tại
+
   return (
     <div className="App">
-      <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/dautruong" element={<DauTruong />} />
-        <Route path="/khotang" element={<KhoTang />} />
-        <Route path="/quathuong" element={<QuaThuong />} />
-        <Route path="/news/:id" element={<NewsDetail />} />
-        <Route path="/tadatv/:id" element={<TadaTVDetail />} />
-        <Route path="/course/:id" element={<CourseDetail />} />
-        <Route path="/quiz/:id" element={<QuizDetail />} />
-        <Route path="/quizstarting/:id" element={<QuizStarting />} />
-        <Route path="/quathuongdetail/:id" element={<QuaThuongDetail />} />
-        <Route path="/setting/:id" element={<Setting />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/dautruong" element={<DauTruong />} />
+          <Route path="/khotang" element={<KhoTang />} />
+          <Route path="/quathuong" element={<QuaThuong />} />
+          <Route path="/Tin tức/:id" element={<NewsDetail />} />
+          <Route path="/tadatv/:id" element={<TadaTVDetail />} />
+          <Route path="/Courses/:id" element={<CourseDetail />} />
+          <Route path="/quiz/:id" element={<QuizDetail />} />
+          <Route path="/quizstarting/:id" element={<QuizStarting />} />
+          <Route path="/quathuongdetail/:id" element={<QuaThuongDetail />} />
+          <Route path="/setting/:id" element={<Setting />} />
+        </Routes>
+      </AnimatePresence>
     </div>
   );
 };

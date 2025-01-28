@@ -1,16 +1,24 @@
 import React from 'react';
 import './Quiz-Rules.css'; // Đảm bảo đã thêm CSS cho phần tử
-import { useNavigate } from 'react-router-dom'; // Import useNavigate từ react-router-dom
 import supportIcon from '../components/assets/icons/support.png'; // Đảm bảo đường dẫn đúng
 import nextIcon from '../components/assets/icons/next.png'; // Đảm bảo đường dẫn đúng
 
-function QuizRules({ quiz }) {
-  const navigate = useNavigate(); // Khởi tạo hàm navigate
-
-  // Hàm xử lý khi nhấn nút
-  const handleNavigate = () => {
-    navigate(`/news/${quiz.id}?dataType=${quiz.dataType}`);
-  };
+function QuizRules({ rules }) {
+  // Kiểm tra và chuyển đổi rules
+  let parsedRules = [];
+  try {
+    if (typeof rules === 'string') {
+      // Loại bỏ ký tự escape nếu có
+      const sanitizedRules = rules.replace(/\\\\/g, '\\').replace(/\\"/g, '"');
+      parsedRules = JSON.parse(sanitizedRules);
+    } else if (Array.isArray(rules)) {
+      parsedRules = rules;
+    } else {
+      console.error('Rules không đúng định dạng. Vui lòng kiểm tra lại.');
+    }
+  } catch (error) {
+    console.error('Lỗi phân tích JSON của rules:', error);
+  }
 
   return (
     <div className="card-container">
@@ -19,12 +27,16 @@ function QuizRules({ quiz }) {
       <div className="card-divider"></div>
       {/* Danh sách luật chơi */}
       <div className="rules-list">
-        {quiz.Rules && quiz.Rules.map((rule, index) => (
-          <div className="rule-item" key={index}>
-            <div className="rule-index">{index + 1}</div>
-            <div className="rule-text">{rule.description}</div>
-          </div>
-        ))}
+        {Array.isArray(parsedRules) && parsedRules.length > 0 ? (
+          parsedRules.map((rule, index) => (
+            <div className="rule-item" key={rule.rule_id || index}>
+              <div className="rule-index">{index + 1}</div>
+              <div className="rule-text">{rule.description}</div>
+            </div>
+          ))
+        ) : (
+          <div className="no-rules">[Chưa có luật nào được quy định.]</div>
+        )}
       </div>
       {/* Đường phân chia */}
       <div className="card-divider"></div>

@@ -1,73 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import './NewsDetail.css'; // Import CSS
-import sharingIcon from '../components/assets/icons/sharing.png';
-import backIcon from '../components/assets/icons/back.png';
-import QuizInfo from '../components/Quiz-Info';
-import QuizRank from '../components/Quiz-Rank';
-import QuizRules from '../components/Quiz-Rules';
-import QuizResult from '../components/Quiz-Result';
-import QuizStart from '../components/Quiz-Start';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import "./NewsDetail.css"; // Import CSS
+import sharingIcon from "../components/assets/icons/sharing.png";
+import backIcon from "../components/assets/icons/back.png";
+import QuizInfo from "../components/Quiz-Info";
+import QuizRank from "../components/Quiz-Rank";
+import QuizRules from "../components/Quiz-Rules";
+import QuizResult from "../components/Quiz-Result";
+import QuizStart from "../components/Quiz-Start";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function QuizDetail() {
   const { id } = useParams(); // Hứng `id` từ URL
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const dataTypeFromUrl = queryParams.get('dataType'); // Lấy `dataType` từ query string trong URL
+  const [quiz, setQuiz] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null); // Lưu dữ liệu người dùng từ sessionStorage
+  const [userQuizResult, setUserQuizResult] = useState(null); // Lưu kết quả quiz nếu tồn tại
 
-  // Dữ liệu bài viết
-  const newsData = [
-    {
-        id: 1,
-        dataType: "TDU",
-        title: "Quiz Learn: Tài chính cơ sở",
-        description: "Tham gia thử sức kiến thức của mình về tài chính cơ sở cùng cộng đồng TadaUp để nhận phần thưởng hấp dẫn mỗi ngày. Đừng quên bổ sung kiến thức nền tảng vững chắc trước khi tham gia để có thật nhiều câu trả lời chính xác và nhanh nhất.",
-        pic: "https://www.berlinsbi.com/uploads/sites/2/2021/12/7-very-good-reasons-to-do-master-s-in-finance.jpg",
-        value: "50",
-        resultTime: '0:65:256',
-        correctAnswers: '8/10',
-        knowleagelink: '#',
-        knowleagetitle: 'Kiến thức cơ bản về tài chính cơ sở',
-        avatar1: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQD8x0ee4fgYxGx_IIofSYK8qCImoimqWKVjA&s",
-        avatar2: "https://i.scdn.co/image/ab6761610000e5eb653268b19c265e835504190e",
-        avatar3: "https://vcdn1-giaitri.vnecdn.net/2024/07/05/ca-si-phuong-linh-1720168809-1-5452-7217-1720169102.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=fWeWTaPCEXOjzAY194qrxA",
-        avatar4: "https://image.anninhthudo.vn/1200x630/Uploaded/2024/abhusbb/2023_05_13/dam-linh-3-7883.jpg",
-        winner1_name: "Hải Tú",
-        winner1: "https://cdnphoto.dantri.com.vn/HwMMbhcJ_sLBod6e9UkplU3i1c8=/thumb_w/1020/2024/03/11/haitu12-edited-1710125677646.jpeg",
-        winner1_timer: '0:33:179',
-        winner2_name: "Trương Quỳnh Anh",
-        winner2: "https://phunuvietnam.mediacdn.vn/thumb_w/700/179072216278405120/2023/1/13/305211937-6222219097793877-7422634245535535123-n-16735919383132145732554-442-0-1385-1509-crop-16735919558141508518608.jpg",
-        winner2_timer: '0:39:784',
-        winner3_name: "Hiền Hồ",
-        winner3: "https://nld.mediacdn.vn/291774122806476800/2022/4/19/n-ho-di-show-chan-dai-toi-nach-nhung-mat-do-cung-hien-ho-toi-do-nhat-nhung-khong-vo-duyen-98fe21-ve-1639984218-310-width1017height1482-11113367-1650361452542454885009.jpg",
-        winner3_timer: '0:45:356',
-        members: "+ 12520",
-        gift_title: "GIẢI THƯỞNG",
-        status: 0, // Thay đổi giá trị này để kiểm tra
-        Rules: [
-            {
-                rule: "Mỗi câu trả lời đúng sẽ được cộng điểm.",
-                description: "Người chơi cần trả lời chính xác để tích lũy điểm cao hơn."
-            },
-            {
-                rule: "Thời gian trả lời bị giới hạn.",
-                description: "Người chơi phải hoàn thành câu hỏi trong thời gian quy định."
-            },
-            {
-                rule: "Chỉ có một cơ hội trả lời cho mỗi câu hỏi.",
-                description: "Nếu trả lời sai, bạn sẽ không thể quay lại câu hỏi này."
-            }
-        ]
-    },
-    // Các bài viết khác
-  ];
+  const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
 
-  // Tìm quiz theo ID
-  const quiz = newsData.find((item) => item.id === parseInt(id) && item.dataType === dataTypeFromUrl);
+  // Lấy dữ liệu `userData` từ `sessionStorage` và lắng nghe thay đổi
+  useEffect(() => {
+    const updateUserData = () => {
+      const cachedUserData = sessionStorage.getItem("userData");
+      if (cachedUserData) {
+        const parsedUserData = JSON.parse(cachedUserData);
+        setUserData(parsedUserData);
+
+        // Kiểm tra xem quizID hiện tại có trong quiz_rank hay không
+        const currentQuizResult = parsedUserData.quiz_rank?.find(
+          (rank) => parseInt(rank.quizID, 10) === parseInt(id, 10) // So sánh chặt chẽ quizID hiện tại
+        );
+        if (currentQuizResult) {
+          setUserQuizResult(currentQuizResult); // Lưu kết quả nếu tìm thấy
+        } else {
+          setUserQuizResult(null); // Không tìm thấy kết quả
+        }
+      } else {
+        console.error("No user data found in sessionStorage!");
+      }
+    };
+
+    // Gọi ngay khi component mount
+    updateUserData();
+
+    // Lắng nghe sự thay đổi trong `sessionStorage`
+    const handleStorageChange = (event) => {
+      if (event.key === "userData") {
+        updateUserData();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [id]);
+
+  // Fetch dữ liệu quiz từ API
+  useEffect(() => {
+    const fetchQuizDetail = async () => {
+      try {
+        const response = await fetch(`http://admin.tducoin.com/api/quiz/${id}`, {
+          method: "GET",
+          headers: {
+            "x-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Không thể lấy dữ liệu bài quiz.");
+        }
+
+        const data = await response.json();
+
+        // Kiểm tra dữ liệu trả về có đúng định dạng hay không
+        if (data && data.data) {
+          setQuiz(data.data);
+        } else {
+          throw new Error("Dữ liệu bài quiz không hợp lệ.");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizDetail();
+  }, [id]);
+
+  if (loading) {
+    return <ReloadSkeleton />;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   if (!quiz) {
     return <div>Không tìm thấy bài viết</div>;
   }
+
+  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const picUrl = `${BASE_URL}${quiz.banner}`;
 
   const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
     window.location.href
@@ -79,21 +118,23 @@ function QuizDetail() {
         <button className="backIcon" onClick={() => window.history.back()}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <img
-          src={quiz.pic}
-          alt="Banner"
-          className="banner-image"
-        />
+        <PreloadImage src={picUrl} alt="Banner" />
       </div>
       <div className="news-detail-content">
         <h2 className="quiz-detail-title">{quiz.title}</h2>
         <div className="name-time-container">
           <div className="players">
             <div className="avatar-container">
-              <div className="avatar" style={{ backgroundImage: `url(${quiz.avatar1})` }}></div>
-              <div className="avatar" style={{ backgroundImage: `url(${quiz.avatar2})` }}></div>
-              <div className="avatar" style={{ backgroundImage: `url(${quiz.avatar3})` }}></div>
-              <div className="avatar" style={{ backgroundImage: `url(${quiz.avatar4})` }}></div>
+              {quiz.topCompleters &&
+                quiz.topCompleters.slice(0, 4).map((member, index) => (
+                  <div
+                    key={index}
+                    className="avatar"
+                    style={{
+                      backgroundImage: `url(${BASE_URL}${member.avatar})`,
+                    }}
+                  ></div>
+                ))}
             </div>
             {quiz.members}
           </div>
@@ -105,19 +146,31 @@ function QuizDetail() {
           </div>
         </div>
 
-        {/* Kiểm tra status trước khi hiển thị QuizResult */}
-        {quiz.status === 0 && <QuizResult quiz={quiz} />} 
-        
-        <QuizInfo quiz={quiz} />
+        {/* Hiển thị QuizResult nếu userQuizResult có giá trị */}
+        {userQuizResult && (
+          <QuizResult 
+            score={userQuizResult.score} 
+            correctAnswers={userQuizResult.correctAnswers}
+            totalQuestions={userQuizResult.totalQuestions} 
+          />
+        )}
+
+        <QuizInfo 
+          description={quiz.description} 
+          knowledgeTitle={quiz.knowledgeTitle}
+          knowledgeTitle_link={quiz.knowledgeTitle_link}
+        />
         
         <div className="QuizRank">
           <span className="quiz-subtitle">Bảng xếp hạng</span>
-          <QuizRank quiz={quiz} />
+          <QuizRank quizID={quiz.id} />
         </div>
         <div className="QuizRules">
-          <QuizRules quiz={quiz} />
+          <QuizRules rules={quiz.rules} />
         </div>
-        <QuizStart quiz={quiz} />
+        {!userQuizResult && (
+          <QuizStart quiz={quiz} />
+        )}
       </div>
     </div>
   );

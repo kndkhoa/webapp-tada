@@ -35,15 +35,16 @@
   justify-content: center; /* Canh giữa icon và chữ */
   background-color: #000; /* Nền đen bao icon và chữ "Câu trả lời đúng" */
   padding: 0px 20px 0px 10px; /* Tăng thêm không gian bên phải bằng padding-right */
-  border-radius: 15px;
+  border-radius: 20px;
   box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước phần tử */
   white-space: nowrap; /* Ngăn ngừa xuống dòng */
   width: fit-content; /* Chiều rộng vừa nội dung */
+  height: 35px;
 }
 
 .result-icon-container {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   background-color: #000; /* Nền đen cho icon */
   border-radius: 12px;
   display: flex;
