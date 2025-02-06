@@ -4,10 +4,13 @@ import { AnimatePresence } from 'framer-motion';
 
 // Import các trang
 import Home from './pages/Home'; 
+import FundBot from './pages/FundBot';
 import DauTruong from './pages/DauTruong';
 import KhoTang from './pages/KhoTang';
+import Earn from './pages/Earn';
 import QuaThuong from './pages/QuaThuong';
 import NewsDetail from './pages/NewsDetail';
+import SignalChart from './pages/SignalChart';
 import TadaTVDetail from './pages/TadaTVDetail';
 import CourseDetail from './pages/CourseDetail';
 import QuizDetail from './pages/QuizDetail';
@@ -24,10 +27,13 @@ const App = () => {
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/fundbot" element={<FundBot />} />
           <Route path="/dautruong" element={<DauTruong />} />
           <Route path="/khotang" element={<KhoTang />} />
+          <Route path="/earn" element={<Earn />} />
           <Route path="/quathuong" element={<QuaThuong />} />
           <Route path="/Tin tức/:id" element={<NewsDetail />} />
+          <Route path="/chart" element={<SignalChart />} />
           <Route path="/tadatv/:id" element={<TadaTVDetail />} />
           <Route path="/Courses/:id" element={<CourseDetail />} />
           <Route path="/quiz/:id" element={<QuizDetail />} />
