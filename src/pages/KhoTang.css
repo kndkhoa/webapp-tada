@@ -74,17 +74,15 @@
   border-bottom: none; /* Không có dòng xanh dưới các nút */
 }
 
-.tab-menu .btn_tintuc.active {
-  font-weight: bold; /* Chữ đậm khi Đấu TDU được chọn */
-  position: relative;
-}
-
-.tab-menu .btn_khoahoc.active {
-  font-weight: bold; /* Chữ đậm khi Đấu TDU được chọn */
-  position: relative;
-}
-
-.tab-menu .btn_tadatv.active {
+.tab-menu .btn_signal.active, 
+.tab-menu .btn_results.active, 
+.tab-menu .btn_channel.active,
+.tab-menu .btn_tintuc.active,
+.tab-menu .btn_tadatv.active,
+.tab-menu .btn_khoahoc.active,
+.tab-menu .btn_portfolio.active,
+.tab-menu .btn_controller.active,
+.tab-menu .btn_account.active {
   font-weight: bold; /* Chữ đậm khi Đấu TDU được chọn */
   position: relative;
 }
@@ -128,3 +126,31 @@
   background-color: #186ECC; /* Màu nền khi hover */
 }
 
+/*---------------------------------------------------------------*/
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+  justify-content: flex-start; /* Canh lề trái */
+  margin-left: 25px;
+}
+
+.filter-button {
+  padding: 5px 20px;
+  border: 2px solid #ccc;
+  border-radius: 15px;
+  background-color: #f0f0f0; /* Màu nền xám */
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.filter-button:hover {
+  background-color: #ccc; /* Màu nền xám đậm khi hover */
+}
+
+.filter-button.active {
+  background-color: #007bff; /* Màu nền xanh khi được chọn */
+  color: white;
+  border-color: #007bff;
+}

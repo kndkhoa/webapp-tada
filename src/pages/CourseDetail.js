@@ -4,7 +4,6 @@ import './NewsDetail.css';
 import sharingIcon from '../components/assets/icons/sharing.png';
 import backIcon from '../components/assets/icons/back.png';
 import socialIcon from '../components/assets/icons/social.png';
-import { ReloadSkeleton, PreloadImage } from "../components/waiting"; // Import ReloadSkeleton và PreloadImage
 
 function CourseDetail() {
   const { id } = useParams();
@@ -20,6 +19,7 @@ function CourseDetail() {
 
   const apiKey = 'oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE';
 
+  // Thêm script API YouTube chỉ một lần
   useEffect(() => {
     if (!window.YT) {
       const script = document.createElement('script');
@@ -65,8 +65,229 @@ function CourseDetail() {
     fetchCourseDetail();
   }, [id, userData]);
 
+  const updateProgress = (lessonID, progress) => {
+    console.log("Calling API to update progress:", { userID: userData.userID, lessonID, progress });
+  
+    fetch('http://admin.tducoin.com/api/course/update-progress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+      },
+      body: JSON.stringify({
+        userID: userData.userID,
+        lessonID,
+        progress,
+      }),
+    })
+      .then((response) => {
+        console.log("API Response Status:", response.status);
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          console.log('Progress updated successfully:', progress);
+  
+          // Cập nhật progress ngay lập tức trong state
+          setCourse((prevCourse) => {
+            const updatedLessons = prevCourse.lessons.map((lesson) => {
+              if (lesson.id === lessonID) {
+                console.log(`Updating progress for lesson ID: ${lessonID} to ${progress}`);
+                return { ...lesson, progress }; // Cập nhật progress
+              }
+              return lesson;
+            });
+  
+            console.log("Updated Lessons:", updatedLessons);
+  
+            return { ...prevCourse, lessons: updatedLessons };
+          });
+  
+          // Sau khi cập nhật progress, kiểm tra trạng thái hoàn thành khóa học
+          setTimeout(() => {
+            setCourse((prevCourse) => {
+              const allLessonsCompleted = prevCourse.lessons.every(
+                (lesson) => lesson.progress === 100
+              );
+              const courseAlreadyCompleted = userData.completed_courses.includes(Number(id));
+  
+              console.log('Checking course completion:', {
+                allLessonsCompleted,
+                courseAlreadyCompleted,
+                lessons: prevCourse.lessons,
+              });
+  
+              if (allLessonsCompleted && !courseAlreadyCompleted) {
+                console.log('All lessons completed. Marking course as complete.');
+                completeCourse();
+              }
+              return prevCourse; // Giữ nguyên state
+            });
+          }, 200); // Trì hoãn nhẹ để đảm bảo cập nhật state hoàn tất
+        } else {
+          console.error('Failed to update progress:', data.message);
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating progress:', error);
+      });
+  };
+  
+  
+
+  const completeCourse = async () => {
+    try {
+      const response = await fetch('http://admin.tducoin.com/api/addbonus/course-completed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          user_id: Number(userData.userID),
+          course_id: Number(id),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Khóa học đã hoàn thành. Điểm đã được cộng vào tài khoản.');
+
+        // Cập nhật session và giao diện
+        const updatedUserData = {
+          ...userData,
+          wallet_AC: result.wallet_AC,
+          completed_courses: [...userData.completed_courses, course.id],
+        };
+        sessionStorage.setItem('userData', JSON.stringify(updatedUserData));
+        setUserData(updatedUserData);
+      } else {
+        console.error('Failed to complete course:', result.message);
+      }
+    } catch (error) {
+      console.error('Error completing course:', error);
+    }
+  };
+
+  const handleVideoPlay = (lesson) => {
+    console.log(`handleVideoPlay called for lesson: ${lesson.lesson_name}`);
+
+    if (!lesson.lesson_link.includes('youtube.com/watch?v=')) {
+      alert('Link video không hợp lệ');
+      return;
+    }
+
+    const embedUrl = lesson.lesson_link.replace('watch?v=', 'embed/');
+    const videoElement = document.createElement('div');
+    videoElement.style.position = 'fixed';
+    videoElement.style.top = 0;
+    videoElement.style.left = 0;
+    videoElement.style.width = '100vw';
+    videoElement.style.height = '100vh';
+    videoElement.style.backgroundColor = 'black';
+    videoElement.style.zIndex = 1000;
+    videoElement.style.display = 'flex';
+    videoElement.style.alignItems = 'center';
+    videoElement.style.justifyContent = 'center';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `${embedUrl}?enablejsapi=1`;
+    iframe.frameBorder = '0';
+    iframe.allow = 'autoplay; encrypted-media';
+    iframe.allowFullscreen = true;
+    iframe.style.width = '80%';
+    iframe.style.height = '80%';
+    iframe.style.borderRadius = '8px';
+
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '✕';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.fontSize = '24px';
+    closeButton.style.color = 'white';
+    closeButton.style.background = 'none';
+    closeButton.style.border = 'none';
+    closeButton.style.cursor = 'pointer';
+
+    let player;
+    let checkInterval;
+
+    const updateAndClose = () => {
+      clearInterval(checkInterval);
+
+      if (player && player.getDuration) {
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration();
+        let newProgress = Math.floor((currentTime / duration) * 100);
+
+        if (newProgress > 98) {
+          newProgress = 100;
+        }
+
+        if (newProgress > (lesson.progress || 0)) {
+          console.log(`Final progress before close: ${newProgress}%`);
+
+          // Cập nhật progress ngay lập tức
+          setCourse((prevCourse) => ({
+            ...prevCourse,
+            lessons: prevCourse.lessons.map((lessonItem) =>
+              lessonItem.id === lesson.id
+                ? { ...lessonItem, progress: newProgress } // Cập nhật giao diện tạm thời
+                : lessonItem
+            ),
+          }));
+
+          // Gọi API cập nhật progress
+          updateProgress(lesson.id, newProgress);
+        }
+      }
+
+      document.body.removeChild(videoElement);
+    };
+
+    closeButton.onclick = () => {
+      console.log('Close button clicked');
+      updateAndClose();
+    };
+
+    videoElement.appendChild(iframe);
+    videoElement.appendChild(closeButton);
+    document.body.appendChild(videoElement);
+
+    const interval = setInterval(() => {
+      if (window.YT && window.YT.Player) {
+        clearInterval(interval);
+
+        player = new YT.Player(iframe, {
+          events: {
+            onStateChange: (event) => {
+              if (event.data === YT.PlayerState.PLAYING) {
+                console.log('Video is playing');
+                const duration = player.getDuration();
+
+                checkInterval = setInterval(() => {
+                  const currentTime = player.getCurrentTime();
+                  const newProgress = Math.floor((currentTime / duration) * 100);
+
+                  if (newProgress > (lesson.progress || 0)) {
+                    console.log(`Progress updated during playback: ${newProgress}%`);
+                  }
+                }, 1000);
+              } else if (event.data === YT.PlayerState.ENDED) {
+                console.log('Video ended');
+                updateAndClose();
+              }
+            },
+          },
+        });
+      }
+    }, 100);
+  };
+
   if (loading) {
-    return <ReloadSkeleton />;
+    return <div>Đang tải...</div>;
   }
 
   if (error) {
@@ -88,10 +309,10 @@ function CourseDetail() {
         <button className="backIcon" onClick={() => window.history.back()}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <PreloadImage src={picUrl} alt="Banner" />
+        <img src={picUrl} alt="Banner" className="banner-image" />
         <h2 className="banner-title">{course.title}</h2>
         <div className="banner-info">
-          <PreloadImage src={mentorUrl} alt="Mentor Avatar" />
+          <img src={mentorUrl} alt="Mentor Avatar" className="banner-info-icon" />
           <span className="banner-info-text">{course.mentor}</span>
         </div>
       </div>

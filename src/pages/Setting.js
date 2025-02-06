@@ -1,45 +1,66 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import './Setting.css'; // Import CSS
-import backIcon from '../components/assets/icons/back.png';
-import usdtIcon from '../components/assets/icons/usdt-large.png';
-import tduIcon from '../components/assets/icons/tdu.png';
-import naptienIcon from '../components/assets/icons/naptien.png';
-import ruttienIcon from '../components/assets/icons/ruttien.png';
-import acIcon from '../components/assets/icons/coin-header.png';
-import bg from '../components/assets/bg-setting.jpg';
-import SettingMenu from '../components/Setting-Menu'; // Import ResultCard component
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "./Setting.css";
+import backIcon from "../components/assets/icons/back.png";
+import naptienIcon from "../components/assets/icons/naptien.png";
+import ruttienIcon from "../components/assets/icons/ruttien.png";
+import acIcon from "../components/assets/icons/coin-header.png";
+import bg from "../components/assets/bg-setting.jpg";
+import SettingMenu from "../components/Setting-Menu";
+import About from "../components/About";
+import Terms from "../components/Terms";
+import Language from "../components/Language";
+import Profile from "../components/Profile";
 
 function Setting() {
   const { id } = useParams();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [isMenuSelected, setIsMenuSelected] = useState(false);
 
-  // Danh sách dữ liệu bài viết
-  const newsData = [
-    {
-      id: 1,
-      usdt: 3646,
-      tdu: 100000,
-      ac: 8050,
-      title: "MicroStrategy dùng 561 triệu USD để mua thêm 5.262 BTC",
-      description:
-        "Tối ngày 23/12/2024, công ty đại chúng MicroStrategy tuyên bố trong 1 tuần vừa qua đã dùng 561 triệu USD tiền mặt để mua thêm 5.262 Bitcoin, với mức giá trung bình 106.662 USD cho mỗi đồng. Giao dịch mua Bitcoin mới nhất của MicroStrategy được thực hiện nhờ khoản tiền bán 1,3 triệu trái phiếu chuyển đổi. Tính đến ngày 23/12, công ty vẫn còn 7,08 tỷ trái phiếu chuyển đổi sẵn sàng để phát hành trong những đợt bán tiếp theo.",
-      pic: 'https://danviet.mediacdn.vn/296231569849192448/2022/2/26/2cd40a65-d9fb-471b-9974-b743ef018b46cba80382-16458936467481875622092.jpg',
-      name: 'An An',
-      time: '15 phút trước',
-    },
-    // Các bài viết khác
-  ];
-
-  const user = newsData.find((item) => item.id === parseInt(id));
+  // Lấy dữ liệu người dùng từ sessionStorage chỉ một lần khi component mount
+  useEffect(() => {
+    const cachedUserData = sessionStorage.getItem("userData");
+    if (cachedUserData) {
+      const parsedUserData = JSON.parse(cachedUserData);
+      setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
+    } else {
+      console.error("No user data found in sessionStorage!");
+    }
+    setLoading(false); // Cập nhật trạng thái sau khi dữ liệu đã được lấy
+  }, []); // Chỉ gọi một lần khi component mount
 
   // State để lưu trạng thái hiển thị của từng giá trị
   const [showFullUSDT, setShowFullUSDT] = useState(false);
   const [showFullTDU, setShowFullTDU] = useState(false);
   const [showFullAC, setShowFullAC] = useState(false);
 
+  // Nếu dữ liệu người dùng chưa được tải xong, hiển thị trạng thái chờ
+  if (loading) {
+    return <div>Đang tải dữ liệu...</div>;
+  }
+
+  // Kiểm tra dữ liệu người dùng có đúng với id từ URL
+  const user = userData && userData.userID === id ? userData : null;
+
+  // Nếu không tìm thấy người dùng với id tương ứng
   if (!user) {
     return <div>Không tìm thấy bài viết</div>;
   }
+
+  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const picUrl = `${BASE_URL}${user.avatar}`; // Mặc định là chuỗi rỗng nếu userData là null
+
+  const handleMenuSelect = (menu) => {
+    setSelectedMenu(menu);
+    setIsMenuSelected(true);
+  };
+
+  const handleBack = () => {
+    setSelectedMenu(null);
+    setIsMenuSelected(false);
+  };
 
   return (
     <div className="setting-detail-container">
@@ -50,50 +71,13 @@ function Setting() {
         <img src={bg} alt="Banner" className="bannersetting-image" />
         <div className="avatarsetting-container">
           <img
-            src={user.pic} // Sử dụng URL của avatar hoặc ảnh người dùng ở đây
+            src={picUrl} // Sử dụng URL của avatar hoặc ảnh người dùng ở đây
             alt="Avatar"
             className="avatarsetting"
           />
         </div>
       </div>
-      <div className="setting-detail-content">
-        <div className="setting-detail-row">
-          {/* USDT */}
-          <div
-            className="setting-detail-item"
-            onClick={() => setShowFullUSDT((prev) => !prev)}
-          >
-            <img
-              src={usdtIcon}
-              alt="Icon"
-              className="setting-detail-item-icon"
-            />
-            <div className="setting-detail-item-text">
-              <span className="setting-detail-item-text-small">USDT</span>
-              <span className="setting-detail-item-text-large">
-                {showFullUSDT ? user.usdt : formatNumber(user.usdt)}
-              </span>
-            </div>
-          </div>
-
-          {/* TDU */}
-          <div
-            className="setting-detail-item"
-            onClick={() => setShowFullTDU((prev) => !prev)}
-          >
-            <img
-              src={tduIcon}
-              alt="Icon"
-              className="setting-detail-item-icon"
-            />
-            <div className="setting-detail-item-text">
-              <span className="setting-detail-item-text-small">TDU</span>
-              <span className="setting-detail-item-text-large">
-                {showFullTDU ? user.tdu : formatNumber(user.tdu)}
-              </span>
-            </div>
-          </div>
-        </div>
+      <div className="setting-detail-content">      
         <div className="setting-detail-row">
           {/* AC */}
           <div
@@ -108,7 +92,7 @@ function Setting() {
             <div className="setting-detail-item-text">
               <span className="setting-detail-item-text-small">AC</span>
               <span className="setting-detail-item-text-large">
-                {showFullAC ? user.ac : formatNumber(user.ac)}
+                {showFullAC ? userData.wallet_AC : formatNumber(userData.wallet_AC)}
               </span>
             </div>
           </div>
@@ -124,7 +108,7 @@ function Setting() {
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
               <span className="setting-coin-button">
-                Nạp tiền
+                Buy AC
               </span>
             </div>
           </div>
@@ -138,13 +122,23 @@ function Setting() {
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
               <span className="setting-coin-button">
-                Rút tiền
+                Withdraw
               </span>
             </div>
           </div>
         </div>
         
-        <SettingMenu user={id} className="setting-menu-container"/>
+        {/* 🔥 Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
+        {!isMenuSelected ? (
+          <SettingMenu onMenuSelect={handleMenuSelect} />
+        ) : (
+          <div>
+            {selectedMenu === "profile" && <Profile user={user} onBack={handleBack} />}
+            {selectedMenu === "language" && <Language onBack={handleBack} />}
+            {selectedMenu === "terms" && <Terms onBack={handleBack} />}
+            {selectedMenu === "about" && <About onBack={handleBack} />}
+          </div>
+        )}
       </div>
     </div>
   );

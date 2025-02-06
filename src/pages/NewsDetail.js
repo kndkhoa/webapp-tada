@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "./NewsDetail.css";
 import sharingIcon from "../components/assets/icons/sharing.png";
@@ -14,8 +14,10 @@ function NewsDetail() {
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState(null);
 
+  const chartContainerRef = useRef(); // Ref cho biểu đồ
   const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
 
+  // Lấy thông tin bài viết
   useEffect(() => {
     const fetchNewsDetail = async () => {
       const cachedUserData = sessionStorage.getItem("userData");
@@ -55,57 +57,96 @@ function NewsDetail() {
     fetchNewsDetail();
   }, [id]);
 
+  // Lấy dữ liệu nến từ Binance
+  const fetchCandlestickData = async () => {
+    try {
+      const response = await fetch(
+        "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=168"
+      );
+
+      if (!response.ok) {
+        throw new Error("Không thể lấy dữ liệu nến từ API");
+      }
+
+      const data = await response.json();
+
+      // Chuyển đổi timestamp từ millisecond về second
+      return data.map((d) => ({
+        time: d[0] / 1000, // Chuyển từ millisecond -> second
+        open: parseFloat(d[1]),
+        high: parseFloat(d[2]),
+        low: parseFloat(d[3]),
+        close: parseFloat(d[4]),
+      }));
+    } catch (error) {
+      console.error("Error fetching candlestick data:", error);
+      return [];
+    }
+  };
+
+  // Tạo biểu đồ
   useEffect(() => {
-    const markAsRead = async () => {
-      if (!userData || !userData.news_reads || !id) {
-        console.error("Thiếu dữ liệu user hoặc ID bản tin");
-        return;
-      }
-
-      const hasRead = userData.news_reads.some((read) => read.news_id === parseInt(id, 10));
-
-      if (hasRead) {
-        console.log("User đã đọc bản tin này");
-        return;
-      }
-
-      try {
-        const response = await fetch("http://admin.tducoin.com/api/addbonus/news-read", {
-          method: "POST",
-          headers: {
-            "x-api-key": apiKey,
-            "Content-Type": "application/json",
+    const initializeChart = async () => {
+      if (chartContainerRef.current) {
+        const chart = createChart(chartContainerRef.current, {
+          width: chartContainerRef.current.clientWidth || 600,
+          height: 300,
+          layout: {
+            backgroundColor: "#131722",
+            textColor: "#d1d4dc",
           },
-          body: JSON.stringify({
-            user_id: userData.userID,
-            news_id: id,
-          }),
+          grid: {
+            vertLines: {
+              color: "#2c2c3e",
+            },
+            horzLines: {
+              color: "#2c2c3e",
+            },
+          },
+          timeScale: {
+            timeVisible: true,
+            secondsVisible: false,
+          },
         });
 
-        if (!response.ok) {
-          throw new Error("Không thể ghi nhận bản tin đã đọc");
-        }
+        const candleSeries = chart.addCandlestickSeries({
+          upColor: "#4CAF50",
+          downColor: "#F44336",
+          borderUpColor: "#4CAF50",
+          borderDownColor: "#F44336",
+          wickUpColor: "#4CAF50",
+          wickDownColor: "#F44336",
+        });
 
-        const result = await response.json();
+        const candlestickData = await fetchCandlestickData();
+        console.log("Candlestick Data:", candlestickData); // Debug dữ liệu
 
-        if (result.success) {
-          const updatedUserData = {
-            ...userData,
-            news_reads: [...userData.news_reads, { news_id: parseInt(id, 10) }],
-            wallet_AC: result.wallet_AC,
-          };
-          setUserData(updatedUserData);
-          sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
+        if (candlestickData.length > 0) {
+          candleSeries.setData(candlestickData);
+
+          // Đường Stop Loss
+          const slSeries = chart.addLineSeries({ color: "red", lineWidth: 2 });
+          slSeries.setData([
+            { time: candlestickData[0].time, value: 19000 },
+            { time: candlestickData[candlestickData.length - 1].time, value: 19000 },
+          ]);
+
+          // Đường Take Profit
+          const tpSeries = chart.addLineSeries({ color: "green", lineWidth: 2 });
+          tpSeries.setData([
+            { time: candlestickData[0].time, value: 25000 },
+            { time: candlestickData[candlestickData.length - 1].time, value: 25000 },
+          ]);
         } else {
-          console.error("Lỗi cộng điểm:", result.message);
+          console.error("No candlestick data available");
         }
-      } catch (error) {
-        console.error("Error marking news as read:", error.message);
+
+        return () => chart.remove();
       }
     };
 
-    markAsRead();
-  }, [id, userData]);
+    initializeChart();
+  }, []);
 
   if (loading) {
     return <ReloadSkeleton />;
@@ -121,7 +162,9 @@ function NewsDetail() {
 
   const BASE_URL = "http://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${news.banner}`;
-  const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(news.title)}`;
+  const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
+    window.location.href
+  )}&text=${encodeURIComponent(news.title)}`;
   const telegramChannelUrl = "https://t.me/tadaup";
 
   return (
@@ -130,10 +173,7 @@ function NewsDetail() {
         <button className="backIcon" onClick={() => window.history.back()}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <PreloadImage
-          src={picUrl}
-          alt="Banner"
-        />
+        <PreloadImage src={picUrl} alt="Banner" />
       </div>
       <div className="news-detail-content">
         <h2>{news.title}</h2>
@@ -148,7 +188,12 @@ function NewsDetail() {
             </a>
           </div>
         </div>
-        <p className="content-news">{news.description}</p>
+        <div className="content-news-wrapper">
+  <div
+    className="content-news"
+    dangerouslySetInnerHTML={{ __html: news.description }}
+  />
+</div>
         <div className="telegram-channel-link">
           <a href={telegramChannelUrl} target="_blank" rel="noopener noreferrer" className="go-to-telegram-button">
             <img src={socialIcon} alt="Social Icon" className="social-icon" /> Kênh thảo luận

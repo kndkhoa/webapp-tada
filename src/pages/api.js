@@ -1,6 +1,22 @@
 export const preloadData = async (apiKey, userId) => {
     try {
-      const [quizData, newsData, userData, courseData, charityData, giftData] = await Promise.all([
+      const [signalData, channelData, quizData, newsData, userData, courseData, charityData, giftData] = await Promise.all([
+        fetch("http://admin.tducoin.com/api/signal", {
+          method: "GET",
+          headers: {
+            "x-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+        }).then((res) => res.json()),
+
+        fetch("http://admin.tducoin.com/api/signal/channel", {
+          method: "GET",
+          headers: {
+            "x-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+        }).then((res) => res.json()),
+        
         fetch("http://admin.tducoin.com/api/quiz", {
           method: "GET",
           headers: {
@@ -51,6 +67,8 @@ export const preloadData = async (apiKey, userId) => {
       ]);
   
       return {
+        signalData: signalData?.data || [],
+        channelData: channelData?.data || [],
         quizData: quizData?.data || [],
         newsData: newsData?.data || [],
         userData: userData?.data || {},
@@ -61,6 +79,8 @@ export const preloadData = async (apiKey, userId) => {
     } catch (error) {
       console.error("Error during preloadData:", error);
       return {
+        signalData: [],
+        channelData: [],
         quizData: [],
         newsData: [],
         userData: {},
