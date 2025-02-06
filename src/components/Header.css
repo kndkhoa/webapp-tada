@@ -50,7 +50,7 @@
 
 /* Container cho nút chat (nằm bên phải) */
 .chat-container {
-  margin-left: 20px; /* Khoảng cách giữa chat và phần bên trái */
+  margin-right: 15px;
 }
 
 /* Style cho icon chat */

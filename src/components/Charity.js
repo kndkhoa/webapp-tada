@@ -1,5 +1,6 @@
 import React from "react";
 import "./Charity.css";
+import DOMPurify from "dompurify";
 import usdtIcon from './assets/icons/usdt.png';
 
 const Charity = ({ id, title, banner, description, charity_target, charity_status, top_contributors, members, charity_title }) => {
@@ -13,8 +14,15 @@ const Charity = ({ id, title, banner, description, charity_target, charity_statu
       </div>
       <div className="charity-content">
         <h2>{title}</h2>
-        <p>{description}</p>
-        
+        {/* Hiển thị text tối đa 100 ký tự từ description */}
+        <p
+          className="content-news"
+          dangerouslySetInnerHTML={{
+            __html: description
+              ? DOMPurify.sanitize(description).replace(/(<([^>]+)>)/gi, '').substring(0, 150) + (description.length > 100 ? "..." : "")
+              : "",
+          }}>
+        </p>
         {/* Status Line */}
         <div className="status-line">
           <div className="status-background"></div>

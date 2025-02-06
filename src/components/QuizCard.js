@@ -1,5 +1,6 @@
 import React from "react";
 import "./QuizCard.css";
+import DOMPurify from "dompurify";
 import usdtIcon from './assets/icons/usdt.png';
 import timerIcon from './assets/icons/timer.png';
 import doneIcon from './assets/icons/done.png';
@@ -48,7 +49,15 @@ const QuizCard = ({
       </div>
       <div className="quiz-content">
         <h2>{title}</h2>
-        <p>{description}</p>
+        {/* Hiển thị text tối đa 100 ký tự từ description */}
+        <p
+          className="content-news"
+          dangerouslySetInnerHTML={{
+            __html: description
+              ? DOMPurify.sanitize(description).replace(/(<([^>]+)>)/gi, '').substring(0, 150) + (description.length > 100 ? "..." : "")
+              : "",
+          }}>
+        </p>
         <div className="quiz-footer-container">
           <div className="quiz-footer">
             <span className="total">{gift_title}</span>

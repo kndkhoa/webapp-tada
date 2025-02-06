@@ -1,5 +1,6 @@
 import React from "react";
 import "./TadaTV.css";
+import DOMPurify from "dompurify";
 import heartIcon from './assets/icons/heart.png';
 import commentIcon from './assets/icons/comment.png';
 import coinactiveIcon from './assets/icons/coin-active.png';
@@ -18,7 +19,15 @@ const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, t
       <div className="tadatv-content">
         <h2>{title}</h2>
         <p className="name-time">{name} - {time}</p>
-        <p>{description}</p>
+        {/* Hiển thị text tối đa 100 ký tự từ description */}
+        <p
+          className="content-news"
+          dangerouslySetInnerHTML={{
+            __html: description
+              ? DOMPurify.sanitize(description).replace(/(<([^>]+)>)/gi, '').substring(0, 150) + (description.length > 100 ? "..." : "")
+              : "",
+          }}>
+        </p>
         <div className="tadatv-pic-container">
           {/* Đảm bảo đường dẫn ảnh hợp lý */}
           <img src={picUrl} alt="Pic" className="tadatv-pic" />

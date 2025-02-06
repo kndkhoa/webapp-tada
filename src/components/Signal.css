@@ -1,0 +1,165 @@
+.signal-container {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    width: 90%;
+    margin: 20px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .signal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .signal-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .header-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .author {
+    font-size: 12px;
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  .margin {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1f1f1f;
+  }
+  
+  .header-button {
+    padding: 5px 15px;
+    border: 2px solid #28a745;
+    border-radius: 20px;
+    background-color: transparent;
+    color: #28a745;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .signal-body {
+    margin-bottom: 15px;
+  }
+  
+  .signal-body-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Căn đều giữa icon và text */
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.signal-body-item .icon {
+    margin-right: 10px; /* Khoảng cách giữa icon và text */
+    flex-shrink: 0; /* Đảm bảo icon không bị co lại */
+    text-align: right; /* Căn phải icon */
+    width: 30px; /* Đặt độ rộng cố định để icon đều nhau */
+    font-size: 20px;
+}
+
+.signal-body-item .text {
+    flex: 1; /* Text sẽ chiếm không gian còn lại */
+    text-align: left; /* Căn trái text */
+    white-space: nowrap; /* Đảm bảo text không bị xuống dòng */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+  
+  .dropdown {
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 10px;
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+}
+  
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  width: 100%; /* Kéo dài hết chiều ngang */;
+}
+
+.dropdown-header .text {
+  flex: 1; /* Canh trái */
+  text-align: left;
+  font-size: 14px;
+}
+
+.dropdown-header .dropdown-arrow {
+  text-align: right;
+}
+  
+.signalfooter-button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+  
+.signalfooter-button:hover {
+    background-color: #02458d;
+}
+
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0; /* Thêm padding để cách đều các phần tử */
+  font-size: 14px;
+  color: #383838;
+  font-weight: bold;
+}
+
+.dropdown-item span:first-child {
+  text-align: left; /* Căn trái cho nhãn */
+  flex: 1; /* Để nhãn chiếm không gian còn lại */
+}
+
+.dropdown-item span:last-child {
+  text-align: right; /* Căn phải cho giá trị */
+  flex: 0; /* Không cho chiếm không gian không cần thiết */
+}
+
+.signal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.signal-text-footer {
+    font-size: 12px;
+}

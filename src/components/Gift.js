@@ -1,5 +1,6 @@
 import React from "react";
 import "./Gift.css";
+import DOMPurify from "dompurify";
 import coinIcon from "./assets/icons/coin-header.png";
 
 const Gift = ({ title, banner, description, giftValue, gift_title, remaining_gifts, backgroundColor }) => {
@@ -14,7 +15,15 @@ const Gift = ({ title, banner, description, giftValue, gift_title, remaining_gif
       </div>
       <div className="gift-content">
         <h2>{title}</h2>
-        <p>{description}</p>      
+        {/* Hiển thị text tối đa 100 ký tự từ description */}
+        <p
+          className="content-news"
+          dangerouslySetInnerHTML={{
+            __html: description
+              ? DOMPurify.sanitize(description).replace(/(<([^>]+)>)/gi, '').substring(0, 150) + (description.length > 100 ? "..." : "")
+              : "",
+          }}>
+        </p>     
         <div className="gift-footer-container">
           <div className="gift-footer">
             <span className="total">{gift_title}</span>
