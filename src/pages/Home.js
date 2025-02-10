@@ -97,7 +97,6 @@ function Home() {
         setIsLoading(false);
       } else {
         const preload = await preloadData(apiKey, telegramId);
-        console.log(preload); // Thêm câu lệnh này để kiểm tra kết quả API
         setSignalData(preload.signalData);
         setChannelData(preload.channelData);
         setQuizData(preload.quizData);
