@@ -1,7 +1,7 @@
 export const preloadData = async (apiKey, userId) => {
   try {
     const [signalData, channelData, quizData, newsData, userData, courseData, charityData, giftData] = await Promise.all([
-      fetch("https://admin.tducoin.com/api/signal", { // Đổi từ http sang https
+      fetch("http://admin.tducoin.com/api/signal", { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -9,7 +9,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch("https://admin.tducoin.com/api/signal/channel", { // Đổi từ http sang https
+      fetch("http://admin.tducoin.com/api/signal/channel", { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -17,7 +17,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch("https://admin.tducoin.com/api/quiz", { // Đổi từ http sang https
+      fetch("http://admin.tducoin.com/api/quiz", { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -25,7 +25,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch("https://admin.tducoin.com/api/news", { // Đổi từ http sang https
+      fetch("http://admin.tducoin.com/api/news", { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -33,7 +33,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch(`https://admin.tducoin.com/api/webappuser/${userId}`, { // Đổi từ http sang https
+      fetch(`http://admin.tducoin.com/api/webappuser/${userId}`, { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -41,7 +41,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch(`https://admin.tducoin.com/api/course/${userId}`, { // Đổi từ http sang https
+      fetch(`http://admin.tducoin.com/api/course/${userId}`, { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -49,7 +49,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch("https://admin.tducoin.com/api/charity", { // Đổi từ http sang https
+      fetch("http://admin.tducoin.com/api/charity", { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
@@ -57,7 +57,7 @@ export const preloadData = async (apiKey, userId) => {
         },
       }).then((res) => res.json()),
 
-      fetch("https://admin.tducoin.com/api/gift", { // Đổi từ http sang https
+      fetch("http://admin.tducoin.com/api/gift", { // Đổi từ http sang http
         method: "GET",
         headers: {
           "x-api-key": apiKey,
