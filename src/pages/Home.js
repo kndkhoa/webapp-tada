@@ -57,10 +57,21 @@ function Home() {
 
   // Lấy ID từ URL hoặc gán mặc định
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const userId = queryParams.get("telegramId") || 9999; // Mặc định nếu không có ID
-    setTelegramId(userId);
-  }, [location.search]);
+  const queryParams = new URLSearchParams(location.search);
+  const userId = queryParams.get("telegramId") || 9999; // Mặc định nếu không có ID
+  const name = queryParams.get("name") || "";
+  const avatar = queryParams.get("avatar") || "";
+  const telegramNick = queryParams.get("telegramNick") || "";
+
+  // Lưu thông tin vào state
+  setTelegramId(userId);
+  setUserData({
+    userID: userId,
+    name: name,
+    avatar: avatar,
+    telegramNick: telegramNick,
+  });
+}, [location.search]);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
