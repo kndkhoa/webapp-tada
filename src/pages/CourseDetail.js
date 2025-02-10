@@ -66,7 +66,7 @@ function CourseDetail() {
   }, [id, userData]);
 
   const updateProgress = (lessonID, progress) => {
-    fetch('http://admin.tducoin.com/api/course/update-progress', {
+    fetch('https://admin.tducoin.com/api/course/update-progress', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
