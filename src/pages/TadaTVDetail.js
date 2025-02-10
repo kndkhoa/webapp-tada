@@ -28,7 +28,7 @@ function TadaTVDetail() {
       }
 
       try {
-        const response = await fetch(`http://admin.tducoin.com/api/news/${id}`, {
+        const response = await fetch(`https://admin.tducoin.com/api/news/${id}`, {
           method: "GET",
           headers: {
             "x-api-key": apiKey,
@@ -69,13 +69,11 @@ function TadaTVDetail() {
       );
 
       if (hasWatched) {
-        console.log("User đã xem TadaTV này");
         return;
       }
 
-      console.log("TadaTV chưa được xem. Gửi yêu cầu POST API...");
       try {
-        const response = await fetch("http://admin.tducoin.com/api/addbonus/news-read", {
+        const response = await fetch("https://admin.tducoin.com/api/addbonus/news-read", {
           method: "POST",
           headers: {
             "x-api-key": apiKey,
@@ -125,7 +123,7 @@ function TadaTVDetail() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${tadatv.banner}`;
   const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
     window.location.href
