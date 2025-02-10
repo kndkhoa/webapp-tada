@@ -49,6 +49,7 @@
   gap: 10px;
   font-size: 24px;
   font-weight: bold;
+  margin-bottom: 20px;
 }
 
 .portfolio-header-title .portfolio-icon {
@@ -98,13 +99,13 @@
 
 /* Điều kiện ngoại lệ cho full width */
 .portfolio-divider-fullwidth {
-  margin-top: 15px;
-  margin-bottom: 10px;
-  border: none;
+  margin-top: 35px;
   border-top: 1px solid #ccc;
-  width: 100vw; /* Đảm bảo full màn hình */
-  position: relative; /* Để tránh bị giới hạn bởi khung chứa */
-  left: calc(-50vw + 50%); /* Đưa divider ra khỏi khung chứa */
+  position: absolute; /* Để phần tử không bị giới hạn bởi bất kỳ phần tử cha nào */
+  left: 50%; /* Đưa divider ra giữa màn hình */
+  transform: translateX(-50%); /* Đảm bảo canh chính xác vào giữa */
+  width: 90%; /* Chiếm 90% chiều rộng màn hình */
+  padding: 0px;
 }
 
 .balance-list {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TelegramNotification from './TelegramNotification';
 import avatar from './assets/avatar.gif'; // Đường dẫn đến ảnh avatar
 import qrcode from './assets/QR-Code.jpg'; // Đường dẫn đến ảnh QR code
 import './Report.css'; // Import CSS riêng
@@ -82,7 +83,6 @@ const BuyAC = ({ userID, walletAC, onClose, userWallet }) => {
 
 const updateUserBalance = async (userID, usdtAmount) => {
     const acAmount = usdtAmount / 10; // Tỷ lệ quy đổi 1 USDT = 10 AC
-    console.log(`User ${userID} updated with ${acAmount} AC`);
 
     // Gửi yêu cầu POST cập nhật AC cho user
     try {
@@ -106,14 +106,11 @@ const updateUserBalance = async (userID, usdtAmount) => {
             updatedUserData.wallet_AC += acAmount; // Cộng thêm số AC vào tài khoản người dùng
             sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
 
-            // Thông báo nhận tiền thành công
-            alert(`Received ${acAmount} AC and updated successfully!`);
         } else {
             alert('Failed to update AC.');
         }
     } catch (error) {
         console.error("Error updating user balance:", error);
-        alert("An error occurred while updating your AC balance.");
     }
 };
 
@@ -160,7 +157,10 @@ const updateUserBalance = async (userID, usdtAmount) => {
               <img src={qrcode} alt="QR Code" className="qr-code" />
               <p><i>Please transfer USDT to the wallet address provided above!</i></p>
               <p>Time Left: <b>{formatTime(timeLeft)}</b></p>
-              {timeLeft === 0 && <p>Time Expired. Please try again.</p>} {/* Hiển thị khi hết thời gian */}
+              {timeLeft === 0 && <p>Time Expired. Please try again.</p>} {/* Hiển thị khi hết thời gian */}            
+              
+              <TelegramNotification message={`Có user ID là ${userID} đăng ký mua ${acAmount} AC, tương đương ${usdtAmount}. Hãy theo dõi tài khoản hệ thống có nhận được tiền chưa nha sếp?!`} />
+            
             </div>
           )}
         </div>

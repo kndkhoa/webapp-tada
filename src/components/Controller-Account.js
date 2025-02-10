@@ -150,7 +150,7 @@ const ControllerAccount = ({ userID, index, accountMT5, trading_accounts, onUser
       {/* Footer */}
       <div className="signal-footer">
         <div className="signal-text-footer">
-          <div>Expiration date: </div>
+          <div>Expiration date: {accountData.done_at}</div>
         </div>
       </div>
     </div>

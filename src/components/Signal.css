@@ -48,7 +48,7 @@
     color: #1f1f1f;
   }
   
-  .header-button {
+  .signal-header-button1 {
     padding: 5px 15px;
     border: 2px solid #28a745;
     border-radius: 20px;
@@ -57,6 +57,27 @@
     font-size: 14px;
     cursor: pointer;
     font-weight: bold;
+  }
+
+  .signal-header-button2 {
+    padding: 5px 15px;
+    border: 2px solid #3c3c3c;
+    border-radius: 20px;
+    background-color: transparent;
+    color: #3c3c3c;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .signal-header-button3 {
+    padding: 5px 15px;
+    border: 2px solid #28a745;
+    border-radius: 20px;
+    background-color: #28a745;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
   }
   
   .signal-body {

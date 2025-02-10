@@ -16,10 +16,11 @@
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
+    font-size: 14px;
     max-width: 300px;
     width: 90%;
     margin: 0 auto; /* Căn giữa nếu có width cố định */
-    position: relative; /* Đảm bảo các phần tử bên trong có thể dùng position tuyệt đối */
+    position: relative;
 }
 
 /* Nút đóng (X) ở góc trên bên phải */
@@ -74,7 +75,18 @@
     cursor: pointer;
 }
 
-.report-button:hover {
+.reportbot-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.report-button:hover, .reportbot-button:hover {
     background-color: #0056b3;
 }
 

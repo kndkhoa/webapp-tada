@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Signal.css";
 import "./Controller-Strategy.css";
 import botsettingIcon from "./assets/icons/bot-setting.png";
+import TelegramNotification from './TelegramNotification';
 
 const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUpdate }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -85,44 +86,54 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
         accountMT5: accountMT5,
         capitalManagement: isStrategyManagementOn ? selectedStrategy : "None",
         orderSL: isStrategyManagementOn ? 0 : numericValue,
-        authors: [
-          // Các kênh đang được chọn (autoCopy = 1)
-          ...selectedChannels.map((author) => ({
-            author: author,
-            autoCopy: 1,
-          })),
-          // Các kênh đã bỏ chọn (autoCopy = 0)
-          ...followingChannels
-            .filter((channel) => !selectedChannels.includes(channel.author))
-            .map((channel) => ({
+        authors: isAutoBotOn
+          ? [
+              // Các kênh đang được chọn (autoCopy = 1)
+              ...selectedChannels.map((author) => ({
+                author: author,
+                autoCopy: 1,
+              })),
+              // Các kênh đã bỏ chọn (autoCopy = 0)
+              ...followingChannels
+                .filter((channel) => !selectedChannels.includes(channel.author))
+                .map((channel) => ({
+                  author: channel.author,
+                  autoCopy: 0,
+                })),
+            ]
+          : // Nếu Auto Bot tắt, đặt tất cả các kênh về autoCopy = 0
+            followingChannels.map((channel) => ({
               author: channel.author,
               autoCopy: 0,
             })),
-        ],
       };
   
-      console.log("Payload:", payload); // Debug payload
-  
       // Gọi API
-      const response = await fetch("http://admin.tducoin.com/api/webappuser/tradingaccount", {
-        method: "POST",
-        headers: {
-          "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-  
-      console.log("API Response Status:", response.status); // Debug status code
+      const response = await fetch(
+        "http://admin.tducoin.com/api/webappuser/tradingaccount",
+        {
+          method: "POST",
+          headers: {
+            "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
   
       if (!response.ok) {
         const errorResponse = await response.json(); // Đọc phản hồi lỗi từ API
         console.error("API Error Response:", errorResponse); // Debug lỗi
+        <TelegramNotification
+          message={
+            "Lỗi POST Save tùy chỉnh component Strategy" +
+            errorResponse.message +
+            " từ user " +
+            userID
+          }
+        />;
         throw new Error(errorResponse.message || "Failed to save data");
       }
-  
-      const result = await response.json();
-      console.log("API Response:", result); // Debug phản hồi thành công
   
       // Cập nhật sessionStorage
       const cachedUserData = JSON.parse(sessionStorage.getItem("userData"));
@@ -148,10 +159,15 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
   
       // Reset trạng thái sau khi lưu thành công
       setIsModified(false);
-      alert("Settings saved successfully!");
     } catch (error) {
-      console.error("Error saving data:", error);
-      alert(`Failed to save settings. Error: ${error.message}`);
+      <TelegramNotification
+        message={
+          "Lỗi POST Save tùy chỉnh component Strategy" +
+          error.message +
+          " từ user " +
+          userID
+        }
+      />;
     }
   };
 
@@ -167,7 +183,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
         {/* Auto Bot */}
         <div className="signal-body-item">
           <span className="icon">🤖</span>
-          <span className="text">Auto Bot</span>
+          <span className="text">Following Channels</span>
           <div className="strategy-toggle">
             <div
               className={`strategy-switch ${isAutoBotOn ? "on" : "off"}`}
@@ -194,7 +210,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
                   width: "100%",
                 }}
               >
-                <span className="text">Follow Channels</span>
+                <span className="text">List Channels</span>
                 <span className="dropdown-arrow">{channelsDropdownOpen ? "🡵" : "🡶"}</span>
               </div>
               <div

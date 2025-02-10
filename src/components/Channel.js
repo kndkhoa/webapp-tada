@@ -33,8 +33,9 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
   // Kiểm tra xem tác giả có trong danh sách theo dõi hay không từ sessionStorage
   const checkIfFollowing = () => {
     const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
-    const followingAuthors = storedUserData.following_authors || [];
-    return followingAuthors.includes(author);  // Kiểm tra nếu tác giả có trong danh sách theo dõi
+    const activeAccount = storedUserData.trading_accounts?.find(account => account.status === 1);  // Tìm tài khoản đang hoạt động (status === 1)
+    const followingChannels = activeAccount?.following_channels || [];  // Lấy danh sách kênh theo dõi từ tài khoản đang hoạt động
+    return followingChannels.some(channel => channel.author === author);  // Kiểm tra nếu tác giả có trong danh sách theo dõi
   };
 
   useEffect(() => {
@@ -42,9 +43,9 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
     const interval = setInterval(() => {
       setIsFollowing(checkIfFollowing());  // Cập nhật trạng thái theo dõi
     }, 1000);  // Cập nhật mỗi giây
-
+  
     document.addEventListener("click", handleOutsideClick);  // Thiết lập sự kiện click
-
+  
     return () => {
       clearInterval(interval);  // Dọn dẹp interval khi component unmount
       document.removeEventListener("click", handleOutsideClick);  // Dọn dẹp sự kiện click

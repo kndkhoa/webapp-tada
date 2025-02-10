@@ -52,53 +52,54 @@ const weeklyIncomeData = incomeData.filter(item => {
 
   return (
     <div className="incomechart-content-container">
-      {/* Header Section */}
-      <div className="portfolio-header">
-        <div className="portfolio-header-title">
-          <img src={moneystackIcon} alt="Balance Icon" className="portfolio-icon" />
-          <span>Balance</span>
+  {/* Header Section */}
+  <div className="portfolio-header">
+    <div className="portfolio-header-title">
+      <img src={moneystackIcon} alt="Balance Icon" className="portfolio-icon" />
+      <span>Balance</span>
+    </div>
+    <div className="portfolio-divider-fullwidth" />
+    <div className="balance-body">
+      <div className="balance-list">
+        <div className="balance-left">
+          <img src={balancecoinIcon} alt="Balance Icon" className="balance-icon" />
+          <div className="balance-title">Total Portfolio Value</div>
         </div>
-        <hr className="portfolio-divider-fullwidth" />
-        <div className="balance-body">
-          <div className="balance-list">
-            <div className="balance-left">
-              <img src={balancecoinIcon} alt="Balance Icon" className="balance-icon" />
-              <div className="balance-title">Total Portfolio Value</div>
-            </div>
-            <span className="balance-amount">
-              ${Number(currentAccount.balance ?? 0).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </span>
-          </div>
-          <div className="balance-list">
-            <div className="balance-left">
-              <img src={balanceincreaseIcon} alt="Balance Icon" className="balance-icon" />
-              <div className="balance-title">Weekly Performance</div>
-            </div>
-            <span className="balance-amount">
-              ${Number(weeklyPerformance ?? 0).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </span>
-          </div>
-          <div className="balance-list-end">
-            <div className="balance-left">
-              <img src={balancebonusIcon} alt="Balance Icon" className="balance-icon" />
-              <div className="balance-title">Commisson</div>
-            </div>
-            <span className="balance-amount">
-              ${Number(currentAccount.commission ?? 0).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </span>
-          </div>
+        <span className="balance-amount">
+          ${Number(currentAccount.balance ?? 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </span>
+      </div>
+      <div className="balance-list">
+        <div className="balance-left">
+          <img src={balanceincreaseIcon} alt="Balance Icon" className="balance-icon" />
+          <div className="balance-title">Weekly Performance</div>
         </div>
+        <span className="balance-amount">
+          ${Number(weeklyPerformance ?? 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </span>
+      </div>
+      <div className="balance-list-end">
+        <div className="balance-left">
+          <img src={balancebonusIcon} alt="Balance Icon" className="balance-icon" />
+          <div className="balance-title">Commisson</div>
+        </div>
+        <span className="balance-amount">
+          ${Number(currentAccount.commission ?? 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </span>
       </div>
     </div>
+  </div>
+</div>
+
   );
 };
 

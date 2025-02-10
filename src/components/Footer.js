@@ -41,14 +41,6 @@ const Footer = () => {
 
   return (
     <footer className={`footer ${isVisible ? 'visible' : 'hidden'}`}>
-      <Link to="/fundbot" className="footer-button">
-        <img
-          src={location.pathname === '/fundbot' ? homeIcon1 : homeIcon2}
-          alt="FundBot"
-          className="icon"
-        />
-        <span>Fund Bot</span>
-      </Link>
       <Link to="/khotang" className="footer-button">
         <img
           src={location.pathname === '/khotang' ? bookIcon1 : bookIcon2}
@@ -56,6 +48,14 @@ const Footer = () => {
           className="icon"
         />
         <span>Treasure</span>
+      </Link>
+      <Link to="/fundbot" className="footer-button">
+        <img
+          src={location.pathname === '/fundbot' ? homeIcon1 : homeIcon2}
+          alt="FundBot"
+          className="icon"
+        />
+        <span>Fund Bot</span>
       </Link>
       <Link to="/earn" className="footer-button">
         <img

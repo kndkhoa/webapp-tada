@@ -11,6 +11,7 @@
 
   .buyac-details p {
     margin-bottom: 5px; /* Tăng khoảng cách giữa các đoạn văn bản */
+    font-size: 14px;
   }
   
   /* Tạo kiểu cho ghi chú phía dưới ô nhập số lượng AC */

@@ -40,7 +40,7 @@ const IncomeChart = ({ trading_accounts, accountMT5 }) => {
   }
 
   // Lấy incomeCharts từ Trading Account, nếu không có thì mặc định là mảng rỗng
-  const chartData = currentAccount.incomeCharts || [];
+  const chartData = currentAccount.income_charts || [];
 
   const [timeframe, setTimeframe] = useState("7-Days");
 
