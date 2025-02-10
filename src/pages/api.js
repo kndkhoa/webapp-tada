@@ -1,7 +1,7 @@
 export const preloadData = async (apiKey, userId) => {
   try {
     // Thực hiện từng yêu cầu fetch riêng lẻ với .catch() để tránh toàn bộ Promise bị lỗi
-    const signalData = await fetch("https://admin.tducoin.com/api/signal", {
+    const signalData = await fetch("https://www.admin.tducoin.com/api/signal", {
       method: "GET",
       headers: {
         "x-api-key": apiKey,
