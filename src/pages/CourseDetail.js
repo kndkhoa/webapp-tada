@@ -4,6 +4,7 @@ import './NewsDetail.css';
 import sharingIcon from '../components/assets/icons/sharing.png';
 import backIcon from '../components/assets/icons/back.png';
 import socialIcon from '../components/assets/icons/social.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function CourseDetail() {
   const { id } = useParams();
@@ -13,7 +14,6 @@ function CourseDetail() {
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState(() => {
     const cachedUserData = sessionStorage.getItem('userData');
-    console.log('Cached user data:', cachedUserData);
     return cachedUserData ? JSON.parse(cachedUserData) : null;
   });
 
@@ -66,8 +66,6 @@ function CourseDetail() {
   }, [id, userData]);
 
   const updateProgress = (lessonID, progress) => {
-    console.log("Calling API to update progress:", { userID: userData.userID, lessonID, progress });
-  
     fetch('http://admin.tducoin.com/api/course/update-progress', {
       method: 'POST',
       headers: {
@@ -80,59 +78,71 @@ function CourseDetail() {
         progress,
       }),
     })
-      .then((response) => {
-        console.log("API Response Status:", response.status);
-        return response.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          console.log('Progress updated successfully:', progress);
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        setCourse((prevCourse) => {
+          if (!prevCourse || !prevCourse.lessons) return prevCourse;
   
-          // Cập nhật progress ngay lập tức trong state
-          setCourse((prevCourse) => {
-            const updatedLessons = prevCourse.lessons.map((lesson) => {
-              if (lesson.id === lessonID) {
-                console.log(`Updating progress for lesson ID: ${lessonID} to ${progress}`);
-                return { ...lesson, progress }; // Cập nhật progress
-              }
-              return lesson;
-            });
+          // Cập nhật tiến độ của bài học trong state
+          const updatedLessons = prevCourse.lessons.map((lesson) =>
+            lesson.id === lessonID ? { ...lesson, progress } : lesson
+          );
   
-            console.log("Updated Lessons:", updatedLessons);
+          // Tính lại completion của khóa học
+          const totalProgress = updatedLessons.reduce((sum, lesson) => sum + lesson.progress, 0);
+          const lessonCount = updatedLessons.length;
+          const newCompletion = lessonCount > 0 ? Math.round(totalProgress / lessonCount) : 0;
   
-            return { ...prevCourse, lessons: updatedLessons };
+          // Kiểm tra nếu completion mới là 100% và khác với giá trị trước khi cập nhật
+          if (newCompletion === 100 && prevCourse.completion !== 100) {
+            completeCourse();  // Gọi hàm completeCourse khi điều kiện thỏa mãn
+          }
+  
+          return { ...prevCourse, lessons: updatedLessons, completion: newCompletion };
+        });
+  
+        // Lấy dữ liệu từ sessionStorage
+        let storedCourseData = JSON.parse(sessionStorage.getItem('courseData'));
+  
+        // Xử lý nếu `storedCourseData` là object nhưng có key `data` bị trùng
+        if (storedCourseData && storedCourseData.data && Array.isArray(storedCourseData.data)) {
+          storedCourseData = storedCourseData.data; // Lấy luôn danh sách courses, bỏ `data`
+        }
+  
+        // Kiểm tra xem có phải object duy nhất không
+        if (storedCourseData && Array.isArray(storedCourseData)) {
+          // Cập nhật dữ liệu trong `storedCourseData`
+          storedCourseData = storedCourseData.map((courseItem) => {
+            if (courseItem.id === course?.id) {
+              const updatedLessons = courseItem.lessons.map((lesson) =>
+                lesson.id === lessonID ? { ...lesson, progress } : lesson
+              );
+  
+              const totalProgress = updatedLessons.reduce((sum, l) => sum + l.progress, 0);
+              const lessonCount = updatedLessons.length;
+              const newCompletion = lessonCount > 0 ? Math.round(totalProgress / lessonCount) : 0;
+  
+              return {
+                ...courseItem,
+                lessons: updatedLessons,
+                completion: newCompletion,
+              };
+            }
+            return courseItem;
           });
   
-          // Sau khi cập nhật progress, kiểm tra trạng thái hoàn thành khóa học
-          setTimeout(() => {
-            setCourse((prevCourse) => {
-              const allLessonsCompleted = prevCourse.lessons.every(
-                (lesson) => lesson.progress === 100
-              );
-              const courseAlreadyCompleted = userData.completed_courses.includes(Number(id));
-  
-              console.log('Checking course completion:', {
-                allLessonsCompleted,
-                courseAlreadyCompleted,
-                lessons: prevCourse.lessons,
-              });
-  
-              if (allLessonsCompleted && !courseAlreadyCompleted) {
-                console.log('All lessons completed. Marking course as complete.');
-                completeCourse();
-              }
-              return prevCourse; // Giữ nguyên state
-            });
-          }, 200); // Trì hoãn nhẹ để đảm bảo cập nhật state hoàn tất
-        } else {
-          console.error('Failed to update progress:', data.message);
+          // Lưu lại vào sessionStorage (Đúng format)
+          sessionStorage.setItem('courseData', JSON.stringify(storedCourseData));
         }
-      })
-      .catch((error) => {
-        console.error('Error updating progress:', error);
-      });
+      } else {
+        console.error('Failed to update progress:', data.message);
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating progress:', error);
+    });
   };
-  
   
 
   const completeCourse = async () => {
@@ -152,8 +162,6 @@ function CourseDetail() {
       const result = await response.json();
 
       if (result.success) {
-        alert('Khóa học đã hoàn thành. Điểm đã được cộng vào tài khoản.');
-
         // Cập nhật session và giao diện
         const updatedUserData = {
           ...userData,
@@ -286,8 +294,13 @@ function CourseDetail() {
     }, 100);
   };
 
+  const handleBack = () => {
+    sessionStorage.setItem("fromCourseDetail", "true"); // Đánh dấu đến từ CourseDetail
+    window.history.back();
+};
+
   if (loading) {
-    return <div>Đang tải...</div>;
+    return <ReloadSkeleton />;
   }
 
   if (error) {
@@ -306,7 +319,7 @@ function CourseDetail() {
   return (
     <div className="news-detail-container">
       <div className="banner-header">
-        <button className="backIcon" onClick={() => window.history.back()}>
+        <button className="backIcon" onClick={handleBack}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={picUrl} alt="Banner" className="banner-image" />

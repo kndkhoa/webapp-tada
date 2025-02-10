@@ -11,6 +11,9 @@ import About from "../components/About";
 import Terms from "../components/Terms";
 import Language from "../components/Language";
 import Profile from "../components/Profile";
+import BuyAC from "../components/BuyAC"; // Import component BuyAC
+
+import { motion, AnimatePresence } from "framer-motion";
 
 function Setting() {
   const { id } = useParams();
@@ -18,6 +21,7 @@ function Setting() {
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [isMenuSelected, setIsMenuSelected] = useState(false);
+  const [showBuyAC, setShowBuyAC] = useState(false); // State để hiển thị BuyAC modal
 
   // Lấy dữ liệu người dùng từ sessionStorage chỉ một lần khi component mount
   useEffect(() => {
@@ -32,8 +36,6 @@ function Setting() {
   }, []); // Chỉ gọi một lần khi component mount
 
   // State để lưu trạng thái hiển thị của từng giá trị
-  const [showFullUSDT, setShowFullUSDT] = useState(false);
-  const [showFullTDU, setShowFullTDU] = useState(false);
   const [showFullAC, setShowFullAC] = useState(false);
 
   // Nếu dữ liệu người dùng chưa được tải xong, hiển thị trạng thái chờ
@@ -63,6 +65,22 @@ function Setting() {
   };
 
   return (
+    <AnimatePresence>
+      <motion.div 
+        className="setting-container"
+        initial={{ x: "-100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: "100%", opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          position: "fixed", // Cố định trang để trượt đúng từ trang trước
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "transparent" // Đảm bảo nền không bị hiện trước
+        }}
+      >
     <div className="setting-detail-container">
       <div className="bannersetting-header">
         <button className="backIcon" onClick={() => window.history.back()}>
@@ -100,6 +118,7 @@ function Setting() {
           {/* NẠP RÚT */}
           <div
             className="setting-detail-item setting-detail-item-deposit"
+            onClick={() => setShowBuyAC(true)}
           >
             <img
               src={naptienIcon}
@@ -128,6 +147,16 @@ function Setting() {
           </div>
         </div>
         
+        {showBuyAC && (
+        <div className="report-modal">
+          <BuyAC 
+            userID={userData.userID} 
+            walletAC={userData.wallet_AC} 
+            onClose={() => setShowBuyAC(false)}
+          />
+        </div>
+        )}
+
         {/* 🔥 Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
         {!isMenuSelected ? (
           <SettingMenu onMenuSelect={handleMenuSelect} />
@@ -141,6 +170,8 @@ function Setting() {
         )}
       </div>
     </div>
+    </motion.div>
+    </AnimatePresence>
   );
 }
 

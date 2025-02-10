@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Charity from "../components/Charity";
 import Gift from "../components/Gift";
+import Report from "../components/Report-Challenge";
 import Footer from "../components/Footer";
 import "./QuaThuong.css";
 import { preloadData } from "./api"; // Import từ file API
@@ -13,6 +14,7 @@ function QuaThuong() {
   const [giftData, setGiftData] = useState([]); // Dữ liệu Đổi thưởng
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showReport, setShowReport] = useState(true);
   const navigate = useNavigate();
 
   const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
@@ -81,15 +83,24 @@ function QuaThuong() {
             className={`btn_doithuong ${activeTab === "doithuong" ? "active" : ""}`}
             onClick={() => handleTabClick("doithuong")}
           >
-            Đổi thưởng
+            Gifts
           </button>
           <button
             className={`btn_tuthien ${activeTab === "tuthien" ? "active" : ""}`}
             onClick={() => handleTabClick("tuthien")}
           >
-            Quyên góp
+            Charity
           </button>
         </div>
+
+         {/* Nếu đang ở tab "tuthien", hiển thị báo cáo Coming Soon */}
+         {activeTab === "tuthien" && (
+           <div className="report-modal">
+           <Report
+             onClose={() => setShowReport(false)}
+           />
+         </div>
+        )}
 
         {/* Hiển thị dữ liệu */}
         <div className="content-container">
@@ -131,8 +142,13 @@ function QuaThuong() {
             } else {
               return null;
             }
-          })}
+            
+          })
+          
+          }
+          
         </div>
+        
       </main>
       <Footer />
     </div>

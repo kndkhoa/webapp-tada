@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 
 import Header from "../components/Header";
 import IncomeChart from "../components/Income-Chart";
@@ -9,91 +7,86 @@ import TradingAnalysis from "../components/Trading-Analysis";
 import Strategy from "../components/Controller-Strategy";
 import ControllerMore from "../components/Controller-More";
 import ControllerAccount from "../components/Controller-Account";
+import DemoAccount from "../components/Demo-Account"; // Thêm import component DemoAccount
+import BotAdd from "../components/Bot-Add";
 import Footer from "../components/Footer";
+import Report from "../components/Report-Bot";
+import BuyAC from "../components/BuyAC";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 import "./KhoTang.css";
 
 function FundBot() {
   const [activeTab, setActiveTab] = useState("portfolio"); // Tab hiện tại
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true); // Trạng thái loading
+  const [showDemoAccount, setShowDemoAccount] = useState(true);
+  const [showReport, setShowReport] = useState(false);
+  const [showBuyAC, setShowBuyAC] = useState(false);
 
-  const navigate = useNavigate();
   const [direction, setDirection] = useState(1); // Hướng trượt
 
-  // Lấy dữ liệu từ sessionStorage
   useEffect(() => {
     const cachedUserData = sessionStorage.getItem("userData");
 
     if (cachedUserData) {
       const parsedData = JSON.parse(cachedUserData);
-
-      // Đảm bảo `trading_accounts` luôn có giá trị
       if (!parsedData.trading_accounts) {
         parsedData.trading_accounts = [];
       }
-
       setUserData(parsedData);
     } else {
       console.error("No user data found in sessionStorage!");
-      setUserData({ trading_accounts: [] }); // Đảm bảo không bị undefined
+      setUserData({ trading_accounts: [] });
     }
 
     setLoading(false);
   }, []);
 
-  // Hàm cập nhật userData
   const handleUserDataUpdate = (updatedAccounts) => {
     setUserData((prevData) => {
       if (!prevData || !Array.isArray(prevData.trading_accounts)) return prevData;
-
       const newUserData = {
         ...prevData,
-        trading_accounts: Array.isArray(updatedAccounts) ? updatedAccounts : [], // Đảm bảo updatedAccounts là một mảng
+        trading_accounts: Array.isArray(updatedAccounts) ? updatedAccounts : [],
       };
-
-      console.log("Updating sessionStorage with:", newUserData);
-      sessionStorage.setItem("userData", JSON.stringify(newUserData)); // Cập nhật sessionStorage
+      sessionStorage.setItem("userData", JSON.stringify(newUserData));
       return newUserData;
     });
   };
 
-  // Đổi tab (portfolio, controller)
+  const updateUserData = (newData) => {
+    setUserData((prevData) => {
+      const updatedData = { ...prevData, ...newData };
+      sessionStorage.setItem("userData", JSON.stringify(updatedData));
+      return updatedData;
+    });
+  };
+
   const handleTabClick = (tab) => {
-    setDirection(tab === "portfolio" ? 1 : -1); // Xác định hướng trượt
+    setDirection(tab === "portfolio" ? 1 : -1);
     setActiveTab(tab);
   };
 
-  const tabVariants = {
-    initial: (direction) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      position: "absolute",
-    }),
-    animate: {
-      x: 0,
-      position: "relative",
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? "100%" : "-100%",
-      position: "absolute",
-      transition: { duration: 0.5, ease: "easeInOut" },
-    }),
-  };
-
-  // Tìm tài khoản có status = 1
   const activeAccount = userData?.trading_accounts?.find(
     (account) => account.status === 1
   );
 
   if (!userData) {
-    return <p>Đang tải dữ liệu...</p>;
+    return <ReloadSkeleton />;
   }
 
   return (
     <div className="App">
       <Header walletAC={userData.wallet_AC} userId={userData.userID} />
       <main>
-        {/* Tab Menu */}
+        {userData.trading_accounts.length === 0 && showDemoAccount &&  (
+          <div className="report-modal">
+          <DemoAccount userID={userData.userID} onClose={() => {
+              setShowDemoAccount(false);
+              updateUserData(JSON.parse(sessionStorage.getItem("userData")));
+            }} />
+          </div>
+        )}
         <div className="tab-menu">
           <button
             className={`btn_portfolio ${activeTab === "portfolio" ? "active" : ""}`}
@@ -115,18 +108,7 @@ function FundBot() {
           </button>
         </div>
 
-        {/* Nội dung thay đổi theo tab */}
         <div className="content-container">
-          <AnimatePresence exitBeforeEnter custom={direction}>
-            <motion.div
-              key={activeTab} // Mỗi tab có một key khác nhau
-              custom={direction}
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="tab-content"
-            >
               {loading ? (
                 <p>Loading...</p>
               ) : (
@@ -136,7 +118,7 @@ function FundBot() {
                       <IncomeChart 
                         trading_accounts={userData.trading_accounts}
                         accountMT5={activeAccount?.accountMT5 || ""}
-                        />
+                      />
                       <Balance 
                         trading_accounts={userData.trading_accounts}
                         accountMT5={activeAccount?.accountMT5 || ""} 
@@ -151,39 +133,65 @@ function FundBot() {
                     <div>
                       <Strategy
                         userID={userData.userID}
-                        accountMT5={activeAccount?.accountMT5 || ""} // Truyền accountMT5 có status = 1
+                        accountMT5={activeAccount?.accountMT5 || ""}
                         trading_accounts={userData.trading_accounts}
-                        onUserDataUpdate={handleUserDataUpdate} // Truyền hàm callback
+                        onUserDataUpdate={handleUserDataUpdate}
                       />
                       <ControllerMore
                         userID={userData.userID}
-                        accountMT5={activeAccount?.accountMT5 || ""} // Truyền accountMT5 có status = 1
-                        onUserDataUpdate={handleUserDataUpdate} // Truyền hàm callback
+                        accountMT5={activeAccount?.accountMT5 || ""}
+                        onUserDataUpdate={handleUserDataUpdate}
                       />
                     </div>
                   )}
                   {activeTab === "account" && (
                     <div>
                       {userData.trading_accounts.length > 0 ? (
-                        userData.trading_accounts.map((account, index) => (
+                        userData.trading_accounts
+                        .filter(account => account.apikeyBot !== null && account.apikeyBot !== undefined) // Lọc những tài khoản có apikeyBot khác null hoặc undefined
+                        .map((account, index) => (
                           <ControllerAccount
+                            key={index}
                             index={index}
                             userID={userData.userID}
-                            accountMT5={account.accountMT5} // Truyền đúng accountMT5 vào mỗi component
+                            accountMT5={account.accountMT5}
                             trading_accounts={userData.trading_accounts}
-                            onUserDataUpdate={handleUserDataUpdate} // Truyền hàm callback
+                            onUserDataUpdate={handleUserDataUpdate}
                           />
-                        ))
+                      ))
                       ) : (
-                        <p>Không có tài khoản giao dịch nào.</p>
+                        <p>Don't found any legal account.</p>
                       )}
+
+                      <BotAdd onClick={() => setShowReport(true)} />
                     </div>
                   )}
                 </>
               )}
-            </motion.div>
-          </AnimatePresence>
         </div>
+        {showReport && !showBuyAC && (
+          <div className="report-modal">
+            <Report
+              userID={userData.userID}
+              price={500}
+              walletAC={userData.wallet_AC}
+              onClose={() => setShowReport(false)}
+              onBuyAC={() => {
+                setShowReport(false); // Ẩn Report
+                setShowBuyAC(true);   // Hiển thị BuyAC
+              }}
+              />
+          </div>
+        )}
+        {showBuyAC && (
+          <div className="report-modal">
+          <BuyAC 
+            userID={userData.userID} 
+            walletAC={userData.wallet_AC}
+            onClose={() => setShowBuyAC(false)}
+          />
+        </div>
+        )}
       </main>
       <Footer />
     </div>

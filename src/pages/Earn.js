@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import Header from "../components/Header";
 import Signal from "../components/Signal";
 import Channel from "../components/Channel";
 import Footer from "../components/Footer";
 import Report from "../components/Report"; // Import component Report
 import BuyAC from "../components/BuyAC";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 import "./KhoTang.css";
 import "./Earn.css";
 
@@ -26,6 +26,11 @@ const formatDate = (dateString) => {
 function Earn() {
   const [activeTab, setActiveTab] = useState("signal");
   const [activeCatalogue, setActiveCatalogue] = useState("All");
+  const [autoCopyData, setAutoCopyData] = useState({});
+  const [apikeyBot, setApikeyBot] = useState("");
+  const [accountMT5, setAccountMT5] = useState("");
+  const [groupId, setGroupID] = useState({});
+  const [freeTradingList, setFreeTradingList] = useState([]);
   const [dataType, setDataType] = useState("Signals");
   const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,12 +81,23 @@ function Earn() {
       const activeAccount = userData.trading_accounts?.find(account => account.status === 1);
       const followingAuthors = activeAccount?.following_channels?.map(channel => channel.author) || [];
 
+      const autoCopyMapping = {};
+        activeAccount.following_channels?.forEach(channel => {
+          autoCopyMapping[channel.author] = channel.autoCopy ?? 0; // Nếu không có autoCopy thì mặc định là 0
+        });
+
+      const freeTradingSignals = activeAccount?.freetrading?.map(ft => ft.signalID) || [];
+
+      setFreeTradingList(freeTradingSignals);
       setFollowingAuthors(followingAuthors);
+      setAutoCopyData(autoCopyMapping);
+      setApikeyBot(activeAccount.apikeyBot || "");
+      setAccountMT5(activeAccount.accountMT5 || "");
+      setGroupID(activeAccount.telegramgroup_id || 0);
     } else {
       console.error("No user data found in sessionStorage!");
       return;
     }
-    
 
     let data = [];
     if (dataType === "Signals" || dataType === "Results") {
@@ -105,10 +121,9 @@ function Earn() {
     };
   }, []);
 
-  const signalStatusMap = useMemo(
-    () => new Map(userData?.news_reads?.map((read) => [read.news_id, true])),
-    [userData]
-  );
+  const handleUpdateFreeTrading = (signalID) => {
+    setFreeTradingList((prevList) => [...prevList, signalID]);
+  };
 
   const filteredData = allData.filter((item) => {
     const isMatchingType =
@@ -123,39 +138,17 @@ function Earn() {
     }
     return isMatchingType && isMatchingCatalogue;
   });
-
-  const handleTabClick = (tab, type) => {
-    setDirection(type === "Signals" ? 1 : -1);
-    setActiveTab(tab);
-    setDataType(type);
-    setActiveCatalogue("All");
-  };
-
-  const handleCatalogueClick = (catalogue) => {
-    setActiveCatalogue(catalogue);
-  };
-
-  const tabVariants = {
-    initial: (direction) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      position: "absolute",
-    }),
-    animate: {
-      x: 0,
-      position: "relative",
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? "100%" : "-100%",
-      position: "absolute",
-      transition: { duration: 0.5, ease: "easeInOut" },
-    }),
+  
+  const handleTabClick = (tab, direction) => {
+    setDirection(direction);  // Chỉ định hướng cho hiệu ứng
+    setActiveTab(tab);         // Cập nhật tab hiện tại
+    setDataType(tab === "channel" ? "Channels" : "Signals"); // Cập nhật dataType
   };
 
   if (!userData) {
-    return <p>Đang tải dữ liệu...</p>;
+    return <ReloadSkeleton />;
   }
-
+ 
   return (
     <div className="App">
       <Header walletAC={userData.wallet_AC} userId={userData.userID} />
@@ -164,100 +157,71 @@ function Earn() {
         <div className="tab-menu">
           <button
             className={`btn_signal ${activeTab === "signal" ? "active" : ""}`}
-            onClick={() => handleTabClick("signal", "Signals")}
+            onClick={() => handleTabClick("signal", 1)}
           >
             Live signals
           </button>
           <button
             className={`btn_results ${activeTab === "results" ? "active" : ""}`}
-            onClick={() => handleTabClick("results", "Results")}
+            onClick={() => handleTabClick("results", -1)}
           >
             Results
           </button>
           <button
             className={`btn_channel ${activeTab === "channel" ? "active" : ""}`}
-            onClick={() => handleTabClick("channel", "Channels")}
+            onClick={() => handleTabClick("channel", 1)}
           >
             Channels
           </button>
         </div>
-
-        {/* Nhóm nút lọc */}
-        <div className="filter-buttons">
-          <button
-            className={`filter-button ${activeCatalogue === "All" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("All")}
-          >
-            All
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Crypto" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Crypto")}
-          >
-            Crypto
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Forex" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Forex")}
-          >
-            Forex
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Stock" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Stock")}
-          >
-            Stock
-          </button>
-        </div>
-
-        {/* Nội dung thay đổi theo tab */}
-        <div className="content-container">
-          <AnimatePresence exitBeforeEnter custom={direction}>
-            <motion.div
-              key={activeTab} // Mỗi tab có một key khác nhau
-              custom={direction}
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="tab-content"
-            >
+  
+                {/* Nội dung thay đổi theo tab */}
+                <div className="content-container">
               {loading ? (
                 <p>Loading...</p>
               ) : (
                 filteredData.map((item) => {
+                  const isFollowing = followingAuthors.includes(item.author);
+                  const status = isFollowing ? 1 : 0;
+                  const autoCopy = autoCopyData[item.author] ?? 0;
+                  const freeTradingStatus = freeTradingList.includes(item.signalID) ? 1 : 0;
                   if (item.dataType === "Signals") {
                     return (
                       <Signal
                         avatar={item.avatar}
-                        TP1={item.TP1}
-                        TP2={item.TP2}
-                        TP3={item.TP3}
-                        E1={item.E1}
-                        E2={item.E2}
-                        E3={item.E3}
-                        SL={item.SL}
-                        margin={item.margin}
-                        command={item.command}
-                        result={item.result}
+                        TP1={item.tpSigPrice1}
+                        TP2={item.tpSigPrice2}
+                        TP3={item.tpSigPrice3}
+                        E1={item.eSigPrice}
+                        SL={item.slSigPrice1}
+                        margin={item.symbol}
+                        command={item.isBuy}
+                        result={item.R_result}
+                        apikeyBot={apikeyBot}
+                        accountMT5={accountMT5}
+                        freetrading={freeTradingStatus}
+                        groupId={groupId}
                         author={item.author}
+                        signalID={item.signalID}
+                        userID={userData.userID}
+                        status={status}
+                        autoCopy={autoCopy}
+                        R_result={item.R_result}                      
                         created_at={formatDate(item.created_at)}
                         done_at={item.done_at ? formatDate(item.done_at) : null}
+
+                        onUpdateFreeTrading={handleUpdateFreeTrading} // Truyền callback xuống Signal
                       />
                     );
                   } else if (item.dataType === "Channels") {
-                    const isFollowing = followingAuthors.includes(item.author);
-                    const status = isFollowing ? 1 : 0;
-                    console.log("danh sách author"+ followingAuthors);
-                    console.log("status channel = " + status + item.author);
                     return (
                       <Channel
                         author={item.author}
                         avatar={item.avatar}
                         description={item.description}
-                        profitRank={item.profitRank}
+                        profitRank={item.wpr}
                         totalSignals={item.totalSignals}
-                        totalPips={item.totalPips}
+                        totalPips={item.totalResult}
                         status={status}
                         price={item.price}
                         onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
@@ -268,10 +232,9 @@ function Earn() {
                   return null;
                 })
               )}
-            </motion.div>
-          </AnimatePresence>
         </div>
-        {showReport && !showBuyAC && (
+
+  {showReport && !showBuyAC && (
   <div className="report-modal">
     <Report
       author={reportAuthor}

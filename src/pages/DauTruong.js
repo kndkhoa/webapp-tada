@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import Header from "../components/Header";
 import QuizCard from "../components/QuizCard";
+import Report from "../components/Report-Challenge";
 import Footer from "../components/Footer";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 import { preloadData } from "./api";
 import "./DauTruong.css";
 
@@ -13,6 +14,7 @@ function DauTruong() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showReport, setShowReport] = useState(true);
 
   const navigate = useNavigate();
   const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
@@ -61,29 +63,12 @@ function DauTruong() {
   };
 
   if (loading) {
-    return <p>Đang tải dữ liệu...</p>;
+    return <ReloadSkeleton />;
   }
 
   if (error) {
     return <p style={{ color: "red" }}>Lỗi: {error}</p>;
   }
-
-  const tabVariants = {
-    initial: (direction) => ({
-      x: direction > 0 ? "100%" : "-100%", // Tab mới bắt đầu ngoài màn hình
-      position: "absolute", // Đảm bảo tab nằm đè lên tab cũ
-    }),
-    animate: {
-      x: 0, // Tab mới trượt vào vị trí trung tâm
-      position: "relative", // Đưa tab mới về vị trí bình thường sau khi chuyển đổi
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? "100%" : "-100%", // Tab cũ trượt ra khỏi màn hình
-      position: "absolute", // Đảm bảo tab cũ không ảnh hưởng tab mới
-      transition: { duration: 0.5, ease: "easeInOut" },
-    }),
-  };
 
   const direction = activeTab === "Đấu AC" ? 1 : -1;
 
@@ -96,27 +81,17 @@ function DauTruong() {
             className={`btn_dauac ${activeTab === "Đấu AC" ? "active" : ""}`}
             onClick={() => handleTabClick("Đấu AC")}
           >
-            Đấu AC
+            AC
           </button>
           <button
             className={`btn_dauusdt ${activeTab === "Đấu USDT" ? "active" : ""}`}
             onClick={() => handleTabClick("Đấu USDT")}
           >
-            Đấu USDT
+            USDT
           </button>
         </div>
 
         <div className="quiz-content">
-          <AnimatePresence exitBeforeEnter custom={direction}>
-            <motion.div
-              key={activeTab}
-              custom={direction}
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="quiz-list"
-            >
               {filteredQuizzes.map((quiz) => (
                 <div
                   key={quiz.id}
@@ -135,9 +110,14 @@ function DauTruong() {
                   />
                 </div>
               ))}
-            </motion.div>
-          </AnimatePresence>
         </div>
+        {showReport && (
+  <div className="report-modal">
+    <Report
+      onClose={() => setShowReport(false)}
+    />
+  </div>
+)}
       </main>
       <Footer />
     </div>

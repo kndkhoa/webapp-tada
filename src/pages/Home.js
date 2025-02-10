@@ -14,7 +14,7 @@ import Loading from "../components/loading";
 import { preloadData } from "./api"; // Import từ file API
 
 const announData = [
-  "Chào mừng bạn đến với Đấu Trường!",
+  "Welcome to Finance World!",
   "Đừng bỏ lỡ cơ hội nhận giải thưởng lớn!",
   "Khám phá ngay các item hấp dẫn!",
   "Tìm hiểu thêm về các chương trình ưu đãi!",
@@ -49,6 +49,7 @@ function Home() {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
+  const [followingAuthors, setFollowingAuthors] = useState([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -121,53 +122,26 @@ function Home() {
     fetchData();
   }, [telegramId, apiKey]);
 
-  // Tạo Map để kiểm tra trạng thái
-  const quizStatusMap = useMemo(
-    () => new Map(userData?.quiz_rank?.map((done) => [done.quizID, true])),
-    [userData]
-  );
-
-  const newsStatusMap = useMemo(
-    () => new Map(userData?.news_reads?.map((read) => [read.news_id, true])),
-    [userData]
-  );
-
-  const navigateToDetail = (id, dataType) => {
-    if (dataType === "Tin tức" || dataType === "TadaTV") {
-      navigate(`/${dataType}/${id}`);
-    } else if (dataType === "Đấu AC" || dataType === "Đấu USDT") {
-      navigate(`/quiz/${id}?${dataType}`);
-    } else if (dataType === "Courses") {
-      navigate(`/courses/${id}`);
+  // Lấy danh sách followingAuthors từ activeAccount
+  useEffect(() => {
+    if (userData) {
+      const activeAccount = userData.trading_accounts?.find(account => account.status === 1);
+      const followingAuthors = activeAccount?.following_channels?.map(channel => channel.author) || [];
+      setFollowingAuthors(followingAuthors);
     }
-  };
+  }, [userData]);
 
   // Cập nhật walletAC từ sessionStorage khi Home load
   useEffect(() => {
     const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
     setUserData(storedUserData);
-  }, []); // Chạy khi Home mount
+  }, []);
 
-  // Lấy dữ liệu người dùng từ sessionStorage khi component mount
-  useEffect(() => {
-    const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
-    if (storedUserData) {
-      setUserData(storedUserData);
-      setWalletAC(storedUserData.wallet_AC || 0); // Lấy wallet_AC từ sessionStorage
-    }
-
-    // Lắng nghe sự kiện 'storage' để cập nhật walletAC khi có thay đổi trong sessionStorage
-    const handleStorageChange = () => {
-      const updatedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
-      setWalletAC(updatedUserData.wallet_AC || 0);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange); // Cleanup sự kiện khi component unmount
-    };
-  }, []); // Chỉ chạy khi component mount
+    useEffect(() => {
+      window.updateFollowingAuthors = (author) => {
+        setFollowingAuthors((prevAuthors) => [...prevAuthors, author]);
+      };
+    }, []);
 
   return (
     <div className="home">
@@ -183,7 +157,7 @@ function Home() {
       </div>
       <main className="content-wrapper">
         <h2 className="title">Featured Channels</h2>
-        {quizData.length === 0 ? (
+        {channelData.length === 0 ? (
           <Loading />
         ) : (
           <Swiper
@@ -191,53 +165,60 @@ function Home() {
             slidesPerView={1}
             pagination={{ clickable: true, dynamicBullets: true }}
           >
-            {channelData.map((item) => (
-              <SwiperSlide
-                key={item.id}
-                onClick={() => navigateToDetail(item.id, item.dataType)}
-              >
-                 <Channel
-                        author={item.author}
-                        avatar={item.avatar}
-                        description={item.description}
-                        profitRank={item.profitRank}
-                        totalSignals={item.totalSignals}
-                        totalPips={item.totalPips}
-                        status={status}
-                        price={item.price}
-                        onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
-                        updateFollowingAuthors={window.updateFollowingAuthors}
-                      />
-              </SwiperSlide>
-            ))}
+            {channelData.map((item) => {
+              const isFollowing = followingAuthors.includes(item.author);
+              const status = isFollowing ? 1 : 0;
+              return (
+                <SwiperSlide key={item.id}>
+                  <Channel
+                    author={item.author}
+                    avatar={item.avatar}
+                    description={item.description}
+                    profitRank={item.profitRank}
+                    totalSignals={item.totalSignals}
+                    totalPips={item.totalPips}
+                    status={status}
+                    price={item.price}
+                    onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
+                    updateFollowingAuthors={window.updateFollowingAuthors}
+                  />
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
         )}
         <div className="dynamic-content">
-          <h2 className="title">Lastest Signals</h2>
+          <h2 className="title">Latest Signals</h2>
         </div>
         {signalData.length === 0 ? (
           <Loading />
         ) : (
           <div>
-            {signalData.map((item) => (
-              <div>
-                <Signal
-                        avatar={item.avatar}
-                        TP1={item.TP1}
-                        TP2={item.TP2}
-                        TP3={item.TP3}
-                        E1={item.E1}
-                        E2={item.E2}
-                        E3={item.E3}
-                        SL={item.SL}
-                        margin={item.margin}
-                        command={item.command}
-                        result={item.result}
-                        author={item.author}
-                        created_at={formatDate(item.created_at)}
-                      />
-              </div>
-            ))}
+            {signalData
+              .filter((item) => item.done_at === null)
+              .map((item) => {
+                const isFollowing = followingAuthors.includes(item.author);
+                const status = isFollowing ? 1 : 0;
+                return (
+                  <div key={item.id}>
+                    <Signal
+                      avatar={item.avatar}
+                      TP1={item.tpSigPrice1}
+                      TP2={item.tpSigPrice2}
+                      TP3={item.tpSigPrice3}
+                      E1={item.eSigPrice}
+                      SL={item.slSigPrice1}
+                      margin={item.symbol}
+                      command={item.isBuy}
+                      result={item.R_result}
+                      author={item.author}
+                      status={status}
+                      created_at={formatDate(item.created_at)}
+                      done_at={null}
+                    />
+                  </div>
+                );
+              })}
           </div>
         )}
       </main>

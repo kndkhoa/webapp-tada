@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 import Header from "../components/Header";
 import News from "../components/News";
 import TadaTV from "../components/TadaTV";
@@ -10,9 +9,15 @@ import Footer from "../components/Footer";
 import "./KhoTang.css";
 
 function KhoTang() {
-  const [activeTab, setActiveTab] = useState("tintuc"); // Tab hiện tại
+  const [activeTab, setActiveTab] = useState(() => {
+    const fromCourseDetail = sessionStorage.getItem("fromCourseDetail");
+    sessionStorage.removeItem("fromCourseDetail"); // Reset để không ảnh hưởng lần sau
+    return fromCourseDetail ? "khoahoc" : "tintuc"; // Nếu từ CourseDetail về thì mở tab "Khoá học"
+  });
   const [activeCatalogue, setActiveCatalogue] = useState("All"); // Loại tin tức (Crypto, Forex,...)
-  const [dataType, setDataType] = useState("Tin tức"); // Kiểu dữ liệu (Tin tức, TadaTV, Courses)
+  const [dataType, setDataType] = useState(() => {
+    return activeTab === "khoahoc" ? "Courses" : "Tin tức";
+  });
   const [allData, setAllData] = useState([]); // Dữ liệu API
   const [loading, setLoading] = useState(true); // Trạng thái loading
   const [userData, setUserData] = useState(null);
@@ -31,24 +36,30 @@ function KhoTang() {
     const cachedCourseData = sessionStorage.getItem("courseData");
 
     if (cachedUserData) {
-      setUserData(JSON.parse(cachedUserData));
+        setUserData(JSON.parse(cachedUserData));
     } else {
-      console.error("No user data found in sessionStorage!");
-      return;
+        console.error("No user data found in sessionStorage!");
+        return;
     }
 
     let data = [];
     if (dataType === "Tin tức") {
-      data = JSON.parse(cachedNewsData || "[]");
+        data = JSON.parse(cachedNewsData || "[]");
     } else if (dataType === "TadaTV") {
-      data = JSON.parse(cachedNewsData || "[]").filter(item => item.dataType === "TadaTV");
+        data = JSON.parse(cachedNewsData || "[]").filter(item => item.dataType === "TadaTV");
     } else if (dataType === "Courses") {
-      data = JSON.parse(cachedCourseData || "[]");
+        data = JSON.parse(cachedCourseData || "[]");
     }
 
     setAllData(data);
     setLoading(false);
-  }, [dataType]);
+}, [dataType, activeTab]); // Khi `dataType` hoặc `activeTab` thay đổi, useEffect sẽ chạy lại
+
+useEffect(() => {
+  if (activeTab === "tintuc") setDataType("Tin tức");
+  if (activeTab === "tadatv") setDataType("TadaTV");
+  if (activeTab === "khoahoc") setDataType("Courses");
+}, [activeTab]);
 
   const newsStatusMap = useMemo(
     () => new Map(userData?.news_reads?.map((read) => [read.news_id, true])),
@@ -69,25 +80,8 @@ function KhoTang() {
     setActiveCatalogue("All"); // Reset catalogue khi đổi tab
   };
 
-  const tabVariants = {
-    initial: (direction) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      position: "absolute",
-    }),
-    animate: {
-      x: 0,
-      position: "relative",
-      transition: { duration: 0.5, ease: "easeInOut" },
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? "100%" : "-100%",
-      position: "absolute",
-      transition: { duration: 0.5, ease: "easeInOut" },
-    }),
-  };
-
   if (!userData) {
-    return <p>Đang tải dữ liệu...</p>;
+    return <ReloadSkeleton />;
   }
 
   return (
@@ -100,7 +94,7 @@ function KhoTang() {
             className={`btn_tintuc ${activeTab === "tintuc" ? "active" : ""}`}
             onClick={() => handleTabClick("tintuc", "Tin tức")}
           >
-            Tin tức
+            News
           </button>
           <button
             className={`btn_tadatv ${activeTab === "tadatv" ? "active" : ""}`}
@@ -112,22 +106,12 @@ function KhoTang() {
             className={`btn_khoahoc ${activeTab === "khoahoc" ? "active" : ""}`}
             onClick={() => handleTabClick("khoahoc", "Courses")}
           >
-            Khóa học
+            Courses
           </button>
         </div>
 
         {/* Nội dung thay đổi theo tab */}
         <div className="content-container">
-          <AnimatePresence exitBeforeEnter custom={direction}>
-            <motion.div
-              key={activeTab} // Mỗi tab có một key khác nhau
-              custom={direction}
-              variants={tabVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="tab-content"
-            >
               {loading ? (
                 <p>Loading...</p>
               ) : (
@@ -182,8 +166,6 @@ function KhoTang() {
                   return null;
                 })
               )}
-            </motion.div>
-          </AnimatePresence>
         </div>
       </main>
       <Footer />
