@@ -37,7 +37,7 @@ function CourseDetail() {
       if (!userData) return;
 
       try {
-        const response = await fetch(`http://admin.tducoin.com/api/course/${id}/${userData.userID}`, {
+        const response = await fetch(`https://admin.tducoin.com/api/course/${id}/${userData.userID}`, {
           method: 'GET',
           headers: {
             'x-api-key': apiKey,
