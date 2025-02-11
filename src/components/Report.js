@@ -79,9 +79,12 @@ const Report = ({ userID, author, price, walletAC, disccount, amount, onBuyAC, o
           // Lưu lại vào sessionStorage
           sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
       
+          // Phát sự kiện tùy chỉnh để cập nhật Header ngay lập tức
+          window.dispatchEvent(new Event("walletUpdated"));
+
           // Gọi hàm cập nhật Header nếu có
           if (typeof window.updateHeaderWalletAC === "function") {
-              window.updateHeaderWalletAC(updatedWalletAC);
+            window.updateHeaderWalletAC(updatedWalletAC);
           }
       } else {
           throw new Error(data.message || "Failed to register.");
@@ -117,9 +120,9 @@ const Report = ({ userID, author, price, walletAC, disccount, amount, onBuyAC, o
               <p><b>Subscription Successful!</b></p>
               <p>You have successfully subscribed to <b>{author}</b>'s channel.</p>
               <p><b>Final Cost:</b> {responseData.final_cost} AC</p>
-              <p><b>Discount Applied:</b> {responseData.discount_applied} AC</p>
+              <p><b>Discount Applied: </b> {responseData.discount_applied} AC</p>
               <p><b>Remaining Balance:</b> {responseData.wallet_balance_after} AC</p>
-              <p><b>Subscription Valid Until:</b> 
+              <p><b>Subscription Valid Until: </b> 
                 {responseData.followers && responseData.followers.length > 0
                   ? new Date(responseData.followers[0].done_at).toLocaleDateString()
                   : "N/A"}
