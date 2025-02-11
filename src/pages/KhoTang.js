@@ -113,7 +113,7 @@ useEffect(() => {
         {/* Nội dung thay đổi theo tab */}
         <div className="content-container">
               {loading ? (
-                <p>Loading...</p>
+                <ReloadSkeleton />
               ) : (
                 filteredData.map(item => {
                   if (item.dataType === "Tin tức") {
