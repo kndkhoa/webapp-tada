@@ -13,8 +13,10 @@ const Gift = ({ title, banner, description, giftValue, gift_title, remaining_gif
     <div className="gift" style={{ backgroundColor: backgroundColor || "#186ECC" }}>
       <div className="giftpic-container">
        <div className="news-pic">
+          <div className="news-pic">
             <PreloadImage src={picUrl} alt="Pic" />
-            </div>
+          </div> 
+        </div>
       </div>
       <div className="gift-content">
         <h2>{title}</h2>
