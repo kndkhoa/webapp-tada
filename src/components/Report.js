@@ -17,7 +17,7 @@ const Report = ({ userID, author, price, walletAC, disccount, amount, onBuyAC, o
     setError(null);
 
     try {
-        const response = await fetch("http://admin.tducoin.com/api/signal/registrychannel", {
+        const response = await fetch("https://admin.tducoin.com/api/signal/registrychannel", {
             method: "POST",
             headers: {
                 "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
