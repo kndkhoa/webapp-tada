@@ -7,32 +7,30 @@ import { Link } from "react-router-dom";
 import "./Header.css";
 
 const Header = ({ userId }) => {
-  const [walletAC, setWalletAC] = useState(0);
-  const location = useLocation();
+  const [walletAC, setWalletAC] = useState(() => {
+    const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
+    return storedUserData.wallet_AC || 0;
+  });
 
-  useEffect(() => {
+  // Hàm cập nhật số dư
+  const updateWalletAC = () => {
     const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
     setWalletAC(storedUserData.wallet_AC || 0);
-
-    window.updateHeaderWalletAC = (newBalance) => {
-      setWalletAC(newBalance);
-    };
-  }, []);
+  };
 
   useEffect(() => {
-    let interval;
-    if (location.pathname === "/home") {
-      interval = setInterval(() => {
-        const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
-        setWalletAC(storedUserData.wallet_AC || 0);
-      }, 1000);
-    }
+    // Lắng nghe sự kiện tùy chỉnh để cập nhật ngay lập tức
+    const handleWalletUpdate = () => updateWalletAC();
+
+    window.addEventListener("walletUpdated", handleWalletUpdate);
+
+    // Kiểm tra và cập nhật ngay khi app khởi động
+    updateWalletAC();
+
     return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
+      window.removeEventListener("walletUpdated", handleWalletUpdate);
     };
-  }, [location.pathname]);
+  }, []);
 
   // Hàm đóng WebApp để quay về giao diện chính của Telegram
   const handleCloseWebApp = () => {
