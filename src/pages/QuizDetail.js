@@ -63,7 +63,7 @@ function QuizDetail() {
   useEffect(() => {
     const fetchQuizDetail = async () => {
       try {
-        const response = await fetch(`http://admin.tducoin.com/api/quiz/${id}`, {
+        const response = await fetch(`https://admin.tducoin.com/api/quiz/${id}`, {
           method: "GET",
           headers: {
             "x-api-key": apiKey,
@@ -105,7 +105,7 @@ function QuizDetail() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${quiz.banner}`;
 
   const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
