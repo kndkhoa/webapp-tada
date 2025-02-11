@@ -5,7 +5,7 @@ import usdtIcon from './assets/icons/usdt.png';
 import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const Charity = ({ id, title, banner, description, charity_target, charity_status, top_contributors, members, charity_title }) => {
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${banner}`;
   
   return (
