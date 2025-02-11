@@ -57,21 +57,10 @@ function Home() {
 
   // Lấy ID từ URL hoặc gán mặc định
   useEffect(() => {
-  const queryParams = new URLSearchParams(location.search);
-  const userId = queryParams.get("telegramId") || 9999; // Mặc định nếu không có ID
-  const name = queryParams.get("name") || "";
-  const avatar = queryParams.get("avatar") || "";
-  const telegramNick = queryParams.get("telegramNick") || "";
-
-  // Lưu thông tin vào state
-  setTelegramId(userId);
-  setUserData({
-    userID: userId,
-    name: name,
-    avatar: avatar,
-    telegramNick: telegramNick,
-  });
-}, [location.search]);
+    const queryParams = new URLSearchParams(location.search);
+    const userId = queryParams.get("telegramId") || 9999; // Mặc định nếu không có ID
+    setTelegramId(userId);
+  }, [location.search]);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
@@ -139,6 +128,7 @@ function Home() {
       const activeAccount = userData.trading_accounts?.find(account => account.status === 1);
       const followingAuthors = activeAccount?.following_channels?.map(channel => channel.author) || [];
       setFollowingAuthors(followingAuthors);
+      setWalletAC(userData.wallet_AC || 0);
     }
   }, [userData]);
 
@@ -154,88 +144,92 @@ function Home() {
       };
     }, []);
 
-  return (
-    <div className="home">
-      {isLoading && <Loading />}
-      <Header userId={userData?.userID} />
-      <div className="rectangle-container">
-        <div className="home-circle">
-          <img src={avatar} alt="Gift Icon" />
-        </div>
-        <div className="rectangle">
-          <div className="rectangle-text">{announText}</div>
-        </div>
+    return (
+      <div className="home">
+        {isLoading && <Loading />}
+        {!isLoading && (
+          <>
+            <Header userId={userData?.userID} />
+            <div className="rectangle-container">
+              <div className="home-circle">
+                <img src={avatar} alt="Gift Icon" />
+              </div>
+              <div className="rectangle">
+                <div className="rectangle-text">{announText}</div>
+              </div>
+            </div>
+            <main className="content-wrapper">
+              <h2 className="title">Featured Channels</h2>
+              {channelData.length === 0 ? (
+                <Loading />
+              ) : (
+                <Swiper
+                  spaceBetween={20}
+                  slidesPerView={1}
+                  pagination={{ clickable: true, dynamicBullets: true }}
+                >
+                  {channelData.map((item) => {
+                    const isFollowing = followingAuthors.includes(item.author);
+                    const status = isFollowing ? 1 : 0;
+                    return (
+                      <SwiperSlide key={item.id}>
+                        <Channel
+                          author={item.author}
+                          avatar={item.avatar}
+                          description={item.description}
+                          profitRank={item.profitRank}
+                          totalSignals={item.totalSignals}
+                          totalPips={item.totalPips}
+                          status={status}
+                          price={item.price}
+                          onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
+                          updateFollowingAuthors={window.updateFollowingAuthors}
+                        />
+                      </SwiperSlide>
+                    );
+                  })}
+                </Swiper>
+              )}
+              <div className="dynamic-content">
+                <h2 className="title">Latest Signals</h2>
+              </div>
+              {signalData.length === 0 ? (
+                <Loading />
+              ) : (
+                <div>
+                  {signalData
+                    .filter((item) => item.done_at === null)
+                    .map((item) => {
+                      const isFollowing = followingAuthors.includes(item.author);
+                      const status = isFollowing ? 1 : 0;
+                      return (
+                        <div key={item.id}>
+                          <Signal
+                            avatar={item.avatar}
+                            TP1={item.tpSigPrice1}
+                            TP2={item.tpSigPrice2}
+                            TP3={item.tpSigPrice3}
+                            E1={item.eSigPrice}
+                            SL={item.slSigPrice1}
+                            margin={item.symbol}
+                            command={item.isBuy}
+                            result={item.R_result}
+                            author={item.author}
+                            status={status}
+                            created_at={formatDate(item.created_at)}
+                            done_at={null}
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </main>
+            <Footer />
+          </>
+        )}
       </div>
-      <main className="content-wrapper">
-        <h2 className="title">Featured Channels</h2>
-        {channelData.length === 0 ? (
-          <Loading />
-        ) : (
-          <Swiper
-            spaceBetween={20}
-            slidesPerView={1}
-            pagination={{ clickable: true, dynamicBullets: true }}
-          >
-            {channelData.map((item) => {
-              const isFollowing = followingAuthors.includes(item.author);
-              const status = isFollowing ? 1 : 0;
-              return (
-                <SwiperSlide key={item.id}>
-                  <Channel
-                    author={item.author}
-                    avatar={item.avatar}
-                    description={item.description}
-                    profitRank={item.profitRank}
-                    totalSignals={item.totalSignals}
-                    totalPips={item.totalPips}
-                    status={status}
-                    price={item.price}
-                    onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
-                    updateFollowingAuthors={window.updateFollowingAuthors}
-                  />
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-        )}
-        <div className="dynamic-content">
-          <h2 className="title">Latest Signals</h2>
-        </div>
-        {signalData.length === 0 ? (
-          <Loading />
-        ) : (
-          <div>
-            {signalData
-              .filter((item) => item.done_at === null)
-              .map((item) => {
-                const isFollowing = followingAuthors.includes(item.author);
-                const status = isFollowing ? 1 : 0;
-                return (
-                  <div key={item.id}>
-                    <Signal
-                      avatar={item.avatar}
-                      TP1={item.tpSigPrice1}
-                      TP2={item.tpSigPrice2}
-                      TP3={item.tpSigPrice3}
-                      E1={item.eSigPrice}
-                      SL={item.slSigPrice1}
-                      margin={item.symbol}
-                      command={item.isBuy}
-                      result={item.R_result}
-                      author={item.author}
-                      status={status}
-                      created_at={formatDate(item.created_at)}
-                      done_at={null}
-                    />
-                  </div>
-                );
-              })}
-          </div>
-        )}
-      </main>
-      <Footer />
-    </div>
-  );
+    );
 }
 
 export default Home;
