@@ -41,7 +41,7 @@ const ControllerMore = ({ userID, accountMT5, onUserDataUpdate }) => {
       console.log("Payload gửi lên API:", payload);
 
       // Gọi API POST
-      const response = await fetch("http://admin.tducoin.com/api/webappuser/tradingaccount", {
+      const response = await fetch("https://admin.tducoin.com/api/webappuser/tradingaccount", {
         method: "POST",
         headers: {
           "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
