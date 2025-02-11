@@ -11,7 +11,9 @@ const Charity = ({ id, title, banner, description, charity_target, charity_statu
   return (
     <div className="charity">
       <div className="charitypic-container">
-        <PreloadImage src={picUrl} alt="charity Pic" className="charity-pic" />
+        <div className="news-pic">
+            <PreloadImage src={picUrl} alt="Pic" />
+            </div>
       </div>
       <div className="charity-content">
         <h2>{title}</h2>
