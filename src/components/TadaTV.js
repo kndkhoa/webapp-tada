@@ -32,8 +32,10 @@ const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, t
         <div className="tadatv-pic-container">
           {/* Đảm bảo đường dẫn ảnh hợp lý */}
           <div className="news-pic">
-            <PreloadImage src={picUrl} alt="Pic" />
-            </div>
+            <div className="news-pic">
+              <PreloadImage src={picUrl} alt="Pic" />
+            </div> 
+          </div>
           {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
           {status === 1 ? (
             <div className="coin-active">
