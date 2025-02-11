@@ -31,7 +31,9 @@ const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, t
         </p>
         <div className="tadatv-pic-container">
           {/* Đảm bảo đường dẫn ảnh hợp lý */}
-          <PreloadImage src={picUrl } alt="Pic" className="tadatv-pic" />
+          const PreloadImage = ({ src, alt, className }) => {
+            return <img src={picUrl } alt="Pic" className="tadatv-pic" />;
+          };
           {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
           {status === 1 ? (
             <div className="coin-active">
