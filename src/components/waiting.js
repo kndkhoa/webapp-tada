@@ -24,7 +24,6 @@ export const ReloadSkeleton = () => {
   );
 };
 
-// Preload Image Component
 export const PreloadImage = ({ src, alt, className }) => {
   const [loaded, setLoaded] = useState(false);
 
@@ -60,3 +59,4 @@ export const PreloadImage = ({ src, alt, className }) => {
     </div>
   );
 };
+
