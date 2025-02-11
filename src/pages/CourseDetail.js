@@ -322,7 +322,7 @@ function CourseDetail() {
         <h2 className="banner-title">{course.title}</h2>
         <div className="banner-info">
           <div className="banner-info-icon">
-            <PreloadImage src={mentorUrl} alt="Mentor Avatar" />
+          <img src={mentorUrl} alt="Mentor Avatar" />
           </div>
           <span className="banner-info-text">{course.mentor}</span>
         </div>
