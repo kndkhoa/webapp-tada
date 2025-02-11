@@ -40,9 +40,9 @@ function QuaThuongDetail() {
       let apiUrl = "";
 
       if (dataTypeFromUrl === "tuthien") {
-        apiUrl = `http://admin.tducoin.com/api/charity/${id}`;
+        apiUrl = `https://admin.tducoin.com/api/charity/${id}`;
       } else if (dataTypeFromUrl === "doithuong") {
-        apiUrl = `http://admin.tducoin.com/api/gift/${id}`;
+        apiUrl = `https://admin.tducoin.com/api/gift/${id}`;
       } else {
         setError("Invalid dataType");
         setLoading(false);
