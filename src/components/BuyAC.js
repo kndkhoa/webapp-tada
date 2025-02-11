@@ -86,7 +86,7 @@ const updateUserBalance = async (userID, usdtAmount) => {
 
     // Gửi yêu cầu POST cập nhật AC cho user
     try {
-        const response = await fetch("http://admin.tducoin.com/api/webappuser/addac", {
+        const response = await fetch("https://admin.tducoin.com/api/webappuser/addac", {
             method: "POST",
             headers: {
                 "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
