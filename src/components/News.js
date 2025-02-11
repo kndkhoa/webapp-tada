@@ -8,7 +8,7 @@ import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
 
 const News = ({ title, banner, description, ac, heartValue, commentValue, author, created_at, status }) => {
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${banner}`;
 
   return (
