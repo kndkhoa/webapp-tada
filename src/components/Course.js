@@ -3,6 +3,7 @@ import "./Course.css";
 import DOMPurify from "dompurify";
 import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const Course = ({ title, banner, description, ac, completion, status }) => {
   const BASE_URL = "https://admin.tducoin.com/public/storage/";
@@ -11,7 +12,7 @@ const Course = ({ title, banner, description, ac, completion, status }) => {
   return (
     <div className="course">
       <div className="pic-container">
-        <img src={picUrl} alt="course Pic" className="course-pic" />
+        <PreloadImage src={picUrl} alt="course Pic" className="course-pic" />
         {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
         {completion === 100 ? (
             <div className="done">
