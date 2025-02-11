@@ -25,17 +25,17 @@ export const ReloadSkeleton = () => {
 };
 
 // Preload Image Component
-export const PreloadImage = ({ src, alt }) => {
+export const PreloadImage = ({ src, alt, className }) => {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <div className="preload-image-container" style={{ position: "relative" }}>
-      {/* Ảnh chính với hiệu ứng mờ dần */}
+      {/* Ảnh chính */}
       <img
         src={src}
         alt={alt}
         onLoad={() => setLoaded(true)}
-        className={`image ${loaded ? "loaded" : "loading"}`}
+        className={`${className} ${loaded ? "loaded" : "loading"}`}
         style={{
           opacity: loaded ? 1 : 0,
           transition: "opacity 1s ease-in-out",
