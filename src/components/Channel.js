@@ -63,7 +63,9 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
   return (
     <div className="course">
       <div className="pic-container">
-        <PreloadImage src={avatar} alt="course Pic" className="course-pic" />
+        const PreloadImage = ({ src, alt, className }) => {
+          return <img src={avatar} alt="course Pic" className="course-pic" />;
+        };
         {(isFollowing || status === 1) ? (
           <div className="done">
             <img src={doneIcon} alt="Done Icon" className="done-icon" />
