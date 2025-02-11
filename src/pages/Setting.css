@@ -25,7 +25,7 @@
     z-index: 10; /* Đảm bảo avatar ở trên banner */
   }
   
-  .avatarsetting {
+  .avatarsetting img {
     width: 150px; /* Kích thước avatar */
     height: 150px;
     border-radius: 50%; /* Hình tròn */
