@@ -26,7 +26,7 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
           }}>
         </p>
         <div className="news-pic-container">
-          <img src={banner} alt="Pic" className="news-pic" />
+          <img src={picUrl } alt="Pic" className="news-pic" />
 
           {/* Hiển thị trạng thái dựa vào status */}
           {ac !== null && (
