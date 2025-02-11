@@ -2,16 +2,17 @@ import React from "react";
 import "./Gift.css";
 import DOMPurify from "dompurify";
 import coinIcon from "./assets/icons/coin-header.png";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const Gift = ({ title, banner, description, giftValue, gift_title, remaining_gifts, backgroundColor }) => {
   
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${banner}`;
   
   return (
     <div className="gift" style={{ backgroundColor: backgroundColor || "#186ECC" }}>
       <div className="giftpic-container">
-        <img src={picUrl} alt="gift Pic" className="gift-pic" />
+        <PreloadImage src={picUrl} alt="gift Pic" className="gift-pic" />
       </div>
       <div className="gift-content">
         <h2>{title}</h2>
