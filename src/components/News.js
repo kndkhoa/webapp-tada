@@ -29,17 +29,20 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
           <img src={banner} alt="Pic" className="news-pic" />
 
           {/* Hiển thị trạng thái dựa vào status */}
-          {status === 1 ? (
-            <div className="coin-active">
-              <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
-              <span>{ac} điểm</span>
-            </div>
-          ) : (
-            <div className="done">
-              <img src={doneIcon} alt="Done Icon" className="done-icon" />
-              <span>Đã hoàn thành</span>
-            </div>
-          )}
+          {ac !== null && (
+  status === 1 ? (
+    <div className="coin-active">
+      <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
+      <span>{ac} điểm</span>
+    </div>
+  ) : (
+    <div className="done">
+      <img src={doneIcon} alt="Done Icon" className="done-icon" />
+      <span>Completed</span>
+    </div>
+  )
+)}
+
 
           <div className="news-footer-container">
             <div className="news-footer">
