@@ -5,13 +5,13 @@ import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
 
 const Course = ({ title, banner, description, ac, completion, status }) => {
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${banner}`;
 
   return (
     <div className="course">
       <div className="pic-container">
-        <img src={picUrl} alt="course Pic" className="course-pic" />
+        <img src={banner} alt="course Pic" className="course-pic" />
         {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
         {completion === 100 ? (
             <div className="done">
