@@ -6,6 +6,7 @@ import commentIcon from './assets/icons/comment.png';
 import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const News = ({ title, banner, description, ac, heartValue, commentValue, author, created_at, status }) => {
   const BASE_URL = "http://admin.tducoin.com/public/storage/";
@@ -32,8 +33,8 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
           {ac !== null && (
   status === 1 ? (
     <div className="coin-active">
-      <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
-      <span>{ac} điểm</span>
+      <PreloadImage src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
+      <span>{ac} point</span>
     </div>
   ) : (
     <div className="done">
@@ -42,7 +43,6 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
     </div>
   )
 )}
-
 
           <div className="news-footer-container">
             <div className="news-footer">
