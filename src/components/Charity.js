@@ -2,6 +2,7 @@ import React from "react";
 import "./Charity.css";
 import DOMPurify from "dompurify";
 import usdtIcon from './assets/icons/usdt.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const Charity = ({ id, title, banner, description, charity_target, charity_status, top_contributors, members, charity_title }) => {
   const BASE_URL = "http://admin.tducoin.com/public/storage/";
@@ -10,7 +11,7 @@ const Charity = ({ id, title, banner, description, charity_target, charity_statu
   return (
     <div className="charity">
       <div className="charitypic-container">
-        <img src={picUrl} alt="charity Pic" className="charity-pic" />
+        <PreloadImage src={picUrl} alt="charity Pic" className="charity-pic" />
       </div>
       <div className="charity-content">
         <h2>{title}</h2>
