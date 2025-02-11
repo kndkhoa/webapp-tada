@@ -147,7 +147,7 @@ function CourseDetail() {
 
   const completeCourse = async () => {
     try {
-      const response = await fetch('http://admin.tducoin.com/api/addbonus/course-completed', {
+      const response = await fetch('https://admin.tducoin.com/api/addbonus/course-completed', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -179,8 +179,6 @@ function CourseDetail() {
   };
 
   const handleVideoPlay = (lesson) => {
-    console.log(`handleVideoPlay called for lesson: ${lesson.lesson_name}`);
-
     if (!lesson.lesson_link.includes('youtube.com/watch?v=')) {
       alert('Link video không hợp lệ');
       return;
@@ -311,7 +309,7 @@ function CourseDetail() {
     return <div>Không tìm thấy khóa học</div>;
   }
 
-  const BASE_URL = 'http://admin.tducoin.com/public/storage/';
+  const BASE_URL = 'https://admin.tducoin.com/public/storage/';
   const picUrl = `${BASE_URL}${course.banner}`;
   const mentorUrl = `${BASE_URL}${course.mentor_avatar}`;
   const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(course.title)}`;
