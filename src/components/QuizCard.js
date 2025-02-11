@@ -33,7 +33,9 @@ const QuizCard = ({
   return (
     <div className="quiz-card">
       <div className="pic-container">
-        <PreloadImage src={picUrl} alt="Quiz Pic" className="quiz-pic" />
+        <div className="news-pic">
+          <PreloadImage src={picUrl} alt="Pic" />
+        </div> 
 
         {/* Hiển thị nội dung dựa vào status */}
         {status === 1 ? (
