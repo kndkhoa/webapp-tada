@@ -65,22 +65,6 @@ function Setting() {
   };
 
   return (
-    <AnimatePresence>
-      <motion.div 
-        className="setting-container"
-        initial={{ x: "-100%", opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: "100%", opacity: 0 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          position: "fixed", // Cố định trang để trượt đúng từ trang trước
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "transparent" // Đảm bảo nền không bị hiện trước
-        }}
-      >
     <div className="setting-detail-container">
       <div className="bannersetting-header">
         <button className="backIcon" onClick={() => window.history.back()}>
@@ -170,8 +154,6 @@ function Setting() {
         )}
       </div>
     </div>
-    </motion.div>
-    </AnimatePresence>
   );
 }
 
