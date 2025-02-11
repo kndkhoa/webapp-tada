@@ -12,7 +12,9 @@ const Course = ({ title, banner, description, ac, completion, status }) => {
   return (
     <div className="course">
       <div className="pic-container">
-        <PreloadImage src={picUrl} alt="course Pic" className="course-pic" />
+        <div className="news-pic">
+            <PreloadImage src={picUrl} alt="Pic" />
+            </div>
         {/* Chỉ xét if để hiển thị nội dung dựa vào status */}
         {completion === 100 ? (
             <div className="done">
