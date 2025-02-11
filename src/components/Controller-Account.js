@@ -35,7 +35,7 @@ const ControllerAccount = ({ userID, index, accountMT5, trading_accounts, onUser
     setLoading(true);
 
     try {
-      const response = await fetch("http://admin.tducoin.com/api/webappuser/tradingaccount", {
+      const response = await fetch("https://admin.tducoin.com/api/webappuser/tradingaccount", {
         method: "POST",
         headers: {
           "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
@@ -49,7 +49,7 @@ const ControllerAccount = ({ userID, index, accountMT5, trading_accounts, onUser
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`https error! Status: ${response.status}`);
       }
 
       const data = await response.json();
