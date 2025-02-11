@@ -27,10 +27,8 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
           }}>
         </p>
         <div className="news-pic-container">
-            const PreloadImage = ({ src, alt, className }) => {
-              return <img src={picUrl } alt="Pic" className="news-pic" />;
-            };
-
+            <PreloadImage src={picUrl} alt="Pic" className="news-pic" />
+            
           {/* Hiển thị trạng thái dựa vào status */}
           {ac !== null && (
   status === 1 ? (
