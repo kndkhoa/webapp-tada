@@ -7,6 +7,7 @@ import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
 import clipIcon from './assets/icons/clip.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 
 const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, time, status, clip }) => {
@@ -35,16 +36,16 @@ const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, t
           {status === 1 ? (
             <div className="coin-active">
               <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
-              <span>{ac} điểm</span>
+              <span>{ac} point</span>
             </div>
           ) : (
             <div className="done">
               <img src={doneIcon} alt="Done Icon" className="done-icon" />
-              <span>Đã hoàn thành</span>
+              <span>Complited</span>
             </div>
           )}
           <div className="clip">
-            <img src={clipIcon} alt="Clip Icon" className="clip-icon" />
+            <PreloadImage src={clipIcon} alt="Clip Icon" className="clip-icon" />
           </div>
           <div className="tadatv-footer-container">
             <div className="tadatv-footer">
