@@ -17,7 +17,7 @@
     left: 0;
   }
   
-  .avatarsetting-container {
+  .avatarsetting-container img {
     position: absolute;
     top: 6vh; /* Kéo avatar xuống dưới banner, điều chỉnh theo nhu cầu */
     left: 50%;
