@@ -6,7 +6,7 @@ import commentIcon from './assets/icons/comment.png';
 import coinactiveIcon from './assets/icons/coin-active.png';
 import doneIcon from './assets/icons/done.png';
 import sharingIcon from './assets/icons/sharing.png';
-import { ReloadSkeleton, PreloadImage } from "../components/waiting";
+import { PreloadImage } from "../components/waiting";
 
 const News = ({ title, banner, description, ac, heartValue, commentValue, author, created_at, status }) => {
   const BASE_URL = "https://admin.tducoin.com/public/storage/";
@@ -27,9 +27,8 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
           }}>
         </p>
         <div className="news-pic-container">
-            <div className="news-pic">
-            <PreloadImage src={picUrl} alt="Pic" />
-            </div>
+            <PreloadImage src={picUrl} alt="Pic" className="news-pic" />
+            
           {/* Hiển thị trạng thái dựa vào status */}
           {ac !== null && (
   status === 1 ? (
