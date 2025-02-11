@@ -110,7 +110,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
   
       // Gọi API
       const response = await fetch(
-        "http://admin.tducoin.com/api/webappuser/tradingaccount",
+        "https://admin.tducoin.com/api/webappuser/tradingaccount",
         {
           method: "POST",
           headers: {
