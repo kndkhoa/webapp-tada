@@ -12,7 +12,7 @@ import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const TadaTV = ({ title, pic, description, ac, heartValue, commentValue, name, time, status, clip }) => {
   // Giả sử đường dẫn gốc tới thư mục ảnh là 'https://example.com/storage/'
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${pic}`;
 
   return (
