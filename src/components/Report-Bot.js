@@ -26,7 +26,7 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
     setError(null);
 
     try {
-      const response = await fetch("http://admin.tducoin.com/api/webappuser/tradingaccount", {
+      const response = await fetch("https://admin.tducoin.com/api/webappuser/tradingaccount", {
         method: "POST",
         headers: {
           "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
