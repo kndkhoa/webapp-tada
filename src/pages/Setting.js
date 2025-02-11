@@ -14,6 +14,7 @@ import Profile from "../components/Profile";
 import BuyAC from "../components/BuyAC"; // Import component BuyAC
 
 import { motion, AnimatePresence } from "framer-motion";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function Setting() {
   const { id } = useParams();
@@ -51,7 +52,7 @@ function Setting() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${user.avatar}`; // Mặc định là chuỗi rỗng nếu userData là null
 
   const handleMenuSelect = (menu) => {
@@ -72,7 +73,7 @@ function Setting() {
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
         <div className="avatarsetting-container">
-          <img
+          <PreloadImage
             src={picUrl} // Sử dụng URL của avatar hoặc ảnh người dùng ở đây
             alt="Avatar"
             className="avatarsetting"
