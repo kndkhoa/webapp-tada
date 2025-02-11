@@ -15,7 +15,8 @@
   overflow: hidden;
 }
 
-.news-pic-container img {
+.news-pic-container img,
+.new-pic {
   width: 100%;
   aspect-ratio: 7.5 / 4; /* Tỷ lệ khung hình 3:2 */
   margin-bottom: 5px; /* Thêm khoảng cách phía dưới ảnh */
