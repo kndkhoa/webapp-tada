@@ -233,8 +233,6 @@ function CourseDetail() {
         }
 
         if (newProgress > (lesson.progress || 0)) {
-          console.log(`Final progress before close: ${newProgress}%`);
-
           // Cập nhật progress ngay lập tức
           setCourse((prevCourse) => ({
             ...prevCourse,
@@ -323,7 +321,7 @@ function CourseDetail() {
         <PreloadImage src={picUrl} alt="Banner" className="banner-image" />
         <h2 className="banner-title">{course.title}</h2>
         <div className="banner-info">
-          <div  className="banner-info-icon">
+          <div className="banner-info-icon">
             <PreloadImage src={mentorUrl} alt="Mentor Avatar" />
           </div>
           <span className="banner-info-text">{course.mentor}</span>
