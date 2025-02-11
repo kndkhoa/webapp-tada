@@ -6,6 +6,7 @@ import doneIcon from './assets/icons/done.png';
 import ACIcon from './assets/icons/coin-header.png';
 import chartIcon from './assets/icons/chart.png';
 import moneygrowthIcon from './assets/icons/money-growth.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const Channel = ({ author, avatar, description, profitRank, totalPips, totalSignals, price, status, onReportClick, updateFollowingAuthors }) => {
   const BASE_URL = "http://admin.tducoin.com/public/storage/";
@@ -62,7 +63,7 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
   return (
     <div className="course">
       <div className="pic-container">
-        <img src={avatar} alt="course Pic" className="course-pic" />
+        <PreloadImage src={avatar} alt="course Pic" className="course-pic" />
         {(isFollowing || status === 1) ? (
           <div className="done">
             <img src={doneIcon} alt="Done Icon" className="done-icon" />
