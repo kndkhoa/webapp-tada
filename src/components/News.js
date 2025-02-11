@@ -35,7 +35,7 @@ const News = ({ title, banner, description, ac, heartValue, commentValue, author
           {ac !== null && (
   status === 1 ? (
     <div className="coin-active">
-      <PreloadImage src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
+      <img src={coinactiveIcon} alt="CoinActive Icon" className="coinactive-icon" />
       <span>{ac} point</span>
     </div>
   ) : (
