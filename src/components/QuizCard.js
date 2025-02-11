@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import usdtIcon from './assets/icons/usdt.png';
 import timerIcon from './assets/icons/timer.png';
 import doneIcon from './assets/icons/done.png';
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 const QuizCard = ({ 
   id, 
@@ -26,13 +27,13 @@ const QuizCard = ({
   const daysLeft = done_at - daysElapsed;
 
   // Thêm tiền tố vào link ảnh
-  const BASE_URL = "http://admin.tducoin.com/public/storage/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${pic}`;
 
   return (
     <div className="quiz-card">
       <div className="pic-container">
-        <img src={picUrl} alt="Quiz Pic" className="quiz-pic" />
+        <PreloadImage src={picUrl} alt="Quiz Pic" className="quiz-pic" />
 
         {/* Hiển thị nội dung dựa vào status */}
         {status === 1 ? (
