@@ -320,10 +320,12 @@ function CourseDetail() {
         <button className="backIcon" onClick={handleBack}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <img src={picUrl} alt="Banner" className="banner-image" />
+        <PreloadImage src={picUrl} alt="Banner" className="banner-image" />
         <h2 className="banner-title">{course.title}</h2>
         <div className="banner-info">
-          <img src={mentorUrl} alt="Mentor Avatar" className="banner-info-icon" />
+          <div  className="banner-info-icon">
+            <PreloadImage src={mentorUrl} alt="Mentor Avatar" />
+          </div>
           <span className="banner-info-text">{course.mentor}</span>
         </div>
       </div>
