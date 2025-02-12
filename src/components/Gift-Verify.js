@@ -19,12 +19,12 @@ const GiftVerify = ({ result }) => {
           <div className="gift-verify-details">
             <p className="gift-verify-message">
               {result?.status === 'success'
-                ? 'Xin chúc mừng!!! Món quà đã được đổi thành công.'
-                : `${result?.message || 'Hệ thống đổi quà đang quá tải anh chị vui lòng thử lại sau nhé!'}`}
+                ? 'Congratulations! The gift has been successfully redeemed.'
+                : `${result?.message || 'The system in overload. Please try again later.'}`}
             </p>
           </div>
           <button className="gift-verify-button" onClick={handleBackToMenu}>
-            Quay lại trang chủ
+            Back Home
           </button>
         </div>
       </div>
