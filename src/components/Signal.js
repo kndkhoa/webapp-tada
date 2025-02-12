@@ -113,19 +113,22 @@ const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, 
   let buttonClass = "signal-header-button1"; // Mặc định là button2 (khóa)
   let buttonOnClick = undefined; // Mặc định không có sự kiện
 
-  if (freetrading === 1 && autoCopy === 0) {
+  if (status === 0) {
+    buttonClass = "signal-header-button2"; // Giữ nguyên khóa
+  } else {
+    if (freetrading === 1 && autoCopy === 0) {
     // ✅ Nếu tín hiệu đã có trong Free Trading nhưng chưa bật autoCopy
     buttonClass = "signal-header-button1"; // Giữ nguyên khóa
-  } else if (autoCopy === 1) {
+  } else if (freetrading === 1 && autoCopy === 1) {
     // ✅ Nếu autoCopy đã bật
     buttonClass = "signal-header-button1";
-  } else if (status === 1 && done_at === null) {
+  } else if (freetrading === 0 && autocopy === 0) {
     // ✅ Nếu tín hiệu mở và không thuộc Free Trading
     buttonClass = "signal-header-button3";
     buttonOnClick = handleTelegramNotification;
-  } else if (status === 0) {
-    // ✅ Nếu tín hiệu mở và không thuộc Free Trading
-    buttonClass = "signal-header-button2";
+  } else if (freetrading === 0 && autocopy === 1) {
+    buttonClass = "signal-header-button1";
+  }
   }
 
   return (
