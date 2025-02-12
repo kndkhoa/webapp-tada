@@ -119,7 +119,9 @@ const ControllerAccount = ({ userID, index, accountMT5, trading_accounts, onUser
           <div className="dropdown">
             <div className="dropdown-header" onClick={toggleDropdown}>
               <span className="text">Following channels</span>
-              <span className="dropdown-arrow">{isDropdownOpen ? "🡵" : "🡶"}</span>
+               <span className="dropdown-arrow">
+                  <img src={channelsDropdownOpen ? upIcon : downIcon} alt="Toggle Icon" className="dropdown-icon" />
+                </span>
             </div>
             <div
               ref={dropdownRef}
