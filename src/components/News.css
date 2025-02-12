@@ -4,7 +4,7 @@
   background-color: #ffffff;
   border-radius: 20px;
   margin: 20px auto;
-  padding: 0;
+  margin-bottom: 0px; /* Thêm khoảng cách phía dưới ảnh */
   width: 90%;
   position: relative;
 }
