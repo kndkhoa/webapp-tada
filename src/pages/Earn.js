@@ -145,6 +145,28 @@ function Earn() {
     setDataType(tab === "channel" ? "Channels" : "Signals"); // Cập nhật dataType
   };
 
+  // Xử lý khi nhấn vào nút lọc
+const handleCatalogueClick = (catalogue) => {
+  setActiveCatalogue(catalogue);
+};
+
+const tabVariants = {
+  initial: (direction) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    position: "absolute",
+  }),
+  animate: {
+    x: 0,
+    position: "relative",
+    transition: { duration: 0.5, ease: "easeInOut" },
+  },
+  exit: (direction) => ({
+    x: direction < 0 ? "100%" : "-100%",
+    position: "absolute",
+    transition: { duration: 0.5, ease: "easeInOut" },
+  }),
+};
+
   if (!userData) {
     return <ReloadSkeleton />;
   }
@@ -174,6 +196,34 @@ function Earn() {
             Channels
           </button>
         </div>
+
+         {/* Nhóm nút lọc */}
+ <div className="filter-buttons">
+   <button
+     className={`filter-button ${activeCatalogue === "All" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("All")}
+   >
+     All
+   </button>
+   <button
+     className={`filter-button ${activeCatalogue === "Crypto" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("Crypto")}
+   >
+     Crypto
+   </button>
+   <button
+     className={`filter-button ${activeCatalogue === "Forex" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("Forex")}
+   >
+     Forex
+   </button>
+   <button
+     className={`filter-button ${activeCatalogue === "Stock" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("Stock")}
+   >
+     Stock
+   </button>
+ </div>
   
                 {/* Nội dung thay đổi theo tab */}
                 <div className="content-container">
