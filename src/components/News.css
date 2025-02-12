@@ -15,10 +15,10 @@
   overflow: hidden;
 }
 
-.news-pic img {
+.news-pic {
   width: 100%;
   aspect-ratio: 7.5 / 4; /* Tỷ lệ khung hình 3:2 */
-  margin-bottom: 5px; /* Thêm khoảng cách phía dưới ảnh */
+  margin-bottom: 10px; /* Thêm khoảng cách phía dưới ảnh */
   object-fit: cover;
   border-radius: 15px 15px 15px 15px;
 }
@@ -41,7 +41,6 @@
   display: flex;
   align-items: center;
   background-color: rgb(0, 0, 0);
-  color: #fff;
   padding: 5px 10px;
   border-radius: 8px;
 }
@@ -66,15 +65,10 @@
 
 .news-footer {
   display: flex;
+  justify-content: space-between;
   gap: 20px; /* Khoảng cách giữa các phần tử */
   width: 100%; /* Đảm bảo phần tử chiếm toàn bộ chiều ngang */
   flex-wrap: nowrap; /* Ngăn các phần tử xuống hàng */
-}
-
-.news-footer {
-  display: flex;
-  justify-content: space-between; /* Phân chia không gian giữa các phần tử trong dòng */
-  width: 100%; /* Chiếm hết chiều rộng của container */
 }
 
 .left-icons {
