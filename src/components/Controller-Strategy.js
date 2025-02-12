@@ -303,7 +303,9 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
                 >
                   {selectedStrategy || "Strategy Options"}
                 </span>
-                <span className="dropdown-arrow">{isDropdownOpen ? "🡵" : "🡶"}</span>
+                <span className="dropdown-arrow">
+                  <img src={channelsDropdownOpen ? upIcon : downIcon} alt="Toggle Icon" className="dropdown-icon" />
+                </span>
               </div>
               <div
                 ref={dropdownRef}
