@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./NewsDetail.css"; // Import CSS
+import "./TadaTV.css";
 import clipIcon from "../components/assets/icons/clip.png";
 import sharingIcon from "../components/assets/icons/sharing.png";
 import backIcon from "../components/assets/icons/back.png";
@@ -14,6 +15,7 @@ function TadaTVDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [tadatvShowVideo, setTadatvShowVideo] = useState(false); // State để mở video
 
   const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
 
@@ -21,10 +23,10 @@ function TadaTVDetail() {
     const fetchTadaTVDetail = async () => {
       const cachedUserData = sessionStorage.getItem("userData");
       if (cachedUserData) {
-        setUserData(JSON.parse(cachedUserData));
+        const parsedUserData = JSON.parse(cachedUserData);
+        setUserData(parsedUserData);
       } else {
-        console.error("No user data found in sessionStorage!");
-        return;
+        console.warn("⚠️ No user data found in sessionStorage!");
       }
 
       try {
@@ -37,16 +39,17 @@ function TadaTVDetail() {
         });
 
         if (!response.ok) {
-          throw new Error("Không thể lấy dữ liệu");
+          throw new Error("❌ Không thể lấy dữ liệu");
         }
 
         const data = await response.json();
         if (data && data.data) {
           setTadatv(data.data);
         } else {
-          setError("Không tìm thấy bài viết");
+          setError("⚠️ Không tìm thấy bài viết");
         }
       } catch (error) {
+        console.error("❌ Fetch Error:", error.message);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -57,58 +60,57 @@ function TadaTVDetail() {
   }, [id]);
 
   useEffect(() => {
-    const markAsWatched = async () => {
-      if (!userData || !userData.news_reads || !id) {
-        console.error("Thiếu dữ liệu user hoặc ID bản tin");
-        return;
-      }
-
-      // Kiểm tra nếu TadaTV đã được xem
-      const hasWatched = userData.news_reads.some(
-        (read) => read.news_id === parseInt(id, 10)
-      );
-
-      if (hasWatched) {
-        return;
-      }
-
-      try {
-        const response = await fetch("https://admin.tducoin.com/api/addbonus/news-read", {
-          method: "POST",
-          headers: {
-            "x-api-key": apiKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userData.userID, // ID người dùng từ sessionStorage
-            news_id: id, // ID bản tin
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Không thể ghi nhận TadaTV đã xem");
+    if (userData && userData.news_reads) {
+      
+      const markAsWatched = async () => {
+        if (!id) {
+          console.error("❌ Thiếu ID bản tin");
+          return;
         }
 
-        const result = await response.json();
+        const hasWatched = userData.news_reads.some(
+          (read) => read.news_id === parseInt(id, 10)
+        );
 
-        if (result.success) {
-          console.log("Cộng điểm thành công:", result.wallet_AC);
-          const updatedUserData = {
-            ...userData,
-            news_reads: [...userData.news_reads, { news_id: parseInt(id, 10) }],
-            wallet_AC: result.wallet_AC,
-          };
-          setUserData(updatedUserData);
-          sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
-        } else {
-          console.error("Lỗi cộng điểm:", result.message);
+        if (hasWatched) {
+          return;
         }
-      } catch (error) {
-        console.error("Error marking TadaTV as watched:", error.message);
-      }
-    };
 
-    markAsWatched();
+        try {
+          const response = await fetch("https://admin.tducoin.com/api/addbonus/news-read", {
+            method: "POST",
+            headers: {
+              "x-api-key": apiKey,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: userData.userID, // ID người dùng từ sessionStorage
+              news_id: id, // ID bản tin
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("❌ Không thể ghi nhận TadaTV đã xem");
+          }
+
+          if (result.success) {
+            const updatedUserData = {
+              ...userData,
+              news_reads: [...userData.news_reads, { news_id: parseInt(id, 10) }],
+              wallet_AC: result.wallet_AC,
+            };
+            setUserData(updatedUserData);
+            sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
+          } else {
+            console.error("⚠️ Lỗi cộng điểm:", result.message);
+          }
+        } catch (error) {
+          console.error("❌ API Error (markAsWatched):", error.message);
+        }
+      };
+
+      markAsWatched();
+    }
   }, [id, userData]);
 
   if (loading) {
@@ -136,6 +138,11 @@ function TadaTVDetail() {
         <button className="backIcon" onClick={() => window.history.back()}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
+        <button className="clipIcon" onClick={() => {
+          setTadatvShowVideo(true);
+        }}>
+          <img src={clipIcon} alt="Clip Icon" className="clipIconImage" />
+        </button>
         <PreloadImage src={picUrl} alt="Banner" />
       </div>
       <div className="news-detail-content">
@@ -158,6 +165,31 @@ function TadaTVDetail() {
           </a>
         </div>
       </div>
+
+      {/* Hiển thị video khi bấm vào clipIcon */}
+      {tadatvShowVideo && (
+  <div className="tadatv-video-overlay">
+    <div className="tadatv-video-container">
+      <button className="tadatv-close-video" onClick={() => {
+        setTadatvShowVideo(false);
+      }}>✕</button>
+
+      {tadatv.clip.includes("youtube.com") ? (
+        <iframe
+          className="tadatv-video-player"
+          src={`https://www.youtube.com/embed/${new URL(tadatv.clip).searchParams.get("v")}?autoplay=1`}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          allowFullScreen
+        />
+      ) : (
+        <video src={tadatv.clip} controls autoPlay className="tadatv-video-player" />
+      )}
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
