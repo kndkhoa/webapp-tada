@@ -17,17 +17,14 @@
     left: 0;
   }
   
-  .avatarsetting-container img {
+   .avatarsetting img {
     position: absolute;
     top: 6vh; /* Kéo avatar xuống dưới banner, điều chỉnh theo nhu cầu */
     left: 50%;
     transform: translateX(-50%); /* Căn giữa avatar */
     z-index: 10; /* Đảm bảo avatar ở trên banner */
-  }
-  
-  .avatarsetting img {
-    width: 150px; /* Kích thước avatar */
-    height: 150px;
+    width: 150px !important; /* Kích thước avatar */
+    height: 150px !important;
     border-radius: 50%; /* Hình tròn */
     border: 4px solid white; /* Viền trắng */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hiệu ứng bóng */
