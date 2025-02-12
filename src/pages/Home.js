@@ -50,11 +50,6 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
   const [followingAuthors, setFollowingAuthors] = useState([]);
-  const [apikeyBot, setApikeyBot] = useState("");
-  const [accountMT5, setAccountMT5] = useState("");
-  const [groupId, setGroupID] = useState({});
-  const [freeTradingList, setFreeTradingList] = useState([]);
-  const [autoCopyData, setAutoCopyData] = useState({});
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -132,20 +127,7 @@ function Home() {
     if (userData) {
       const activeAccount = userData.trading_accounts?.find(account => account.status === 1);
       const followingAuthors = activeAccount?.following_channels?.map(channel => channel.author) || [];
-      
-      const autoCopyMapping = {};
-        activeAccount.following_channels?.forEach(channel => {
-          autoCopyMapping[channel.author] = channel.autoCopy ?? 0; // Nếu không có autoCopy thì mặc định là 0
-        });
-
-      const freeTradingSignals = activeAccount?.freetrading?.map(ft => ft.signalID) || [];
-
-      setFreeTradingList(freeTradingSignals);
       setFollowingAuthors(followingAuthors);
-      setAutoCopyData(autoCopyMapping);
-      setApikeyBot(activeAccount.apikeyBot || "");
-      setAccountMT5(activeAccount.accountMT5 || "");
-      setGroupID(activeAccount.telegramgroup_id || 0);
       setWalletAC(userData.wallet_AC || 0);
     }
   }, [userData]);
@@ -161,10 +143,6 @@ function Home() {
         setFollowingAuthors((prevAuthors) => [...prevAuthors, author]);
       };
     }, []);
-
-    const handleUpdateFreeTrading = (signalID) => {
-      setFreeTradingList((prevList) => [...prevList, signalID]);
-    };
 
     return (
       <div className="home">
@@ -224,8 +202,6 @@ function Home() {
                     .map((item) => {
                       const isFollowing = followingAuthors.includes(item.author);
                       const status = isFollowing ? 1 : 0;
-                      const autoCopy = autoCopyData[item.author] ?? 0;
-                      const freeTradingStatus = freeTradingList.includes(item.signalID) ? 1 : 0;
                       return (
                         <div key={item.id}>
                           <Signal
@@ -238,20 +214,10 @@ function Home() {
                             margin={item.symbol}
                             command={item.isBuy}
                             result={item.R_result}
-                            apikeyBot={apikeyBot}
-                            accountMT5={accountMT5}
-                            freetrading={freeTradingStatus}
-                            groupId={groupId}
                             author={item.author}
-                            signalID={item.signalID}
-                            userID={userData.userID}
                             status={status}
-                            autoCopy={autoCopy}
-                            R_result={item.R_result}                      
                             created_at={formatDate(item.created_at)}
                             done_at={null}
-    
-                            onUpdateFreeTrading={handleUpdateFreeTrading} // Truyền callback xuống Signal
                           />
                         </div>
                       );
