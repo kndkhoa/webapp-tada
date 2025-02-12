@@ -122,7 +122,7 @@ const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, 
   } else if (freetrading === 1 && autoCopy === 1) {
     // ✅ Nếu autoCopy đã bật
     buttonClass = "signal-header-button1";
-  } else if (freetrading === 0 && autocopy === 0) {
+  } else if (freetrading === 0 && autoCopy === 0) {
     // ✅ Nếu tín hiệu mở và không thuộc Free Trading
     buttonClass = "signal-header-button3";
     buttonOnClick = handleTelegramNotification;
