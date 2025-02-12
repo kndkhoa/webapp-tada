@@ -125,3 +125,14 @@
 .strategy-footer-button:hover {
     background-color: #02458d;
 }
+
+.dropdown-icon {
+  width: 16px; /* Điều chỉnh kích thước theo mong muốn */
+  height: 16px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.dropdown-arrow img {
+  display: inline-block;
+  vertical-align: middle;
+}
