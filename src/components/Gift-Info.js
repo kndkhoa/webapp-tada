@@ -20,7 +20,6 @@ function GiftInfo({ quiz }) {
         className="card-content"
         dangerouslySetInnerHTML={{ __html: quiz.description }}
         />
-      </div>
       {/* Đường phân chia */}
       <div className="card-divider"></div>
       {/* Phần Button */}
