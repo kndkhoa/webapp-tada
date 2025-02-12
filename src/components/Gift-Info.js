@@ -16,7 +16,11 @@ function GiftInfo({ quiz }) {
     <div className="card-container">
       <div className="card-title">Thông tin quà tặng</div>
       <div className="card-divider"></div>
-      <div className="card-content">{quiz.description}</div>
+      <div
+        className="card-content"
+        dangerouslySetInnerHTML={{ __html: quiz.description }}
+        />
+      </div>
       {/* Đường phân chia */}
       <div className="card-divider"></div>
       {/* Phần Button */}
