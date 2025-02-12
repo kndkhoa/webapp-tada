@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import "./Signal.css";
 import "./Controller-Strategy.css";
 import botsettingIcon from "./assets/icons/bot-setting.png";
+import upIcon from "./assets/icons/up.png";
+import downIcon from "./assets/icons/down.png";
 import TelegramNotification from './TelegramNotification';
 
 const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUpdate }) => {
@@ -211,7 +213,9 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, onUserDataUp
                 }}
               >
                 <span className="text">List Channels</span>
-                <span className="dropdown-arrow">{channelsDropdownOpen ? "🡵" : "🡶"}</span>
+                <span className="dropdown-arrow">
+                  <img src={channelsDropdownOpen ? upIcon : downIcon} alt="Toggle Icon" className="dropdown-icon" />
+                </span>
               </div>
               <div
                 ref={channelsDropdownRef}
