@@ -126,7 +126,7 @@ const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, 
     // ✅ Nếu tín hiệu mở và không thuộc Free Trading
     buttonClass = "signal-header-button3";
     buttonOnClick = handleTelegramNotification;
-  } else if (freetrading === 0 && autocopy === 1) {
+  } else if (freetrading === 0 && autoCopy === 1) {
     buttonClass = "signal-header-button1";
   }
   }
