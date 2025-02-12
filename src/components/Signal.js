@@ -116,7 +116,7 @@ const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, 
     buttonClass = "signal-header-button1"; // Giữ nguyên khóa
   } else if (autoCopy === 1) {
     // ✅ Nếu autoCopy đã bật
-    buttonClass = "signal-header-button2";
+    buttonClass = "signal-header-button1";
   } else if (status === 1 && done_at === null) {
     // ✅ Nếu tín hiệu mở và không thuộc Free Trading
     buttonClass = "signal-header-button3";
