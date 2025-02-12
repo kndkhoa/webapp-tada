@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import controllermoreIcon from "./assets/icons/controller-more.png";
+import upIcon from "./assets/icons/up.png";
+import downIcon from "./assets/icons/down.png";
 import "./Signal.css";
 import "./Controller-Account.css";
 
