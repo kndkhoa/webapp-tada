@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { sendTelegramMessage, sendSignal } from "./TelegramNotification"; 
+import { sendTelegramMessage, sendSignal } from "./TelegramNotification";
+import upIcon from "./assets/icons/up.png";
+import downIcon from "./assets/icons/down.png";
 import "./Signal.css";
 
 const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, TP1, TP2, TP3, command, created_at, status, freetrading, autoCopy, apikeyBot, groupId, done_at, R_result, onUpdateFreeTrading }) => {
@@ -37,7 +39,7 @@ const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, 
         sendSignal(`${signalID} - ${apikeyBot}`, groupId);
 
         // ✅ Gửi POST request lên API
-        const apiUrl = "http://admin.tducoin.com/api/signal/addfreetrading";
+        const apiUrl = "https://admin.tducoin.com/api/signal/addfreetrading";
         const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
     
         const requestData = {
@@ -183,7 +185,7 @@ const Signal = ({ signalID, userID, accountMT5, author, avatar, margin, SL, E1, 
           >
             <span className="text" style={{ flex: 1, textAlign: "left" }}>Targets</span>
             <span className="dropdown-arrow" style={{ textAlign: "right", flex: 0 }}>
-              {isDropdownOpen ? "🡵" : "🡶"}
+              <img src={isDropdownOpen ? upIcon : downIcon} alt="Toggle Icon" className="dropdown-icon" />
             </span>
           </div>
           <div
