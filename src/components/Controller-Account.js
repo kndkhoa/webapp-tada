@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import controllermoreIcon from "./assets/icons/controller-more.png";
+import upIcon from "./assets/icons/up.png";
+import downIcon from "./assets/icons/down.png";
 import "./Signal.css";
 import "./Controller-Account.css";
 
@@ -119,7 +121,9 @@ const ControllerAccount = ({ userID, index, accountMT5, trading_accounts, onUser
           <div className="dropdown">
             <div className="dropdown-header" onClick={toggleDropdown}>
               <span className="text">Following channels</span>
-              <span className="dropdown-arrow">{isDropdownOpen ? "🡵" : "🡶"}</span>
+              <span className="dropdown-arrow">
+                  <img src={channelsDropdownOpen ? upIcon : downIcon} alt="Toggle Icon" className="dropdown-icon" />
+                </span>
             </div>
             <div
               ref={dropdownRef}
