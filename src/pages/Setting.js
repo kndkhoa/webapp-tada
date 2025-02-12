@@ -72,14 +72,12 @@ function Setting() {
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
-        //<div className="avatarsetting-container">
           <div className="avatarsetting">
             <PreloadImage
               src={picUrl} // Sử dụng URL của avatar hoặc ảnh người dùng ở đây
               alt="Avatar"            
             />
           </div>
-        //</div>
       </div>
       <div className="setting-detail-content">      
         <div className="setting-detail-row">
