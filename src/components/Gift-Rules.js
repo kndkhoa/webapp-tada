@@ -23,7 +23,7 @@ function GiftRules({ rules }) {
   return (
     <div className="card-container">
       {/* Tiêu đề */}
-      <div className="card-title">Cách sử dụng và đổi quà</div>
+      <div className="card-title">Rules for redeeming and using rewards</div>
       <div className="card-divider"></div>
       {/* Danh sách luật */}
       <div className="rules-list">
@@ -35,7 +35,7 @@ function GiftRules({ rules }) {
             </div>
           ))
         ) : (
-          <div className="no-rules">[Chưa có luật nào được quy định.]</div>
+          <div className="no-rules">[Don't any rules here.]</div>
         )}
       </div>
       {/* Đường phân chia */}
