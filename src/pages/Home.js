@@ -39,6 +39,7 @@ function Home() {
   const [currentAnnounIndex, setCurrentAnnounIndex] = useState(0);
   const [newsData, setNewsData] = useState([]);
   const [channelData, setChannelData] = useState([]);
+  const [signalData, setSignalData] = useState([]);
   const [quizData, setQuizData] = useState([]);
   const [courseData, setCourseData] = useState([]);
   const [charityData, setCharityData] = useState([]);
@@ -72,6 +73,7 @@ function Home() {
       const cachedCharityData = sessionStorage.getItem("charityData");
       const cachedGiftData = sessionStorage.getItem("giftData");
       const cachedUserData = sessionStorage.getItem("userData");
+      const cachedSignalData = sessionStorage.getItem("signalData");
 
       if (
         cachedNewsData &&
@@ -80,10 +82,12 @@ function Home() {
         cachedCourseData &&
         cachedCharityData &&
         cachedGiftData &&
+        cachedSignalData &&
         cachedUserData
       ) {
         setNewsData(JSON.parse(cachedNewsData));
         setChannelData(JSON.parse(cachedChannelData));
+        setSignalData(JSON.parse(cachedSignalData));
         setQuizData(JSON.parse(cachedQuizData));
         setCourseData(JSON.parse(cachedCourseData));
         setUserData(JSON.parse(cachedUserData));
@@ -94,6 +98,7 @@ function Home() {
         const preload = await preloadData(apiKey, telegramId);
         setNewsData(preload.newsData);
         setChannelData(preload.channelData);
+        setSignalData(preload.signalData);
         setQuizData(preload.quizData);
         setCourseData(preload.courseData);
         setCharityData(preload.charityData);
@@ -103,6 +108,7 @@ function Home() {
         // Lưu vào sessionStorage
         sessionStorage.setItem("newsData", JSON.stringify(preload.newsData));
         sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
+        sessionStorage.setItem("signalData", JSON.stringify(preload.signalData));
         sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
         sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
         sessionStorage.setItem("userData", JSON.stringify(preload.userData));
