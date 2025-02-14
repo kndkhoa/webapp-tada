@@ -52,8 +52,9 @@ function Setting() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const BASE_URL = "https://admin.tducoin.com/public/storage/";
-  const picUrl = `${BASE_URL}${user.avatar}`; // Mặc định là chuỗi rỗng nếu userData là null
+  const key = "7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4";
+  const BASE_URL = "https://api.telegram.org/file/bot";
+  const picUrl = `${BASE_URL}${key}/`; // Mặc định là chuỗi rỗng nếu userData là null
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
