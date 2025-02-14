@@ -54,7 +54,7 @@ function Setting() {
 
   const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
   const BASE_URL = `https://api.telegram.org/file/bot`;
-  const picUrl = `${BASE_URL}${key}/`; // Mặc định là chuỗi rỗng nếu userData là null
+  const picUrl = `${BASE_URL}${key}/{userData.avatar}`; // Mặc định là chuỗi rỗng nếu userData là null
   console.log("link ảnh avatar: " + picUrl);
 
   const handleMenuSelect = (menu) => {
