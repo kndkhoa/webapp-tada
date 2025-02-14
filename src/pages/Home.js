@@ -57,18 +57,14 @@ function Home() {
 
   // Lấy ID từ URL hoặc gán mặc định
   useEffect(() => {
-  // Lấy query string từ URL
-  const queryParams = new URLSearchParams(window.location.search);
-  sendTelegramMessage("Kiểm tra hứng đầu vào " + window.location.search);
-  // Lấy giá trị của telegramId từ query string
-  const telegramIdFromUrl = queryParams.get("telegramId");
-  sendTelegramMessage("Kiểm tra biến telegramIdFromUrl " + telegramIdFromUrl); // Kiểm tra giá trị của telegramId
-  // Nếu có telegramId, cập nhật state
-  if (telegramIdFromUrl) {
-    setTelegramId(telegramIdFromUrl);
+  if (window.Telegram && window.Telegram.WebApp) {
+    const telegramIdFromWebApp = window.Telegram.WebApp.initDataUnsafe.user.id;
+    setTelegramId(telegramIdFromWebApp || 9999); // Nếu không lấy được, dùng giá trị mặc định
   } else {
-    // Nếu không có telegramId, đặt giá trị mặc định (nếu cần)
-    setTelegramId(9999); // Giá trị mặc định
+    // Nếu không có Telegram.WebApp, cố gắng lấy từ query string
+    const queryParams = new URLSearchParams(window.location.search);
+    const telegramIdFromUrl = queryParams.get("telegramId");
+    setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
   }
 }, []);
 
