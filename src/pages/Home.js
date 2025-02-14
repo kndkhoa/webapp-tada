@@ -11,6 +11,7 @@ import "./Home.css";
 import avatar from "../components/assets/avatar.gif";
 import Loading from "../components/loading";
 import { preloadData } from "./api"; // Import từ file API
+import { sendTelegramMessage } from "./TelegramNotification";
 
 const announData = [
   "Welcome to Finance World!",
@@ -58,10 +59,10 @@ function Home() {
   useEffect(() => {
   // Lấy query string từ URL
   const queryParams = new URLSearchParams(window.location.search);
-  
+  sendTelegramMessage("Kiểm tra hứng đầu vào " + window.location.search);
   // Lấy giá trị của telegramId từ query string
   const telegramIdFromUrl = queryParams.get("telegramId");
-  console.log(telegramIdFromUrl); // Kiểm tra giá trị của telegramId
+  sendTelegramMessage("Kiểm tra biến telegramIdFromUrl " + telegramIdFromUrl); // Kiểm tra giá trị của telegramId
   // Nếu có telegramId, cập nhật state
   if (telegramIdFromUrl) {
     setTelegramId(telegramIdFromUrl);
