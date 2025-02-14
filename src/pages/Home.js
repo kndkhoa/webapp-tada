@@ -57,18 +57,28 @@ function Home() {
 
   // Lấy ID từ URL hoặc gán mặc định
   useEffect(() => {
-  if (window.Telegram && window.Telegram.WebApp) {
-    const telegramIdFromWebApp = window.Telegram.WebApp.initDataUnsafe.user.id;
-    sendTelegramMessage("coi thử có dữ liệu đầu vào từ Inline Button không: " + telegramIdFromWebApp);
-    setTelegramId(telegramIdFromWebApp || 9999); // Nếu không lấy được, dùng giá trị mặc định
-  } else {
-    // Nếu không có Telegram.WebApp, cố gắng lấy từ query string
-    const queryParams = new URLSearchParams(window.location.search);
-    const telegramIdFromUrl = queryParams.get("telegramId");
-     sendTelegramMessage("coi thử có dữ liệu đầu vào từ link không: " + telegramIdFromUrl);
-    setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
-  }
+  const checkTelegramData = () => {
+    if (window.Telegram && window.Telegram.WebApp) {
+      const telegramData = window.Telegram.WebApp.initDataUnsafe;
+      sendTelegramMessage("Coi thử có telegramData không? Kết quả là: " + telegramData); // Log dữ liệu để kiểm tra
+      if (telegramData && telegramData.user) {
+        const telegramId = telegramData.user.id;
+        setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
+      } else {
+        sendTelegramMessage("Không tìm thấy user data từ Telegram Web App.");
+        setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
+      }
+    } else {
+      sendTelegramMessage("Không phải trong Telegram Web App.");
+      const queryParams = new URLSearchParams(window.location.search);
+      const telegramIdFromUrl = queryParams.get("telegramId");
+      setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
+    }
+  };
+
+  checkTelegramData();
 }, []);
+
 
   // Lấy dữ liệu từ API
   useEffect(() => {
