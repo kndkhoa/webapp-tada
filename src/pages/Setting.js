@@ -52,10 +52,10 @@ function Setting() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const key = "7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4";
-  const BASE_URL = "https://api.telegram.org/file/bot";
+  const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
+  const BASE_URL = `https://api.telegram.org/file/bot`;
   const picUrl = `${BASE_URL}${key}/`; // Mặc định là chuỗi rỗng nếu userData là null
-  console.log(picUrl);
+  console.log("link ảnh avatar: " + picUrl);
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
