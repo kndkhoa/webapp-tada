@@ -61,7 +61,7 @@ function Home() {
   
   // Lấy giá trị của telegramId từ query string
   const telegramIdFromUrl = queryParams.get("telegramId");
-
+  console.log(telegramIdFromUrl); // Kiểm tra giá trị của telegramId
   // Nếu có telegramId, cập nhật state
   if (telegramIdFromUrl) {
     setTelegramId(telegramIdFromUrl);
