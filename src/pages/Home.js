@@ -59,6 +59,7 @@ function Home() {
   useEffect(() => {
   if (window.Telegram && window.Telegram.WebApp) {
     const telegramIdFromWebApp = window.Telegram.WebApp.initDataUnsafe.user.id;
+    sendTelegramMessage("coi thử có dữ liệu đầu vào không: " + telegramIdFromWebApp);
     setTelegramId(telegramIdFromWebApp || 9999); // Nếu không lấy được, dùng giá trị mặc định
   } else {
     // Nếu không có Telegram.WebApp, cố gắng lấy từ query string
