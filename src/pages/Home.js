@@ -11,7 +11,7 @@ import "./Home.css";
 import avatar from "../components/assets/avatar.gif";
 import Loading from "../components/loading";
 import { preloadData } from "./api"; // Import từ file API
-import { sendTelegramMessage } from "./TelegramNotification";
+import { sendTelegramMessage } from "../components/TelegramNotification";
 
 const announData = [
   "Welcome to Finance World!",
