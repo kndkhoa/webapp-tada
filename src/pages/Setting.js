@@ -54,8 +54,7 @@ function Setting() {
 
   const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
   const BASE_URL = `https://api.telegram.org/file/bot`;
-  const picUrl = `${BASE_URL}${key}/${userData.avatar}`; // Mặc định là chuỗi rỗng nếu userData là null
-  console.log("link ảnh avatar: " + picUrl);
+  const picUrl = userData.avatar ? `${BASE_URL}${key}/${userData.avatar}` : null;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
@@ -74,12 +73,16 @@ function Setting() {
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
+         {picUrl ? (
           <div className="avatarsetting">
             <img
-              src={picUrl} // Sử dụng URL của avatar hoặc ảnh người dùng ở đây
-              alt="Avatar"            
+              src={picUrl} // Sử dụng URL của avatar nếu có
+              alt="Avatar"
             />
           </div>
+          ) : (
+            <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
+          )}
       </div>
       <div className="setting-detail-content">      
         <div className="setting-detail-row">
