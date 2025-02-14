@@ -56,70 +56,80 @@ function Home() {
 
   // Lấy ID từ URL hoặc gán mặc định
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const userId = queryParams.get("telegramId") || 9999; // Mặc định nếu không có ID
-    setTelegramId(userId);
-  }, [location.search]);
+  // Lấy query string từ URL
+  const queryParams = new URLSearchParams(window.location.search);
+  
+  // Lấy giá trị của telegramId từ query string
+  const telegramIdFromUrl = queryParams.get("telegramId");
+
+  // Nếu có telegramId, cập nhật state
+  if (telegramIdFromUrl) {
+    setTelegramId(telegramIdFromUrl);
+  } else {
+    // Nếu không có telegramId, đặt giá trị mặc định (nếu cần)
+    setTelegramId(9999); // Giá trị mặc định
+  }
+}, []);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
-    if (!telegramId) return;
+  if (!telegramId) return; // Chỉ fetch dữ liệu khi có telegramId
 
-    const fetchData = async () => {
-      const cachedNewsData = sessionStorage.getItem("newsData");
-      const cachedChannelData = sessionStorage.getItem("channelData");
-      const cachedQuizData = sessionStorage.getItem("quizData");
-      const cachedCourseData = sessionStorage.getItem("courseData");
-      const cachedCharityData = sessionStorage.getItem("charityData");
-      const cachedGiftData = sessionStorage.getItem("giftData");
-      const cachedUserData = sessionStorage.getItem("userData");
-      const cachedSignalData = sessionStorage.getItem("signalData");
+  const fetchData = async () => {
+    const cachedNewsData = sessionStorage.getItem("newsData");
+    const cachedChannelData = sessionStorage.getItem("channelData");
+    const cachedQuizData = sessionStorage.getItem("quizData");
+    const cachedCourseData = sessionStorage.getItem("courseData");
+    const cachedCharityData = sessionStorage.getItem("charityData");
+    const cachedGiftData = sessionStorage.getItem("giftData");
+    const cachedUserData = sessionStorage.getItem("userData");
+    const cachedSignalData = sessionStorage.getItem("signalData");
 
-      if (
-        cachedNewsData &&
-        cachedChannelData &&
-        cachedQuizData &&
-        cachedCourseData &&
-        cachedCharityData &&
-        cachedGiftData &&
-        cachedSignalData &&
-        cachedUserData
-      ) {
-        setNewsData(JSON.parse(cachedNewsData));
-        setChannelData(JSON.parse(cachedChannelData));
-        setSignalData(JSON.parse(cachedSignalData));
-        setQuizData(JSON.parse(cachedQuizData));
-        setCourseData(JSON.parse(cachedCourseData));
-        setUserData(JSON.parse(cachedUserData));
-        setCharityData(JSON.parse(cachedCharityData));
-        setGiftData(JSON.parse(cachedGiftData));
-        setIsLoading(false);
-      } else {
-        const preload = await preloadData(apiKey, telegramId);
-        setNewsData(preload.newsData);
-        setChannelData(preload.channelData);
-        setSignalData(preload.signalData);
-        setQuizData(preload.quizData);
-        setCourseData(preload.courseData);
-        setCharityData(preload.charityData);
-        setGiftData(preload.giftData);
-        setUserData(preload.userData);
+    if (
+      cachedNewsData &&
+      cachedChannelData &&
+      cachedQuizData &&
+      cachedCourseData &&
+      cachedCharityData &&
+      cachedGiftData &&
+      cachedSignalData &&
+      cachedUserData
+    ) {
+      setNewsData(JSON.parse(cachedNewsData));
+      setChannelData(JSON.parse(cachedChannelData));
+      setSignalData(JSON.parse(cachedSignalData));
+      setQuizData(JSON.parse(cachedQuizData));
+      setCourseData(JSON.parse(cachedCourseData));
+      setUserData(JSON.parse(cachedUserData));
+      setCharityData(JSON.parse(cachedCharityData));
+      setGiftData(JSON.parse(cachedGiftData));
+      setIsLoading(false);
+    } else {
+      const preload = await preloadData(apiKey, telegramId); // Sử dụng telegramId từ URL
+      setNewsData(preload.newsData);
+      setChannelData(preload.channelData);
+      setSignalData(preload.signalData);
+      setQuizData(preload.quizData);
+      setCourseData(preload.courseData);
+      setCharityData(preload.charityData);
+      setGiftData(preload.giftData);
+      setUserData(preload.userData);
 
-        // Lưu vào sessionStorage
-        sessionStorage.setItem("newsData", JSON.stringify(preload.newsData));
-        sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
-        sessionStorage.setItem("signalData", JSON.stringify(preload.signalData));
-        sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
-        sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
-        sessionStorage.setItem("userData", JSON.stringify(preload.userData));
-        sessionStorage.setItem("charityData", JSON.stringify(preload.charityData));
-        sessionStorage.setItem("giftData", JSON.stringify(preload.giftData));
-        setIsLoading(false);
-      }
-    };
+      // Lưu vào sessionStorage
+      sessionStorage.setItem("newsData", JSON.stringify(preload.newsData));
+      sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
+      sessionStorage.setItem("signalData", JSON.stringify(preload.signalData));
+      sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
+      sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
+      sessionStorage.setItem("userData", JSON.stringify(preload.userData));
+      sessionStorage.setItem("charityData", JSON.stringify(preload.charityData));
+      sessionStorage.setItem("giftData", JSON.stringify(preload.giftData));
+      setIsLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [telegramId, apiKey]);
+  fetchData();
+}, [telegramId, apiKey]); // Thêm telegramId vào dependency array
 
   // Lấy danh sách followingAuthors từ activeAccount
   useEffect(() => {
