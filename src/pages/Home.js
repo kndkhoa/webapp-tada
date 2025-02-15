@@ -67,7 +67,7 @@ function Home() {
 
       if (telegramData && telegramData.user) {
         const telegramId = telegramData.user.id;
-        sendTelegramMessage("Usr ID là " + telegramId);
+        sendTelegramMessage("User ID là " + telegramId);
         setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
       } else {
         setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
