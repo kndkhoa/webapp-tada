@@ -63,11 +63,12 @@ function Home() {
       window.Telegram.WebApp.ready();
 
       // Sử dụng initData thay vì initDataUnsafe
-      const telegramData = window.Telegram.WebApp.initData;
+      const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
       sendTelegramMessage("Coi thử có telegramData không? Kết quả là: " + telegramData); // Log dữ liệu để kiểm tra
 
       if (telegramData && telegramData.user) {
         const telegramId = telegramData.user.id;
+        sendTelegramMessage("Usr ID là " + telegramId);
         setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
       } else {
         sendTelegramMessage("Không tìm thấy user data từ Telegram Web App.");
