@@ -13,8 +13,7 @@ import Language from "../components/Language";
 import Profile from "../components/Profile";
 import BuyAC from "../components/BuyAC"; // Import component BuyAC
 
-import { motion, AnimatePresence } from "framer-motion";
-import { ReloadSkeleton, PreloadImage } from "../components/waiting";
+import { PreloadImage } from "../components/waiting";
 
 function Setting() {
   const { id } = useParams();
@@ -22,30 +21,22 @@ function Setting() {
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [isMenuSelected, setIsMenuSelected] = useState(false);
-  const [showBuyAC, setShowBuyAC] = useState(false); // State để hiển thị BuyAC modal
+  const [showBuyAC, setShowBuyAC] = useState(false);
 
   // Lấy dữ liệu người dùng từ sessionStorage chỉ một lần khi component mount
   useEffect(() => {
-  // Lấy lại dữ liệu người dùng từ sessionStorage mỗi khi component Setting render
-  const cachedUserData = sessionStorage.getItem("userData");
-  if (cachedUserData) {
-    const parsedUserData = JSON.parse(cachedUserData);
-    setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
-  } else {
-    console.error("No user data found in sessionStorage!");
-  }
+    const cachedUserData = sessionStorage.getItem("userData");
 
-  // Sau khi đã lấy dữ liệu từ sessionStorage, cập nhật `loading` thành false
-  setLoading(false);
-}, []); // Chỉ gọi một lần khi component mount
+    if (cachedUserData) {
+      const parsedUserData = JSON.parse(cachedUserData);
+      setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
+    } else {
+      console.error("No user data found in sessionStorage!");
+    }
 
-// Cập nhật state nếu userData thay đổi
-useEffect(() => {
-  if (userData) {
+    // Cập nhật `loading` thành false sau khi đã lấy dữ liệu từ sessionStorage
     setLoading(false);
-  }
-}, [userData]);
-
+  }, []); // Chỉ gọi một lần khi component mount
 
   // State để lưu trạng thái hiển thị của từng giá trị
   const [showFullAC, setShowFullAC] = useState(false);
@@ -62,8 +53,6 @@ useEffect(() => {
   if (!user) {
     return <div>Không tìm thấy bài viết</div>;
   }
-
-  const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
@@ -82,16 +71,18 @@ useEffect(() => {
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
-         {/* Render avatar khi userData đã có */}
-      {userData && (
         <div className="avatarsetting">
-          <PreloadImage
-            src={userData.avatar} // Sử dụng URL của avatar nếu có
-            alt="Avatar"
-          />
+          {/* Đảm bảo rằng userData có avatar trước khi hiển thị */}
+          {userData && userData.avatar && (
+            <PreloadImage
+              src={userData.avatar} // Sử dụng URL của avatar nếu có
+              alt="Avatar"
+            />
+          )}
         </div>
       </div>
-      <div className="setting-detail-content">      
+
+      <div className="setting-detail-content">
         <div className="setting-detail-row">
           {/* AC */}
           <div
@@ -122,38 +113,34 @@ useEffect(() => {
               className="setting-coin-icon"
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
-              <span className="setting-coin-button">
-                Buy AC
-              </span>
+              <span className="setting-coin-button">Buy AC</span>
             </div>
           </div>
-          <div
-            className="setting-detail-item setting-detail-item-withdraw"
-          >
+
+          {/* Rút tiền */}
+          <div className="setting-detail-item setting-detail-item-withdraw">
             <img
               src={ruttienIcon}
               alt="Icon"
               className="setting-coin-icon"
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
-              <span className="setting-coin-button">
-                Withdraw
-              </span>
+              <span className="setting-coin-button">Withdraw</span>
             </div>
           </div>
         </div>
-        
+
         {showBuyAC && (
-        <div className="report-modal">
-          <BuyAC 
-            userID={userData.userID} 
-            walletAC={userData.wallet_AC} 
-            onClose={() => setShowBuyAC(false)}
-          />
-        </div>
+          <div className="report-modal">
+            <BuyAC
+              userID={userData.userID}
+              walletAC={userData.wallet_AC}
+              onClose={() => setShowBuyAC(false)}
+            />
+          </div>
         )}
 
-        {/* 🔥 Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
+        {/* Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
         {!isMenuSelected ? (
           <SettingMenu onMenuSelect={handleMenuSelect} />
         ) : (
@@ -170,10 +157,10 @@ useEffect(() => {
 }
 
 function formatNumber(value) {
-  if (value == null) { // Kiểm tra xem value có phải là null hoặc undefined không
-    return '0'; // Hoặc trả về một giá trị mặc định nào đó nếu cần
+  if (value == null) {
+    return '0'; // Nếu value là null hoặc undefined, trả về giá trị mặc định
   }
-  
+
   if (value >= 1_000_000) {
     return `${(value / 1_000_000).toFixed(1)}M`; // Hiển thị dạng 'x.xM'
   } else if (value >= 1_000) {
