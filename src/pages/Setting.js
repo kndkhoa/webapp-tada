@@ -53,8 +53,6 @@ function Setting() {
   }
 
   const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
-  const BASE_URL = `https://api.telegram.org/file/bot`;
-  const picUrl = userData.avatar ? `${BASE_URL}${key}/${userData.avatar}` : null;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
@@ -76,7 +74,7 @@ function Setting() {
          {picUrl ? (
           <div className="avatarsetting">
             <img
-              src={picUrl} // Sử dụng URL của avatar nếu có
+              src={userData.avatar} // Sử dụng URL của avatar nếu có
               alt="Avatar"
             />
           </div>
