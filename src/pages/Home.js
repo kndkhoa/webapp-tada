@@ -59,8 +59,13 @@ function Home() {
   useEffect(() => {
   const checkTelegramData = () => {
     if (window.Telegram && window.Telegram.WebApp) {
-      const telegramData = window.Telegram.WebApp.initDataUnsafe;
+      // Báo cho Telegram biết rằng Web App đã sẵn sàng
+      window.Telegram.WebApp.ready();
+
+      // Sử dụng initData thay vì initDataUnsafe
+      const telegramData = window.Telegram.WebApp.initData;
       sendTelegramMessage("Coi thử có telegramData không? Kết quả là: " + telegramData); // Log dữ liệu để kiểm tra
+
       if (telegramData && telegramData.user) {
         const telegramId = telegramData.user.id;
         setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
