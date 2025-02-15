@@ -27,8 +27,7 @@ const QuizCard = ({
   const daysLeft = done_at - daysElapsed;
 
   // Thêm tiền tố vào link ảnh
-  const BASE_URL = "https://admin.tducoin.com/public/storage/";
-  const picUrl = `${BASE_URL}${pic}`;
+  const BASE_URL = "https://api.telegram.org/file/bot7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4/";
 
   return (
     <div className="quiz-card">
