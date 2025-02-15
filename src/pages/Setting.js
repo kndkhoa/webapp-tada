@@ -82,12 +82,14 @@ useEffect(() => {
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
-         <div className="avatarsetting">
-            <PreloadImage
-              src={userData.avatar} // Sử dụng URL của avatar nếu có
-              alt="Avatar"
-            />
-          </div>
+         {/* Render avatar khi userData đã có */}
+      {userData && (
+        <div className="avatarsetting">
+          <PreloadImage
+            src={userData.avatar} // Sử dụng URL của avatar nếu có
+            alt="Avatar"
+          />
+        </div>
       </div>
       <div className="setting-detail-content">      
         <div className="setting-detail-row">
