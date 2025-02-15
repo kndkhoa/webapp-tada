@@ -71,16 +71,12 @@ function Setting() {
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
-         {picUrl ? (
-          <div className="avatarsetting">
+         <div className="avatarsetting">
             <img
               src={userData.avatar} // Sử dụng URL của avatar nếu có
               alt="Avatar"
             />
           </div>
-          ) : (
-            <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
-          )}
       </div>
       <div className="setting-detail-content">      
         <div className="setting-detail-row">
