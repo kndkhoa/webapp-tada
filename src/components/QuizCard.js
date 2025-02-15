@@ -27,7 +27,8 @@ const QuizCard = ({
   const daysLeft = done_at - daysElapsed;
 
   // Thêm tiền tố vào link ảnh
-  const BASE_URL = "https://api.telegram.org/file/bot7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4/";
+  const API_URL = "https://api.telegram.org/file/bot7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4/";
+  const BASE_URL = "https://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${pic}`;
 
   return (
@@ -78,7 +79,7 @@ const QuizCard = ({
                     key={index}
                     className="avatar"
                     style={{
-                      backgroundImage: `url(${BASE_URL}${member.avatar})`
+                      backgroundImage: `url(${API_URL}${member.avatar})`
                     }}
                   ></div>
                 ))}
