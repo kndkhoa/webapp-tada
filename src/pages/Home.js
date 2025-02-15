@@ -67,10 +67,11 @@ function Home() {
 
       if (telegramData) {
         const telegramId = telegramData.id;
-        setTelegramId(telegramId || 0); // Nếu không có id, dùng giá trị mặc định
+        setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
 
         // Cập nhật avatar và photo_url từ telegramData nếu có
         const avatarUrl = telegramData.photo_url || null; // Lấy ảnh đại diện nếu có
+
         // Lấy dữ liệu user cũ từ sessionStorage
         const cachedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
 
@@ -86,15 +87,18 @@ function Home() {
         // Cập nhật lại state của userData
         setUserData(updatedUserData);
       } else {
-        return;
+        setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
       }
     } else {
-      return;
+      const queryParams = new URLSearchParams(window.location.search);
+      const telegramIdFromUrl = queryParams.get("telegramId");
+      setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
     }
   };
 
   checkTelegramData();
 }, []);
+
 
 
   // Lấy dữ liệu từ API
