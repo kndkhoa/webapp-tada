@@ -70,8 +70,10 @@ function Home() {
       }
     } else {
       sendTelegramMessage("Không phải trong Telegram Web App.");
-      const queryParams = new URLSearchParams(window.location.search);
+      const queryParams = new URLSearchParams(window.location.search);      
+      sendTelegramMessage("Có thấy cá queryParams không? - " +  queryParams);
       const telegramIdFromUrl = queryParams.get("telegramId");
+      sendTelegramMessage("Rồi có lấy được telegramIdFromUrl không? - " + telegramIdFromUrl);
       setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
     }
   };
