@@ -64,7 +64,7 @@ function Home() {
 
       // Sử dụng initData thay vì initDataUnsafe
       const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
-      sendTelegramMessage("Coi thử có telegramData không? Kết quả là: " + telegramData); // Log dữ liệu để kiểm tra
+      sendTelegramMessage("Coi thử có telegramData không? Kết quả là: " + JSON.stringify(telegramData)); // Log dữ liệu để kiểm tra
 
       if (telegramData && telegramData.user) {
         const telegramId = telegramData.id;
