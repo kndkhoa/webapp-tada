@@ -28,6 +28,7 @@ const QuizCard = ({
 
   // Thêm tiền tố vào link ảnh
   const BASE_URL = "https://api.telegram.org/file/bot7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4/";
+  const picUrl = `${BASE_URL}${pic}`;
 
   return (
     <div className="quiz-card">
