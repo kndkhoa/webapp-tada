@@ -34,6 +34,9 @@ function Setting() {
   } else {
     console.error("No user data found in sessionStorage!");
   }
+  
+  // Cập nhật loading thành false sau khi dữ liệu đã được tải
+  setLoading(false);
 }, []); // Chỉ gọi một lần khi component mount
 
   // State để lưu trạng thái hiển thị của từng giá trị
