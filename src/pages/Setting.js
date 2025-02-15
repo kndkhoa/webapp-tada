@@ -12,7 +12,9 @@ import Terms from "../components/Terms";
 import Language from "../components/Language";
 import Profile from "../components/Profile";
 import BuyAC from "../components/BuyAC"; // Import component BuyAC
-import { PreloadImage } from "../components/waiting";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function Setting() {
   const { id } = useParams();
@@ -20,36 +22,39 @@ function Setting() {
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [isMenuSelected, setIsMenuSelected] = useState(false);
-  const [showBuyAC, setShowBuyAC] = useState(false);
-  const [showFullAC, setShowFullAC] = useState(false);
+  const [showBuyAC, setShowBuyAC] = useState(false); // State để hiển thị BuyAC modal
 
-  // Lấy dữ liệu người dùng từ localStorage và cập nhật state
+  // Lấy dữ liệu người dùng từ sessionStorage chỉ một lần khi component mount
   useEffect(() => {
-    const cachedUserData = localStorage.getItem("userData");
-
+    const cachedUserData = sessionStorage.getItem("userData");
     if (cachedUserData) {
       const parsedUserData = JSON.parse(cachedUserData);
       setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
     } else {
-      console.error("No user data found in localStorage!");
+      console.error("No user data found in sessionStorage!");
     }
+    setLoading(false); // Cập nhật trạng thái sau khi dữ liệu đã được lấy
+  }, []); // Chỉ gọi một lần khi component mount
 
-    // Cập nhật `loading` thành false sau khi đã lấy dữ liệu
-    setLoading(false);
-  }, []);
+  // State để lưu trạng thái hiển thị của từng giá trị
+  const [showFullAC, setShowFullAC] = useState(false);
 
-  // Kiểm tra dữ liệu người dùng có đúng với id từ URL
-  const user = userData && userData.userID === id ? userData : null;
-
-  // Nếu dữ liệu đang tải, hiển thị trạng thái chờ
+  // Nếu dữ liệu người dùng chưa được tải xong, hiển thị trạng thái chờ
   if (loading) {
     return <div>Đang tải dữ liệu...</div>;
   }
 
+  // Kiểm tra dữ liệu người dùng có đúng với id từ URL
+  const user = userData && userData.userID === id ? userData : null;
+
   // Nếu không tìm thấy người dùng với id tương ứng
   if (!user) {
-    return <div>Không tìm thấy người dùng</div>;
+    return <div>Không tìm thấy bài viết</div>;
   }
+
+  const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
+  const BASE_URL = `https://api.telegram.org/file/bot`;
+  const picUrl = userData.avatar ? `${BASE_URL}${key}/${userData.avatar}` : null;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
@@ -67,20 +72,18 @@ function Setting() {
         <button className="backIcon" onClick={() => window.history.back()}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <img src={bg} alt="Banner" className="bannersetting-image" />
-        <div className="avatarsetting">
-          {/* Đảm bảo rằng userData có avatar trước khi hiển thị */}
-          {userData && userData.avatar ? (
-            <PreloadImage
-              src={userData.avatar} // Sử dụng URL của avatar nếu có
-              alt="Avatar"
-            />
-          ) : (
-            <div className="avatar-placeholder">No Avatar</div>
-          )}
-        </div>
+        <img src={bg} alt="Banner" className="bannersetting-image" />      
+        {picUrl ? (
+    <div className="avatarsetting">
+      <img
+        src={picUrl} // Sử dụng URL của avatar nếu có
+        alt="Avatar"
+      />
+    </div>
+  ) : (
+    <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
+  )}
       </div>
-
       <div className="setting-detail-content">
         <div className="setting-detail-row">
           {/* AC */}
@@ -112,19 +115,23 @@ function Setting() {
               className="setting-coin-icon"
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
-              <span className="setting-coin-button">Buy AC</span>
+              <span className="setting-coin-button">
+                Buy AC
+              </span>
             </div>
           </div>
-
-          {/* Rút tiền */}
-          <div className="setting-detail-item setting-detail-item-withdraw">
+          <div
+            className="setting-detail-item setting-detail-item-withdraw"
+          >
             <img
               src={ruttienIcon}
               alt="Icon"
               className="setting-coin-icon"
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
-              <span className="setting-coin-button">Withdraw</span>
+              <span className="setting-coin-button">
+                Withdraw
+              </span>
             </div>
           </div>
         </div>
@@ -139,7 +146,7 @@ function Setting() {
           </div>
         )}
 
-        {/* Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
+        {/* 🔥 Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
         {!isMenuSelected ? (
           <SettingMenu onMenuSelect={handleMenuSelect} />
         ) : (
@@ -156,10 +163,6 @@ function Setting() {
 }
 
 function formatNumber(value) {
-  if (value == null) {
-    return '0'; // Nếu value là null hoặc undefined, trả về giá trị mặc định
-  }
-
   if (value >= 1_000_000) {
     return `${(value / 1_000_000).toFixed(1)}M`; // Hiển thị dạng 'x.xM'
   } else if (value >= 1_000) {
