@@ -163,6 +163,10 @@ function Setting() {
 }
 
 function formatNumber(value) {
+  if (value == null) { // Kiểm tra xem value có phải là null hoặc undefined không
+    return '0'; // Hoặc trả về một giá trị mặc định nào đó nếu cần
+  }
+  
   if (value >= 1_000_000) {
     return `${(value / 1_000_000).toFixed(1)}M`; // Hiển thị dạng 'x.xM'
   } else if (value >= 1_000) {
