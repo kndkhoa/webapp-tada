@@ -81,7 +81,7 @@ function Setting() {
       />
     </div>
   ) : (
-    <div className="avatar-default">{userData.name}</div> // Hình tròn màu xanh
+    <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
   )}
       </div>
       <div className="setting-detail-content">
