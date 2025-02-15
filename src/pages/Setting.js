@@ -12,7 +12,6 @@ import Terms from "../components/Terms";
 import Language from "../components/Language";
 import Profile from "../components/Profile";
 import BuyAC from "../components/BuyAC"; // Import component BuyAC
-
 import { PreloadImage } from "../components/waiting";
 
 function Setting() {
@@ -22,36 +21,34 @@ function Setting() {
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [isMenuSelected, setIsMenuSelected] = useState(false);
   const [showBuyAC, setShowBuyAC] = useState(false);
+  const [showFullAC, setShowFullAC] = useState(false);
 
-  // Lấy dữ liệu người dùng từ sessionStorage chỉ một lần khi component mount
+  // Lấy dữ liệu người dùng từ localStorage và cập nhật state
   useEffect(() => {
-    const cachedUserData = sessionStorage.getItem("userData");
+    const cachedUserData = localStorage.getItem("userData");
 
     if (cachedUserData) {
       const parsedUserData = JSON.parse(cachedUserData);
       setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
     } else {
-      console.error("No user data found in sessionStorage!");
+      console.error("No user data found in localStorage!");
     }
 
-    // Cập nhật `loading` thành false sau khi đã lấy dữ liệu từ sessionStorage
+    // Cập nhật `loading` thành false sau khi đã lấy dữ liệu
     setLoading(false);
-  }, []); // Chỉ gọi một lần khi component mount
-
-  // State để lưu trạng thái hiển thị của từng giá trị
-  const [showFullAC, setShowFullAC] = useState(false);
-
-  // Nếu dữ liệu người dùng chưa được tải xong, hiển thị trạng thái chờ
-  if (loading) {
-    return <div>Đang tải dữ liệu...</div>;
-  }
+  }, []);
 
   // Kiểm tra dữ liệu người dùng có đúng với id từ URL
   const user = userData && userData.userID === id ? userData : null;
 
+  // Nếu dữ liệu đang tải, hiển thị trạng thái chờ
+  if (loading) {
+    return <div>Đang tải dữ liệu...</div>;
+  }
+
   // Nếu không tìm thấy người dùng với id tương ứng
   if (!user) {
-    return <div>Không tìm thấy bài viết</div>;
+    return <div>Không tìm thấy người dùng</div>;
   }
 
   const handleMenuSelect = (menu) => {
@@ -73,11 +70,13 @@ function Setting() {
         <img src={bg} alt="Banner" className="bannersetting-image" />
         <div className="avatarsetting">
           {/* Đảm bảo rằng userData có avatar trước khi hiển thị */}
-          {userData && userData.avatar && (
+          {userData && userData.avatar ? (
             <PreloadImage
               src={userData.avatar} // Sử dụng URL của avatar nếu có
               alt="Avatar"
             />
+          ) : (
+            <div className="avatar-placeholder">No Avatar</div>
           )}
         </div>
       </div>
