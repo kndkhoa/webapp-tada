@@ -67,7 +67,7 @@ function Home() {
       sendTelegramMessage("Coi thử có telegramData không? Kết quả là: " + telegramData); // Log dữ liệu để kiểm tra
 
       if (telegramData && telegramData.user) {
-        const telegramId = telegramData.user.id;
+        const telegramId = telegramData.id;
         sendTelegramMessage("Usr ID là " + telegramId);
         setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
       } else {
