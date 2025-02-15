@@ -72,7 +72,7 @@ function Setting() {
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />
          <div className="avatarsetting">
-            <img
+            <PreloadImage
               src={userData.avatar} // Sử dụng URL của avatar nếu có
               alt="Avatar"
             />
