@@ -68,24 +68,6 @@ function Home() {
       if (telegramData) {
         const telegramId = telegramData.id;
         setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
-
-        // Cập nhật avatar và photo_url từ telegramData nếu có
-        const avatarUrl = telegramData.photo_url || null; // Lấy ảnh đại diện nếu có
-
-        // Lấy dữ liệu user cũ từ sessionStorage
-        const cachedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
-
-        // Cập nhật thông tin avatar và photo_url vào userData cũ
-        const updatedUserData = {
-          ...cachedUserData,
-          avatar: avatarUrl,
-        };
-
-        // Lưu lại userData đã cập nhật vào sessionStorage
-        sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
-
-        // Cập nhật lại state của userData
-        setUserData(updatedUserData);
       } else {
         setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
       }
