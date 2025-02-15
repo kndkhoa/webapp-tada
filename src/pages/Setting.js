@@ -30,14 +30,22 @@ function Setting() {
   const cachedUserData = sessionStorage.getItem("userData");
   if (cachedUserData) {
     const parsedUserData = JSON.parse(cachedUserData);
-    setUserData(parsedUserData); // Cập nhật lại state khi có dữ liệu
+    setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
   } else {
     console.error("No user data found in sessionStorage!");
   }
-  
-  // Cập nhật loading thành false sau khi dữ liệu đã được tải
+
+  // Sau khi đã lấy dữ liệu từ sessionStorage, cập nhật `loading` thành false
   setLoading(false);
 }, []); // Chỉ gọi một lần khi component mount
+
+// Cập nhật state nếu userData thay đổi
+useEffect(() => {
+  if (userData) {
+    setLoading(false);
+  }
+}, [userData]);
+
 
   // State để lưu trạng thái hiển thị của từng giá trị
   const [showFullAC, setShowFullAC] = useState(false);
