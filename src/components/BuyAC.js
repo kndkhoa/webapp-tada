@@ -5,14 +5,13 @@ import qrcode from './assets/QR-Code.jpg'; // Đường dẫn đến ảnh QR co
 import './Report.css'; // Import CSS riêng
 import './BuyAC.css'; // Import CSS của BuyAC
 
-const BuyAC = ({ userID, walletAC, onClose, userWallet }) => {
+const BuyAC = ({ userID, walletAC, onClose }) => {
   const [acAmount, setAcAmount] = useState(0); // Lưu số lượng AC muốn mua
   const [error, setError] = useState(null); // Trạng thái lỗi
   const [showQRCode, setShowQRCode] = useState(false); // Hiển thị QR code sau khi confirm
   const [timeLeft, setTimeLeft] = useState(600); // 10 phút = 600 giây
   const [transactionConfirmed, setTransactionConfirmed] = useState(false); // Trạng thái giao dịch đã xác nhận
-  
-  const walletAddress= "TV7qBtuDZfhq7N8ctqJrXkXBtMtb6CMz46"; // Địa chỉ ví TadaUp
+  const [initialWalletAC, setInitialWalletAC] = useState(walletAC); // Lưu giá trị wallet_AC ban đầu
 
   const handleChangeAmount = (event) => {
     setAcAmount(event.target.value); // Cập nhật số lượng AC khi nhập
@@ -28,7 +27,7 @@ const BuyAC = ({ userID, walletAC, onClose, userWallet }) => {
     setShowQRCode(true); // Hiển thị QR code và bắt đầu bộ đếm ngược
 
     // Bắt đầu kiểm tra giao dịch
-    checkTransaction();
+    checkWalletAC();
   };
 
   // Tính số tiền USDT cần trả (1 USDT = 10 AC)
@@ -53,68 +52,35 @@ const BuyAC = ({ userID, walletAC, onClose, userWallet }) => {
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
-  const checkTransaction = () => {
+  const checkWalletAC = () => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`https://api.tronscan.org/api/transactions?address=${walletAddress}`);
-        const data = await response.json();
-        const transactions = data.data;
+        const response = await fetch(`https://admin.tducoin.com/api/webappuser/checkac/${userID}`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': 'oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE',
+            'Content-Type': 'application/json',
+          },
+        });
 
-        // Kiểm tra các giao dịch gửi USDT
-        const transaction = transactions.find((tx) => tx.to_address === walletAddress && tx.from_address === userWallet);
-        if (transaction) {
+        const data = await response.json();
+        const currentWalletAC = data.wallet_AC;
+
+        if (currentWalletAC !== initialWalletAC) {
           setTransactionConfirmed(true); // Giao dịch thành công
-          
-          // Sử dụng số lượng USDT đã nhận được từ giao dịch
-          const usdtAmount = transaction.amount; // Số lượng USDT nhận được
-          updateUserBalance(userID, usdtAmount); // Cập nhật AC cho người dùng
           clearInterval(interval); // Dừng việc kiểm tra sau khi nhận được giao dịch
+          alert('Giao dịch thành công!');
         }
       } catch (error) {
-        console.error('Lỗi khi lấy giao dịch:', error);
+        console.error('Lỗi khi lấy dữ liệu wallet_AC:', error);
       }
 
       if (timeLeft <= 0) {
         clearInterval(interval); // Dừng khi hết thời gian
         setError('Hết thời gian. Vui lòng thử lại.');
       }
-    }, 5000); // Kiểm tra mỗi 5 giây
+    }, 10000); // Kiểm tra mỗi 10 giây
   };
-
-const updateUserBalance = async (userID, usdtAmount) => {
-    const acAmount = usdtAmount / 10; // Tỷ lệ quy đổi 1 USDT = 10 AC
-
-    // Gửi yêu cầu POST cập nhật AC cho user
-    try {
-        const response = await fetch("https://admin.tducoin.com/api/webappuser/addac", {
-            method: "POST",
-            headers: {
-                "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userID: userID,
-                amount: acAmount, // Số lượng AC cần cộng vào tài khoản
-            }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Cập nhật wallet_AC trong sessionStorage
-            const updatedUserData = JSON.parse(sessionStorage.getItem("userData"));
-            updatedUserData.wallet_AC += acAmount; // Cộng thêm số AC vào tài khoản người dùng
-            sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
-
-        } else {
-            alert('Failed to update AC.');
-        }
-    } catch (error) {
-        console.error("Error updating user balance:", error);
-    }
-};
-
-
 
   return (
     <>
