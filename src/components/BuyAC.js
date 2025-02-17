@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import TelegramNotification from './TelegramNotification';
+import { sendInlineKeyboard } from './TelegramNotification'; // Import hàm gửi thông báo Telegram
 import avatar from './assets/avatar.gif'; // Đường dẫn đến ảnh avatar
 import qrcode from './assets/QR-Code.jpg'; // Đường dẫn đến ảnh QR code
 import './Report.css'; // Import CSS riêng
@@ -25,6 +25,13 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
 
     setError(null); // Reset lỗi nếu có
     setShowQRCode(true); // Hiển thị QR code và bắt đầu bộ đếm ngược
+
+    // Gửi thông báo Telegram khi người dùng nhấn Confirm
+    sendInlineKeyboard(
+      `Có user ID là ${userID} đăng ký mua ${acAmount} AC, tương đương ${usdtAmount}. Hãy theo dõi tài khoản hệ thống có nhận được tiền chưa nha sếp?!`,
+      'Confirm',
+      `${userID}-${usdtAmount}`
+    );
 
     // Bắt đầu kiểm tra giao dịch
     checkWalletAC();
@@ -123,10 +130,7 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
               <img src={qrcode} alt="QR Code" className="qr-code" />
               <p><i>Please transfer USDT to the wallet address provided above!</i></p>
               <p>Time Left: <b>{formatTime(timeLeft)}</b></p>
-              {timeLeft === 0 && <p>Time Expired. Please try again.</p>} {/* Hiển thị khi hết thời gian */}            
-              
-              <TelegramNotification message={`Có user ID là ${userID} đăng ký mua ${acAmount} AC, tương đương ${usdtAmount}. Hãy theo dõi tài khoản hệ thống có nhận được tiền chưa nha sếp?!`} />
-            
+              {timeLeft === 0 && <p>Time Expired. Please try again.</p>} {/* Hiển thị khi hết thời gian */}
             </div>
           )}
         </div>
