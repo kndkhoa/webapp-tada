@@ -2,8 +2,10 @@
 import React from 'react';
 
 const token = '8032885107:AAEjNWGp7v2n7ZH78Oy6cCCWHGiCMIzB2xU'; // Bot An An là AI
+const main_token = '7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4'; // Bot TadaUp Global
 const adminId = '6461541179'; // ID của admin Telegram
 const url = `https://api.telegram.org/bot${token}/sendMessage`;
+const main_url = `https://api.telegram.org/bot${main_token}/sendMessage`;
 
 // Hàm gửi tin nhắn đến Telegram
 export const sendTelegramMessage = async (message) => {
@@ -55,7 +57,7 @@ export const sendSignal = async (message, groupId) => {
 // Hàm gửi Inline Keyboard
 export const sendInlineKeyboard = async (text, buttonText, callbackData) => {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(main_url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
