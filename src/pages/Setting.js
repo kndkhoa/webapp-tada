@@ -24,16 +24,28 @@ function Setting() {
   const [isMenuSelected, setIsMenuSelected] = useState(false);
   const [showBuyAC, setShowBuyAC] = useState(false); // State để hiển thị BuyAC modal
 
-  // Lấy dữ liệu người dùng từ sessionStorage chỉ một lần khi component mount
+  // Lấy dữ liệu người dùng từ sessionStorage và cập nhật khi có sự kiện walletUpdated
   useEffect(() => {
-    const cachedUserData = sessionStorage.getItem("userData");
-    if (cachedUserData) {
-      const parsedUserData = JSON.parse(cachedUserData);
-      setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
-    } else {
-      console.error("No user data found in sessionStorage!");
-    }
-    setLoading(false); // Cập nhật trạng thái sau khi dữ liệu đã được lấy
+    const updateUserData = () => {
+      const cachedUserData = sessionStorage.getItem("userData");
+      if (cachedUserData) {
+        const parsedUserData = JSON.parse(cachedUserData);
+        setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
+      } else {
+        console.error("No user data found in sessionStorage!");
+      }
+    };
+
+    // Lấy dữ liệu ban đầu
+    updateUserData();
+
+    // Lắng nghe sự kiện walletUpdated để cập nhật lại userData
+    window.addEventListener("walletUpdated", updateUserData);
+
+    // Dọn dẹp khi component unmount
+    return () => {
+      window.removeEventListener("walletUpdated", updateUserData);
+    };
   }, []); // Chỉ gọi một lần khi component mount
 
   // State để lưu trạng thái hiển thị của từng giá trị
@@ -74,15 +86,15 @@ function Setting() {
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />      
         {picUrl ? (
-    <div className="avatarsetting">
-      <img
-        src={picUrl} // Sử dụng URL của avatar nếu có
-        alt="Avatar"
-      />
-    </div>
-  ) : (
-    <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
-  )}
+          <div className="avatarsetting">
+            <img
+              src={picUrl} // Sử dụng URL của avatar nếu có
+              alt="Avatar"
+            />
+          </div>
+        ) : (
+          <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
+        )}
       </div>
       <div className="setting-detail-content">
         <div className="setting-detail-row">
