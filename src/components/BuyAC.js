@@ -5,7 +5,7 @@ import qrcode from './assets/QR-Code.jpg'; // Đường dẫn đến ảnh QR co
 import './Report.css'; // Import CSS riêng
 import './BuyAC.css'; // Import CSS của BuyAC
 
-const BuyAC = ({ userID, walletAC, onClose, onWalletACUpdate }) => {
+const BuyAC = ({ userID, walletAC, onClose }) => {
   const [acAmount, setAcAmount] = useState(0); // Lưu số lượng AC muốn mua
   const [error, setError] = useState(null); // Trạng thái lỗi
   const [showQRCode, setShowQRCode] = useState(false); // Hiển thị QR code sau khi confirm
@@ -78,13 +78,21 @@ const BuyAC = ({ userID, walletAC, onClose, onWalletACUpdate }) => {
           clearInterval(interval); // Dừng việc kiểm tra sau khi nhận được giao dịch
           setShowQRCode(false); // Ẩn QR code và bộ đếm thời gian
 
-          // Cập nhật wallet_AC trong session
-          if (onWalletACUpdate) {
-            onWalletACUpdate(currentWalletAC); // Gọi hàm callback để cập nhật wallet_AC
-          }
+          // Cập nhật sessionStorage
+          const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
+          const updatedUserData = {
+            ...storedUserData,
+            wallet_AC: currentWalletAC, // Cập nhật wallet_AC
+          };
+          sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
 
-          // Cập nhật initialWalletAC để tránh so sánh sai trong tương lai
-          setInitialWalletAC(currentWalletAC);
+          // Phát sự kiện tùy chỉnh để cập nhật Header ngay lập tức
+          window.dispatchEvent(new Event("walletUpdated"));
+
+          // Gọi hàm cập nhật Header nếu có
+          if (typeof window.updateHeaderWalletAC === "function") {
+            window.updateHeaderWalletAC(currentWalletAC);
+          }
         }
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu wallet_AC:', error);
