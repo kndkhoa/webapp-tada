@@ -76,6 +76,7 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
         if (currentWalletAC !== initialWalletAC) {
           setTransactionConfirmed(true); // Giao dịch thành công
           clearInterval(interval); // Dừng việc kiểm tra sau khi nhận được giao dịch
+          setShowQRCode(false); // Ẩn QR code và bộ đếm thời gian
           alert('Giao dịch thành công!');
         }
       } catch (error) {
@@ -85,6 +86,7 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
       if (timeLeft <= 0) {
         clearInterval(interval); // Dừng khi hết thời gian
         setError('Hết thời gian. Vui lòng thử lại.');
+        setShowQRCode(false); // Ẩn QR code và bộ đếm thời gian
       }
     }, 10000); // Kiểm tra mỗi 10 giây
   };
@@ -98,7 +100,7 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
           <img src={avatar} alt="Avatar" className="report-avatar" />
 
           {/* Nếu chưa nhấn Confirm, hiển thị các thông tin */}
-          {!showQRCode && (
+          {!showQRCode && !transactionConfirmed && (
             <div className="buyac-details">
               <p><b>User ID:</b> {userID}</p>
               <p><b>Wallet AC:</b> {walletAC} AC</p>
@@ -125,12 +127,26 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
           )}
 
           {/* Nếu đã nhấn Confirm, hiển thị QR code và bộ đếm thời gian */}
-          {showQRCode && (
+          {showQRCode && !transactionConfirmed && (
             <div className="qr-container">
               <img src={qrcode} alt="QR Code" className="qr-code" />
               <p><i>Please transfer USDT to the wallet address provided above!</i></p>
               <p>Time Left: <b>{formatTime(timeLeft)}</b></p>
               {timeLeft === 0 && <p>Time Expired. Please try again.</p>} {/* Hiển thị khi hết thời gian */}
+            </div>
+          )}
+
+          {/* Nếu giao dịch thành công, hiển thị thông báo "Successful!!!" */}
+          {transactionConfirmed && (
+            <div className="success-message">
+              <p>Successful!!!</p>
+            </div>
+          )}
+
+          {/* Nếu hết thời gian, hiển thị thông báo "Thời gian giao dịch quá hạn" */}
+          {timeLeft <= 0 && !transactionConfirmed && (
+            <div className="error-message">
+              <p>Thời gian giao dịch quá hạn.</p>
             </div>
           )}
         </div>
