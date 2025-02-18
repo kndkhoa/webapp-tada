@@ -5,7 +5,7 @@ import qrcode from './assets/QR-Code.jpg'; // Đường dẫn đến ảnh QR co
 import './Report.css'; // Import CSS riêng
 import './BuyAC.css'; // Import CSS của BuyAC
 
-const BuyAC = ({ userID, walletAC, onClose }) => {
+const BuyAC = ({ userID, walletAC, onClose, onWalletACUpdate }) => {
   const [acAmount, setAcAmount] = useState(0); // Lưu số lượng AC muốn mua
   const [error, setError] = useState(null); // Trạng thái lỗi
   const [showQRCode, setShowQRCode] = useState(false); // Hiển thị QR code sau khi confirm
@@ -77,7 +77,14 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
           setTransactionConfirmed(true); // Giao dịch thành công
           clearInterval(interval); // Dừng việc kiểm tra sau khi nhận được giao dịch
           setShowQRCode(false); // Ẩn QR code và bộ đếm thời gian
-          alert('Giao dịch thành công!');
+
+          // Cập nhật wallet_AC trong session
+          if (onWalletACUpdate) {
+            onWalletACUpdate(currentWalletAC); // Gọi hàm callback để cập nhật wallet_AC
+          }
+
+          // Cập nhật initialWalletAC để tránh so sánh sai trong tương lai
+          setInitialWalletAC(currentWalletAC);
         }
       } catch (error) {
         console.error('Lỗi khi lấy dữ liệu wallet_AC:', error);
