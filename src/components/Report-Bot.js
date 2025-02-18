@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import avatar from './assets/avatar.gif'; // Đường dẫn đến ảnh avatar
 import './Report.css'; // Import CSS riêng
-import TelegramNotification from './TelegramNotification';
+import { sendInlineKeyboard } from './TelegramNotification';
 
 const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClose }) => {
   const navigate = useNavigate();
@@ -61,12 +61,12 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
           }
         ];
         userData.wallet_AC = walletAC - price;
-                 
-        <TelegramNotification 
-          messageinlineText={`Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server} \nHãy setup tài khoản cho user và nhấn kích hoạt nhé sếp?!`} 
-          buttonText="Comfirm"
-          callbackData={`addBotAccount-${mt5Account}-${userID}`}
-        />
+
+        sendInlineKeyboard(
+          `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server} \nHãy setup tài khoản cho user và nhấn kích hoạt nhé anh Thỏ?!`,
+          'Confirm',
+          `setupbot-${userID}`
+        );
         
           // Lưu lại vào sessionStorage
         sessionStorage.setItem("userData", JSON.stringify(userData));
