@@ -62,8 +62,11 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         ];
         userData.wallet_AC = walletAC - price;
 
-        sendTelegramMessage(`Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server} \nHãy setup tài khoản cho user và nhấn kích hoạt nhé anh Thỏ?!`);
-        
+        sendInlineKeyboard(
+          `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server} \nHãy setup tài khoản cho user và gửi em ID của Group Telegram riêng của khách hàng này nha anh Thỏ?!`,
+          'Nhập ID Group',
+          `updateGroupID-${userID}-${acAmount}`
+        );
           // Lưu lại vào sessionStorage
         sessionStorage.setItem("userData", JSON.stringify(userData));
 
