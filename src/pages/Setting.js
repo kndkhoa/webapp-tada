@@ -64,7 +64,7 @@ function Setting() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const BASE_URL = 'https://admin.tducoin.com/public/storage/';
+  const BASE_URL = 'https://admin.tducoin.com/public/';
   const picUrl = userData && userData.avatar ? `${BASE_URL}${userData.avatar}` : null;
 
   const handleMenuSelect = (menu) => {
