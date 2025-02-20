@@ -64,9 +64,8 @@ function Setting() {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const key = `7458768044:AAG-LvoaLQhn8VMgCY1ZCtnq099gMvfEnW4`;
-  const BASE_URL = `https://api.telegram.org/file/bot`;
-  const picUrl = userData.avatar ? `${BASE_URL}${key}/${userData.avatar}` : null;
+  const BASE_URL = 'https://admin.tducoin.com/public/storage/';
+  const picUrl = userData && userData.avatar ? `${BASE_URL}${userData.avatar}` : null;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
