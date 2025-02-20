@@ -42,6 +42,9 @@ function AffiliateProfit({ onBack }) {
 
   const BASE_URL = 'https://admin.tducoin.com/public/';
 
+  // Tính tổng ac_bonus của tất cả các thành viên
+  const totalAcBonus = members.reduce((total, member) => total + member.ac_bonus, 0);
+
   // Nếu đang loading, hiển thị component Loading
   if (isLoading) {
     return (
@@ -53,6 +56,12 @@ function AffiliateProfit({ onBack }) {
 
   return (
     <div className="menu-container">
+      {/* Dòng hiển thị tổng ac_bonus */}
+      <div className="total-ac-bonus">
+        <span>Total Affiliate Commission</span>
+        <span className="ac-bonus-value"><b>{totalAcBonus} AC</b></span>
+      </div>
+
       {members.map((member, index) => (
         <div key={member.memberID}>
           <div className="menu-item">
@@ -62,9 +71,9 @@ function AffiliateProfit({ onBack }) {
                 alt="icon" 
                 className={`affiliate-icon-left ${!member.avatar ? "affiliate-default-avatar" : ""}`}
               />
-              <span>{member.name}</span>
+              <span><b>{member.name}</b></span>
               <div className="icon-right">
-                <span>{member.ac_bonus}</span> {/* Display ac_bonus instead of the radio button */}
+                <span>+{member.ac_bonus} AC</span> {/* Display ac_bonus instead of the radio button */}
               </div>
             </button>
           </div>

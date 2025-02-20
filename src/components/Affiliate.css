@@ -19,7 +19,24 @@
   .affiliate-icon-left.default-avatar {
     background-color: green; /* Default background color if the image is missing */
     color: white; /* White text color for fallback */
-    font-size: 14px; /* Adjust font size for fallback text */
-    font-weight: bold; /* Make the text bold */
   }
   
+  .total-ac-bonus {
+    padding: 10px;
+    background-color: #f0f0f0; /* Màu nền nhẹ cho phần tổng */
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex; /* Sử dụng flexbox để căn chỉnh */
+    justify-content: space-between; /* Chia không gian giữa phần chữ và phần giá trị */
+    color: #333;
+  }
+
+  .total-ac-bonus span {
+    text-align: left; /* Chữ "Total AC Bonus" canh lề trái */
+  }
+  
+  .total-ac-bonus .ac-bonus-value {
+    text-align: right; /* Giá trị AC Bonus canh lề phải */
+  }
