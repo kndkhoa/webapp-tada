@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import "./Setting-Menu.css";
 import "./Setting-Format.css";
 import "./Affiliate.css";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function AffiliateProfit({ onBack }) {
   const [selectedMember, setSelectedMember] = useState(null); // Track the selected member
@@ -36,6 +37,8 @@ function AffiliateProfit({ onBack }) {
     setSelectedMember(member);
   };
 
+  const BASE_URL = 'https://admin.tducoin.com/public/';
+
   return (
     <div className="menu-container">
       {members.map((member, index) => (
@@ -43,7 +46,7 @@ function AffiliateProfit({ onBack }) {
           <div className="menu-item">
             <button className="menu-button" onClick={() => handleSelectMember(member)}>
             <img
-              src={member.avatar || null} 
+              src={member.avatar ? `${BASE_URL}${member.avatar}` : `${BASE_URL}images/avatars/9999.jpg`} 
               alt="icon" 
               className={`affiliate-icon-left ${!member.avatar ? "affiliate-default-avatar" : ""}`}
 />
