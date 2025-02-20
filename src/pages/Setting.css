@@ -41,7 +41,7 @@
     border-radius: 20px 20px 0 0;
     padding: 20px;
     padding-top: 90px;
-    height: auto; /* Chiều cao tự động thay đổi nếu nội dung nhiều hơn */
+    min-height: 100vh;
   }
 
   .setting-detail-item {
