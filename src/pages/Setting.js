@@ -65,7 +65,7 @@ function Setting() {
   }
 
   const BASE_URL = 'https://admin.tducoin.com/public/';
-  const picUrl = userData && userData.avatar ? `${BASE_URL}${userData.avatar}` : null;
+  const picUrl = userData && userData.avatar ? `${BASE_URL}${userData.avatar}` : `${BASE_URL}images/avatars/9999.jpg`;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
@@ -84,16 +84,12 @@ function Setting() {
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />      
-        {picUrl ? (
-          <div className="avatarsetting">
+        <div className="avatarsetting">
             <img
               src={picUrl} // Sử dụng URL của avatar nếu có
               alt="Avatar"
             />
           </div>
-        ) : (
-          <div className="avatarsetting avatar-default">{userData.name}</div> // Hình tròn màu xanh
-        )}
       </div>
       <div className="setting-detail-content">
         <div className="setting-detail-row">
