@@ -61,15 +61,6 @@ function SettingMenu({ user, onBack }) {
         </button>
       </div>
 
-      <div className="divider"></div>
-       {/* Nút Back */}
-       <div className="setting-format-comeback-button-container">
-        <div className="setting-format-comeback-button" onClick={onBack}>
-          <strong>Comeback</strong>
-          <img src={nextIcon} alt="Next" className="setting-format-icon" />
-        </div>
-      </div>
-
     </div>
   );
 }
