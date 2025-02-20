@@ -30,9 +30,9 @@ function SettingMenu({ onMenuSelect }) {
       {/* Phần Button */}
       <div className="menu-item">
         {/* Lịch sử nạp rút */}
-        <button className="menu-button" onClick={() => handleNavigate("history")}>
+        <button className="menu-button" onClick={() => handleNavigate("affiliate")}>
           <img src={lichsunaprutIcon} alt="icon" className="icon-left" />
-          <span>History</span>
+          <span>Affiliate Profit</span>
           <div className="icon-right">
             <img src={nextIcon} alt="arrow" className="arrow-icon" />
           </div>
