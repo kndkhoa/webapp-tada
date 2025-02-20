@@ -21,6 +21,7 @@ function Setting() {
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [isMenuSelected, setIsMenuSelected] = useState(false);
   const [showBuyAC, setShowBuyAC] = useState(false); // State để hiển thị BuyAC modal
+  const [startX, setStartX] = useState(0); // Store the starting position of the swipe
 
   // Lấy dữ liệu người dùng từ sessionStorage và cập nhật khi có sự kiện walletUpdated
   useEffect(() => {
@@ -72,6 +73,20 @@ function Setting() {
     setIsMenuSelected(true);
   };
 
+   // Function to handle swipe start event
+   const handleTouchStart = (e) => {
+    const touchStartX = e.touches[0].clientX;
+    setStartX(touchStartX);
+  };
+
+  // Function to handle swipe end event
+  const handleTouchEnd = (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    if (touchEndX - startX > 100) { // Check if the swipe is significant enough (e.g., 100px)
+      handleBack(); // Trigger the back action if swipe is detected
+    }
+  };
+
   const handleBack = () => {
     if (selectedMenu !== null) {
       // Nếu đang ở trang chi tiết, quay lại trang SettingMenu
@@ -84,7 +99,11 @@ function Setting() {
   };
 
   return (
-    <div className="setting-detail-container">
+    <div 
+      className="setting-detail-container"
+      onTouchStart={handleTouchStart} // Listen for touch start
+      onTouchEnd={handleTouchEnd}   // Listen for touch end
+    >
       <div className="bannersetting-header">
         <button className="backIcon" onClick={handleBack}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
