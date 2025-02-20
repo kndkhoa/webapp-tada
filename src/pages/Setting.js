@@ -9,12 +9,10 @@ import bg from "../components/assets/bg-setting.jpg";
 import SettingMenu from "../components/Setting-Menu";
 import About from "../components/About";
 import Terms from "../components/Terms";
+import Affiliate from "../components/Affiliate-Profit";
 import Language from "../components/Language";
 import Profile from "../components/Profile";
 import BuyAC from "../components/BuyAC"; // Import component BuyAC
-
-import { motion, AnimatePresence } from "framer-motion";
-import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
 function Setting() {
   const { id } = useParams();
@@ -30,11 +28,13 @@ function Setting() {
       const cachedUserData = sessionStorage.getItem("userData");
       if (cachedUserData) {
         const parsedUserData = JSON.parse(cachedUserData);
-        setUserData(parsedUserData); // Cập nhật state khi có dữ liệu
+        setUserData(parsedUserData);
+        setLoading(false); // Thêm dòng này để cập nhật trạng thái loading
       } else {
         console.error("No user data found in sessionStorage!");
       }
     };
+    
 
     // Lấy dữ liệu ban đầu
     updateUserData();
@@ -142,7 +142,7 @@ function Setting() {
             />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
               <span className="setting-coin-button">
-                Withdraw
+                Swap
               </span>
             </div>
           </div>
@@ -164,6 +164,7 @@ function Setting() {
         ) : (
           <div>
             {selectedMenu === "profile" && <Profile user={user} onBack={handleBack} />}
+            {selectedMenu === "affiliate" && <Affiliate onBack={handleBack} />}
             {selectedMenu === "language" && <Language onBack={handleBack} />}
             {selectedMenu === "terms" && <Terms onBack={handleBack} />}
             {selectedMenu === "about" && <About onBack={handleBack} />}
