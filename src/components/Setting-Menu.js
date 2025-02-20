@@ -15,18 +15,6 @@ function SettingMenu({ onMenuSelect }) {
 
   return (
     <div className="menu-container">
-      <div className="menu-item">
-        {/* Button với icon và tiêu đề */}
-        <button className="menu-button" onClick={() => handleNavigate("profile")}>
-          <img src={hosoIcon} alt="icon" className="icon-left" />
-          <span>Profile</span>
-          <div className="icon-right">
-            <img src={nextIcon} alt="arrow" className="arrow-icon" />
-          </div>
-        </button>
-      </div>
-      {/* Đường phân chia */}
-      <div className="divider"></div>
       {/* Phần Button */}
       <div className="menu-item">
         {/* Lịch sử nạp rút */}
@@ -39,6 +27,18 @@ function SettingMenu({ onMenuSelect }) {
         </button>
       </div>
       <div className="divider"></div>
+      <div className="menu-item">
+        {/* Button với icon và tiêu đề */}
+        <button className="menu-button" onClick={() => handleNavigate("profile")}>
+          <img src={hosoIcon} alt="icon" className="icon-left" />
+          <span>Profile</span>
+          <div className="icon-right">
+            <img src={nextIcon} alt="arrow" className="arrow-icon" />
+          </div>
+        </button>
+      </div>
+      {/* Đường phân chia */}
+      <div className="divider"></div>     
       {/* Phần Button */}
       <div className="menu-item">
         {/* Button với icon và tiêu đề */}
