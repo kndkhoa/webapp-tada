@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import "./Setting-Menu.css";
 import "./Setting-Format.css";
 import "./Affiliate.css";
-import { ReloadSkeleton, PreloadImage } from "../components/waiting";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting"; // Đảm bảo rằng các component waiting được nhập đúng
 
 function AffiliateProfit({ onBack }) {
   const [selectedMember, setSelectedMember] = useState(null); // Track the selected member
   const [members, setMembers] = useState([]); // Store the list of members
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
 
   useEffect(() => {
     // Fetch the affiliate members from the API
@@ -27,6 +28,8 @@ function AffiliateProfit({ onBack }) {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false); // Stop loading after the data is fetched
       }
     };
 
@@ -39,17 +42,26 @@ function AffiliateProfit({ onBack }) {
 
   const BASE_URL = 'https://admin.tducoin.com/public/';
 
+  // Nếu đang loading, hiển thị component Loading
+  if (isLoading) {
+    return (
+      <div className="menu-container">
+        <ReloadSkeleton /> {/* Hoặc PreloadImage tùy theo design bạn muốn */}
+      </div>
+    );
+  }
+
   return (
     <div className="menu-container">
       {members.map((member, index) => (
         <div key={member.memberID}>
           <div className="menu-item">
             <button className="menu-button" onClick={() => handleSelectMember(member)}>
-            <img
-              src={member.avatar ? `${BASE_URL}${member.avatar}` : `${BASE_URL}images/avatars/9999.jpg`} 
-              alt="icon" 
-              className={`affiliate-icon-left ${!member.avatar ? "affiliate-default-avatar" : ""}`}
-/>
+              <img
+                src={member.avatar ? `${BASE_URL}${member.avatar}` : `${BASE_URL}images/avatars/9999.jpg`} 
+                alt="icon" 
+                className={`affiliate-icon-left ${!member.avatar ? "affiliate-default-avatar" : ""}`}
+              />
               <span>{member.name}</span>
               <div className="icon-right">
                 <span>{member.ac_bonus}</span> {/* Display ac_bonus instead of the radio button */}
