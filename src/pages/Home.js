@@ -55,60 +55,33 @@ function Home() {
   const navigate = useNavigate();
   const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
 
-  const saveAvatarToDB = async (avatarUrl, userID) => {
-    try {
-      const response = await fetch(`https://admin.tducoin.com/api/webappuser/upavatar/${userID}`, {
-        method: 'POST',
-        headers: {
-          'x-api-key': 'oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          avatar_url: avatarUrl, // URL avatar bạn nhận từ Telegram hoặc từ người dùng
-        }),
-      });
+  // Lấy ID từ URL hoặc gán mặc định
+  useEffect(() => {
+  const checkTelegramData = () => {
+    if (window.Telegram && window.Telegram.WebApp) {
+      // Báo cho Telegram biết rằng Web App đã sẵn sàng
+      window.Telegram.WebApp.ready();
 
-      const data = await response.json();
+      // Lấy dữ liệu người dùng từ initDataUnsafe
+      const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
 
-      if (data.success) {
-        console.log('Avatar saved successfully:', data.data.avatar);
+      if (telegramData) {
+        const telegramId = telegramData.id;
+        setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
       } else {
-        console.error('Failed to save avatar:', data.message);
+        setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
       }
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
+    } else {
+      const queryParams = new URLSearchParams(window.location.search);
+      const telegramIdFromUrl = queryParams.get("telegramId");
+      setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
     }
   };
 
-  // Lấy ID từ URL hoặc gán mặc định
-  useEffect(() => {
-    const checkTelegramData = () => {
-      if (window.Telegram && window.Telegram.WebApp) {
-        // Báo cho Telegram biết rằng Web App đã sẵn sàng
-        window.Telegram.WebApp.ready();
+  checkTelegramData();
+}, []);
 
-        // Lấy dữ liệu người dùng từ initDataUnsafe
-        const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
 
-        if (telegramData) {
-          const telegramId = telegramData.id;
-          setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
-          // Gọi API để lưu avatar nếu có
-          if (telegramData.photo_url) {
-            saveAvatarToDB(telegramData.photo_url, telegramId);
-          }
-        } else {
-          setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
-        }
-      } else {
-        const queryParams = new URLSearchParams(window.location.search);
-        const telegramIdFromUrl = queryParams.get("telegramId");
-        setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
-      }
-    };
-
-    checkTelegramData();
-  }, []);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
