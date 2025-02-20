@@ -73,14 +73,20 @@ function Setting() {
   };
 
   const handleBack = () => {
-    setSelectedMenu(null);
-    setIsMenuSelected(false);
+    if (selectedMenu !== null) {
+      // Nếu đang ở trang chi tiết, quay lại trang SettingMenu
+      setSelectedMenu(null);
+      setIsMenuSelected(false);
+    } else {
+      // Nếu đang ở trang chính (Setting), thoát khỏi trang (quay lại trang trước)
+      window.history.back();
+    }
   };
 
   return (
     <div className="setting-detail-container">
       <div className="bannersetting-header">
-        <button className="backIcon" onClick={() => window.history.back()}>
+        <button className="backIcon" onClick={handleBack}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
         <img src={bg} alt="Banner" className="bannersetting-image" />      
