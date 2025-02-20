@@ -1,5 +1,6 @@
 .setting-detail-container {
     position: relative;
+    background-color: #ffffff;
   }
   
   .bannersetting-header {
@@ -30,41 +31,17 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hiệu ứng bóng */
     object-fit: cover; /* Đảm bảo ảnh không bị méo và phủ đầy hình tròn */
   }
-
-.avatarsetting.avatar-default {
-    background-color: #0077b3; /* Màu xanh */
-    position: absolute;
-    top: 6vh; /* Kéo avatar xuống dưới banner, điều chỉnh theo nhu cầu */
-    left: 50%;
-    transform: translateX(-50%); /* Căn giữa avatar */
-    z-index: 10; /* Đảm bảo avatar ở trên banner */
-    width: 150px !important; /* Kích thước avatar */
-    height: 150px !important;
-    border-radius: 50%; /* Hình tròn */
-    border: 4px solid white; /* Viền trắng */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Hiệu ứng bóng */
-
-    justify-content: center;
-    align-items: center;
-    color: white; /* Màu chữ trắng */
-    font-size: 22px; /* Kích thước chữ */
-    font-weight: bold; /* Chữ đậm */
-    padding: 30px 15px 15px 15px; /* Khoảng cách bên trong */
-    text-align: center; /* Căn giữa chữ ngang */
-    line-height: 1.2; /* Căn giữa chữ dọc */
-  }
   
   .setting-detail-content {
     position: relative;
     top: -100px; /* Đẩy nội dung lên để không bị che khuất */
     left: 0;
     width: 100%;
-    min-height: 100vh;
     background-color: white;
-    border-radius: 20px;
+    border-radius: 20px 20px 0 0;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding-top: 90px; /* Điều chỉnh thêm nếu cần thiết để không bị đè lên nội dung */
+    padding-top: 90px;
+    height: auto; /* Chiều cao tự động thay đổi nếu nội dung nhiều hơn */
   }
 
   .setting-detail-item {
