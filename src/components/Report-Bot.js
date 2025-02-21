@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import avatar from './assets/avatar.gif'; // Đường dẫn đến ảnh avatar
 import './Report.css'; // Import CSS riêng
-import { sendTelegramMessage } from './TelegramNotification';
+import { sendInlineKeyboard } from './TelegramNotification';
 
 const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClose }) => {
   const navigate = useNavigate();
