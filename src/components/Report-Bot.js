@@ -70,10 +70,8 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
           // Lưu lại vào sessionStorage
         sessionStorage.setItem("userData", JSON.stringify(userData));
 
-        // Gọi hàm cập nhật Header nếu có
-        if (typeof window.updateHeaderWalletAC === "function") {
-          window.updateHeaderWalletAC(updatedWalletAC);
-        }
+        window.dispatchEvent(new Event("walletUpdated"));
+
       } else {
         <TelegramNotification message={data.message} />
         throw new Error(data.message || "Failed to register.");       
