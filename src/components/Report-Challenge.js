@@ -26,8 +26,8 @@ const Report = ({ userID, activeAccount, author, price, walletAC, disccount, amo
           {/* Hiển thị lỗi nếu có */}
           {error && <p className="error-message">{error}</p>}
 
-          <button className="report-button">
-              {loading ? "Processing..." : "Discovery"}
+          <button className="report-button" onClick={() => navigate('/Home')}>
+              {loading ? "Processing..." : "Back Home"}
             </button>
         </div>
       </div>
