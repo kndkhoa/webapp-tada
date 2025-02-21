@@ -12,7 +12,8 @@ import Terms from "../components/Terms";
 import Affiliate from "../components/Affiliate-Profit";
 import Language from "../components/Language";
 import Profile from "../components/Profile";
-import BuyAC from "../components/BuyAC"; // Import component BuyAC
+import BuyAC from "../components/BuyAC";
+import Swap from "../components/Report-Swap";
 
 function Setting() {
   const { id } = useParams();
@@ -20,101 +21,101 @@ function Setting() {
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [isMenuSelected, setIsMenuSelected] = useState(false);
-  const [showBuyAC, setShowBuyAC] = useState(false); // State để hiển thị BuyAC modal
-  const [startX, setStartX] = useState(0); // Store the starting position of the swipe
+  const [showBuyAC, setShowBuyAC] = useState(false);
+  const [showReportSwap, setShowSwap] = useState(false);
+  const [startX, setStartX] = useState(0);
 
-  // Lấy dữ liệu người dùng từ sessionStorage và cập nhật khi có sự kiện walletUpdated
+  // Lấy dữ liệu người dùng từ sessionStorage
   useEffect(() => {
     const updateUserData = () => {
       const cachedUserData = sessionStorage.getItem("userData");
       if (cachedUserData) {
         const parsedUserData = JSON.parse(cachedUserData);
+        console.log("Parsed userData from sessionStorage:", parsedUserData); // Debug dữ liệu
         setUserData(parsedUserData);
-        setLoading(false); // Thêm dòng này để cập nhật trạng thái loading
+        setLoading(false);
       } else {
         console.error("No user data found in sessionStorage!");
+        setLoading(false); // Vẫn cho phép render để hiển thị lỗi nếu không có dữ liệu
       }
     };
-    
 
-    // Lấy dữ liệu ban đầu
     updateUserData();
 
-    // Lắng nghe sự kiện walletUpdated để cập nhật lại userData
-    window.addEventListener("walletUpdated", updateUserData);
-
-    // Dọn dẹp khi component unmount
-    return () => {
-      window.removeEventListener("walletUpdated", updateUserData);
+    // Lắng nghe sự kiện storage (chỉ cần nếu dùng nhiều tab)
+    const handleStorageChange = (event) => {
+      if (event.key === "userData") {
+        updateUserData();
+      }
     };
-  }, []); // Chỉ gọi một lần khi component mount
 
-  // State để lưu trạng thái hiển thị của từng giá trị
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
   const [showFullAC, setShowFullAC] = useState(false);
 
-  // Nếu dữ liệu người dùng chưa được tải xong, hiển thị trạng thái chờ
   if (loading) {
     return <div>Đang tải dữ liệu...</div>;
   }
 
-  // Kiểm tra dữ liệu người dùng có đúng với id từ URL
+  // Kiểm tra dữ liệu người dùng có khớp với id từ URL không
   const user = userData && userData.userID === id ? userData : null;
-
-  // Nếu không tìm thấy người dùng với id tương ứng
   if (!user) {
     return <div>Không tìm thấy bài viết</div>;
   }
 
-  const BASE_URL = 'https://admin.tducoin.com/public/';
-  const picUrl = userData && userData.avatar ? `${BASE_URL}${userData.avatar}` : `${BASE_URL}images/avatars/9999.jpg`;
+  const BASE_URL = "https://admin.tducoin.com/public/";
+  const picUrl = userData?.avatar
+    ? `${BASE_URL}${userData.avatar}`
+    : `${BASE_URL}images/avatars/9999.jpg`;
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
     setIsMenuSelected(true);
   };
 
-   // Function to handle swipe start event
-   const handleTouchStart = (e) => {
-    const touchStartX = e.touches[0].clientX;
-    setStartX(touchStartX);
+  const handleTouchStart = (e) => {
+    setStartX(e.touches[0].clientX);
   };
 
-  // Function to handle swipe end event
   const handleTouchEnd = (e) => {
     const touchEndX = e.changedTouches[0].clientX;
-    if (touchEndX - startX > 100) { // Check if the swipe is significant enough (e.g., 100px)
-      handleBack(); // Trigger the back action if swipe is detected
+    if (touchEndX - startX > 100) {
+      handleBack();
     }
+  };
+
+  const handleUpdateTotalCommission = (newTotalCommission) => {
+    const updatedUserData = { ...userData, totalCommission: newTotalCommission };
+    sessionStorage.setItem("userData", JSON.stringify(updatedUserData));
+    setUserData(updatedUserData); // Cập nhật state để trigger re-render
+    console.log("Updated userData in Setting:", updatedUserData); // Debug
   };
 
   const handleBack = () => {
     if (selectedMenu !== null) {
-      // Nếu đang ở trang chi tiết, quay lại trang SettingMenu
       setSelectedMenu(null);
       setIsMenuSelected(false);
     } else {
-      // Nếu đang ở trang chính (Setting), thoát khỏi trang (quay lại trang trước)
       window.history.back();
     }
   };
 
   return (
-    <div 
+    <div
       className="setting-detail-container"
-      onTouchStart={handleTouchStart} // Listen for touch start
-      onTouchEnd={handleTouchEnd}   // Listen for touch end
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="bannersetting-header">
         <button className="backIcon" onClick={handleBack}>
           <img src={backIcon} alt="Back Icon" className="backIconImage" />
         </button>
-        <img src={bg} alt="Banner" className="bannersetting-image" />      
+        <img src={bg} alt="Banner" className="bannersetting-image" />
         <div className="avatarsetting">
-            <img
-              src={picUrl} // Sử dụng URL của avatar nếu có
-              alt="Avatar"
-            />
-          </div>
+          <img src={picUrl} alt="Avatar" />
+        </div>
       </div>
       <div className="setting-detail-content">
         <div className="setting-detail-row">
@@ -123,11 +124,7 @@ function Setting() {
             className="setting-detail-item"
             onClick={() => setShowFullAC((prev) => !prev)}
           >
-            <img
-              src={acIcon}
-              alt="Icon"
-              className="setting-detail-item-icon"
-            />
+            <img src={acIcon} alt="Icon" className="setting-detail-item-icon" />
             <div className="setting-detail-item-text">
               <span className="setting-detail-item-text-small">AC</span>
               <span className="setting-detail-item-text-large">
@@ -136,34 +133,23 @@ function Setting() {
             </div>
           </div>
 
-          {/* NẠP RÚT */}
+          {/* NẠP RÚT */}
           <div
             className="setting-detail-item setting-detail-item-deposit"
             onClick={() => setShowBuyAC(true)}
           >
-            <img
-              src={naptienIcon}
-              alt="Icon"
-              className="setting-coin-icon"
-            />
+            <img src={naptienIcon} alt="Icon" className="setting-coin-icon" />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
-              <span className="setting-coin-button">
-                Buy AC
-              </span>
+              <span className="setting-coin-button">Buy AC</span>
             </div>
           </div>
           <div
             className="setting-detail-item setting-detail-item-withdraw"
+            onClick={() => setShowSwap(true)}
           >
-            <img
-              src={ruttienIcon}
-              alt="Icon"
-              className="setting-coin-icon"
-            />
+            <img src={ruttienIcon} alt="Icon" className="setting-coin-icon" />
             <div className="setting-detail-item-text setting-detail-item-text-naprut">
-              <span className="setting-coin-button">
-                Swap
-              </span>
+              <span className="setting-coin-button">Swap</span>
             </div>
           </div>
         </div>
@@ -178,7 +164,19 @@ function Setting() {
           </div>
         )}
 
-        {/* 🔥 Nội dung chính (SettingMenu, Profile, Language, Terms, About) */}
+        {showReportSwap && (
+          <div className="report-modal">
+            <Swap
+              userID={userData.userID}
+              totalCommission={userData.totalCommission || 0} // Truyền trực tiếp từ userData
+              addressWallet={userData.addressWallet}
+              onClose={() => setShowSwap(false)}
+              onUpdateTotalCommission={handleUpdateTotalCommission}
+            />
+          </div>
+        )}
+
+        {/* Nội dung chính */}
         {!isMenuSelected ? (
           <SettingMenu onMenuSelect={handleMenuSelect} />
         ) : (
@@ -196,16 +194,10 @@ function Setting() {
 }
 
 function formatNumber(value) {
-  if (value == null) { // Kiểm tra xem value có phải là null hoặc undefined không
-    return '0'; // Hoặc trả về một giá trị mặc định nào đó nếu cần
-  }
-  
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(1)}M`; // Hiển thị dạng 'x.xM'
-  } else if (value >= 1_000) {
-    return `${(value / 1_000).toFixed(1)}K`; // Hiển thị dạng 'x.xK'
-  }
-  return value.toString(); // Trả về giá trị gốc nếu nhỏ hơn 1,000
+  if (value == null) return "0";
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toString();
 }
 
 export default Setting;
