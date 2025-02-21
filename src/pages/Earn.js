@@ -4,20 +4,22 @@ import Header from "../components/Header";
 import Signal from "../components/Signal";
 import Channel from "../components/Channel";
 import Footer from "../components/Footer";
-import Report from "../components/Report";
+import Report from "../components/Report"; // Import component Report
 import BuyAC from "../components/BuyAC";
-import { ReloadSkeleton } from "../components/waiting";
+import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 import "./KhoTang.css";
 import "./Earn.css";
 
 const formatDate = (dateString) => {
-  if (!dateString) return "";
+  if (!dateString) return ""; // Xử lý trường hợp dateString là null hoặc undefined
+
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return ""; // Kiểm tra nếu date không hợp lệ
+
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
+
   return `${hours}:${minutes} - ${day}/${month}`;
 };
 
@@ -41,211 +43,274 @@ function Earn() {
   const [reportuserID, setReportuserID] = useState(null);
   const [reportactiveAccount, setReportActiveAccount] = useState(null);
   const [followingAuthors, setFollowingAuthors] = useState([]);
+
   const navigate = useNavigate();
+  const [direction, setDirection] = useState(1);
+
+  const handleReportClick = (author, price) => {
+    if (!userData) {
+      console.error("userData chưa được tải!");
+      return;
+    }
+    const activeAccount = userData?.trading_accounts?.find(account => account.status === 1);
+
+    setReportAuthor(author);
+    setReportPrice(price);
+    setReportWalletAC(userData.wallet_AC);
+    setReportuserID(userData.userID);
+    setShowReport(true);
+    if (activeAccount) {
+      setReportActiveAccount(activeAccount.accountMT5);
+    }
+  };
+
+  const handleItemClick = (Id, userId) => {
+    navigate(`/${dataType}/${Id}`, { state: { userId } });
+  };
 
   useEffect(() => {
     const cachedUserData = sessionStorage.getItem("userData");
     const cachedSignalData = sessionStorage.getItem("signalData");
     const cachedChannelData = sessionStorage.getItem("channelData");
 
-    if (!cachedUserData) {
-      console.error("No user data in sessionStorage!");
-      setLoading(false);
+    if (cachedUserData) {
+      const userData = JSON.parse(cachedUserData);
+      setUserData(userData);
+    
+      // ✅ Lấy danh sách following_channels từ tài khoản đang hoạt động (status === 1)
+      const activeAccount = userData.trading_accounts?.find(account => account.status === 1);
+      const followingAuthors = activeAccount?.following_channels?.map(channel => channel.author) || [];
+
+      const autoCopyMapping = {};
+        activeAccount.following_channels?.forEach(channel => {
+          autoCopyMapping[channel.author] = channel.autoCopy ?? 0; // Nếu không có autoCopy thì mặc định là 0
+        });
+
+      const freeTradingSignals = activeAccount?.freetrading?.map(ft => ft.signalID) || [];
+
+      setFreeTradingList(freeTradingSignals);
+      setFollowingAuthors(followingAuthors);
+      setAutoCopyData(autoCopyMapping);
+      setApikeyBot(activeAccount.apikeyBot || "");
+      setAccountMT5(activeAccount.accountMT5 || "");
+      setGroupID(activeAccount.telegramgroup_id || 0);
+    } else {
+      console.error("No user data found in sessionStorage!");
       return;
     }
-
-    let parsedUserData;
-    try {
-      parsedUserData = JSON.parse(cachedUserData);
-    } catch (error) {
-      console.error("Error parsing userData:", error);
-      setLoading(false);
-      return;
-    }
-
-    setUserData(parsedUserData);
-
-    const activeAccount = parsedUserData?.trading_accounts?.find(account => account.status === 1) || {};
-    const followingAuthors = activeAccount.following_channels?.map(channel => channel.author) || [];
-    const autoCopyMapping = {};
-    activeAccount.following_channels?.forEach(channel => {
-      if (channel.author) autoCopyMapping[channel.author] = channel.autoCopy ?? 0;
-    });
-    const freeTradingSignals = activeAccount.freetrading?.map(ft => ft.signalID) || [];
-
-    setFollowingAuthors(followingAuthors);
-    setAutoCopyData(autoCopyMapping);
-    setFreeTradingList(freeTradingSignals);
-    setApikeyBot(activeAccount.apikeyBot || "");
-    setAccountMT5(activeAccount.accountMT5 || "");
-    setGroupID(activeAccount.telegramgroup_id || 0);
 
     let data = [];
-    try {
-      data = dataType === "Channels" 
-        ? JSON.parse(cachedChannelData || "[]") 
-        : JSON.parse(cachedSignalData || "[]");
-    } catch (error) {
-      console.error(`Error parsing ${dataType} data:`, error);
+    if (dataType === "Signals" || dataType === "Results") {
+      data = JSON.parse(cachedSignalData || "[]");
+    } else if (dataType === "Channels") {
+      data = JSON.parse(cachedChannelData || "[]");
     }
 
-    const normalizedData = data.map(item => ({
+    const normalizedData = data.map((item) => ({
       ...item,
-      done_at: item.done_at === "0000-00-00 00:00:00" || !item.done_at ? null : item.done_at,
-      dataType: item.dataType || dataType, // Đảm bảo dataType luôn có giá trị
-      author: item.author || "", // Đảm bảo author không bị undefined
+      done_at: item.done_at === "0000-00-00 00:00:00" ? null : item.done_at,
     }));
 
     setAllData(normalizedData);
     setLoading(false);
   }, [dataType]);
 
-  const filteredData = useMemo(() => {
-    return allData.filter(item => {
-      const isMatchingType = dataType === "All" || item.dataType === dataType;
-      const isMatchingCatalogue = activeCatalogue === "All" || item.catalogues === activeCatalogue;
-      if (activeTab === "results") {
-        return isMatchingType && isMatchingCatalogue && item.done_at !== null;
-      } else if (activeTab === "signal") {
-        return isMatchingType && isMatchingCatalogue && item.done_at === null;
-      }
-      return isMatchingType && isMatchingCatalogue;
-    });
-  }, [allData, activeTab, activeCatalogue, dataType]);
+  useEffect(() => {
+    window.updateFollowingAuthors = (author) => {
+      setFollowingAuthors((prevAuthors) => [...prevAuthors, author]);
+    };
+  }, []);
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-    setDataType(tab === "channel" ? "Channels" : "Signals");
+  const handleUpdateFreeTrading = (signalID) => {
+    setFreeTradingList((prevList) => [...prevList, signalID]);
   };
 
-  const handleReportClick = (author, price) => {
-    if (!userData) return;
-    const activeAccount = userData?.trading_accounts?.find(account => account.status === 1) || {};
-    setReportAuthor(author || "");
-    setReportPrice(price || 0);
-    setReportWalletAC(userData.wallet_AC || 0);
-    setReportuserID(userData.userID || "");
-    setReportActiveAccount(activeAccount.accountMT5 || "");
-    setShowReport(true);
+  const filteredData = allData.filter((item) => {
+    const isMatchingType =
+      dataType === "All" || item.dataType === "Signals" || item.dataType === "Channels";
+    const isMatchingCatalogue =
+      activeCatalogue === "All" || item.catalogues === activeCatalogue;
+
+    if (activeTab === "results") {
+      return isMatchingType && isMatchingCatalogue && item.done_at !== null;
+    } else if (activeTab === "signal") {
+      return isMatchingType && isMatchingCatalogue && item.done_at === null;
+    }
+    return isMatchingType && isMatchingCatalogue;
+  });
+  
+  const handleTabClick = (tab, direction) => {
+    setDirection(direction);  // Chỉ định hướng cho hiệu ứng
+    setActiveTab(tab);         // Cập nhật tab hiện tại
+    setDataType(tab === "channel" ? "Channels" : "Signals"); // Cập nhật dataType
   };
 
-  if (loading) return <ReloadSkeleton />;
-  if (!userData) return <p>No user data available. Please log in.</p>;
+  // Xử lý khi nhấn vào nút lọc
+const handleCatalogueClick = (catalogue) => {
+  setActiveCatalogue(catalogue);
+};
 
+const tabVariants = {
+  initial: (direction) => ({
+    x: direction > 0 ? "100%" : "-100%",
+    position: "absolute",
+  }),
+  animate: {
+    x: 0,
+    position: "relative",
+    transition: { duration: 0.5, ease: "easeInOut" },
+  },
+  exit: (direction) => ({
+    x: direction < 0 ? "100%" : "-100%",
+    position: "absolute",
+    transition: { duration: 0.5, ease: "easeInOut" },
+  }),
+};
+
+  if (!userData) {
+    return <ReloadSkeleton />;
+  }
+ 
   return (
     <div className="App">
-      <Header walletAC={userData.wallet_AC || 0} userId={userData.userID || ""} />
+      <Header walletAC={userData.wallet_AC} userId={userData.userID} />
       <main>
+        {/* Tab Menu */}
         <div className="tab-menu">
           <button
             className={`btn_signal ${activeTab === "signal" ? "active" : ""}`}
-            onClick={() => handleTabClick("signal")}
+            onClick={() => handleTabClick("signal", 1)}
           >
             Live signals
           </button>
           <button
             className={`btn_results ${activeTab === "results" ? "active" : ""}`}
-            onClick={() => handleTabClick("results")}
+            onClick={() => handleTabClick("results", -1)}
           >
             Results
           </button>
           <button
             className={`btn_channel ${activeTab === "channel" ? "active" : ""}`}
-            onClick={() => handleTabClick("channel")}
+            onClick={() => handleTabClick("channel", 1)}
           >
             Channels
           </button>
         </div>
 
-        <div className="filter-buttons">
-          {["All", "Crypto", "Forex", "Stock"].map(catalogue => (
-            <button
-              key={catalogue}
-              className={`filter-button ${activeCatalogue === catalogue ? "active" : ""}`}
-              onClick={() => setActiveCatalogue(catalogue)}
-            >
-              {catalogue}
-            </button>
-          ))}
-        </div>
-
-        <div className="content-container">
-          {filteredData.length === 0 ? (
-            <p>No data available for this selection.</p>
-          ) : (
-            filteredData.map((item, index) => (
-              item.dataType === "Signals" ? (
-                <Signal
-                  key={item.signalID || index}
-                  avatar={item.avatar || ""}
-                  TP1={item.tpSigPrice1 || ""}
-                  TP2={item.tpSigPrice2 || ""}
-                  TP3={item.tpSigPrice3 || ""}
-                  E1={item.eSigPrice || ""}
-                  SL={item.slSigPrice1 || ""}
-                  margin={item.symbol || ""}
-                  command={item.isBuy || ""}
-                  result={item.R_result || ""}
-                  apikeyBot={apikeyBot}
-                  accountMT5={accountMT5}
-                  freetrading={freeTradingList.includes(item.signalID) ? 1 : 0}
-                  groupId={groupId}
-                  author={item.author || ""}
-                  signalID={item.signalID || ""}
-                  userID={userData.userID || ""}
-                  status={followingAuthors.includes(item.author) ? 1 : 0}
-                  autoCopy={autoCopyData[item.author] ?? 0}
-                  created_at={formatDate(item.created_at)}
-                  done_at={item.done_at ? formatDate(item.done_at) : null}
-                />
+         {/* Nhóm nút lọc */}
+ <div className="filter-buttons">
+   <button
+     className={`filter-button ${activeCatalogue === "All" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("All")}
+   >
+     All
+   </button>
+   <button
+     className={`filter-button ${activeCatalogue === "Crypto" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("Crypto")}
+   >
+     Crypto
+   </button>
+   <button
+     className={`filter-button ${activeCatalogue === "Forex" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("Forex")}
+   >
+     Forex
+   </button>
+   <button
+     className={`filter-button ${activeCatalogue === "Stock" ? "active" : ""}`}
+     onClick={() => handleCatalogueClick("Stock")}
+   >
+     Stock
+   </button>
+ </div>
+  
+                {/* Nội dung thay đổi theo tab */}
+                <div className="content-container">
+              {loading ? (
+                <p>Loading...</p>
               ) : (
-                <Channel
-                  key={item.author || index}
-                  author={item.author || ""}
-                  avatar={item.avatar || ""}
-                  description={item.description || ""}
-                  profitRank={item.wpr || 0}
-                  totalSignals={item.totalSignals || 0}
-                  totalPips={item.totalResult || 0}
-                  status={followingAuthors.includes(item.author) ? 1 : 0}
-                  price={item.price || 0}
-                  onReportClick={
-                    !followingAuthors.includes(item.author)
-                      ? () => handleReportClick(item.author, item.price)
-                      : undefined
+                filteredData.map((item) => {
+                  const isFollowing = followingAuthors.includes(item.author);
+                  const status = isFollowing ? 1 : 0;
+                  const autoCopy = autoCopyData[item.author] ?? 0;
+                  const freeTradingStatus = freeTradingList.includes(item.signalID) ? 1 : 0;
+                  if (item.dataType === "Signals") {
+                    return (
+                      <Signal
+                        avatar={item.avatar}
+                        TP1={item.tpSigPrice1}
+                        TP2={item.tpSigPrice2}
+                        TP3={item.tpSigPrice3}
+                        E1={item.eSigPrice}
+                        SL={item.slSigPrice1}
+                        margin={item.symbol}
+                        command={item.isBuy}
+                        result={item.R_result}
+                        apikeyBot={apikeyBot}
+                        accountMT5={accountMT5}
+                        freetrading={freeTradingStatus}
+                        groupId={groupId}
+                        author={item.author}
+                        signalID={item.signalID}
+                        userID={userData.userID}
+                        status={status}
+                        autoCopy={autoCopy}
+                        R_result={item.R_result}                      
+                        created_at={formatDate(item.created_at)}
+                        done_at={item.done_at ? formatDate(item.done_at) : null}
+
+                        onUpdateFreeTrading={handleUpdateFreeTrading} // Truyền callback xuống Signal
+                      />
+                    );
+                  } else if (item.dataType === "Channels") {
+                    return (
+                      <Channel
+                        author={item.author}
+                        avatar={item.avatar}
+                        description={item.description}
+                        profitRank={item.wpr}
+                        totalSignals={item.totalSignals}
+                        totalPips={item.totalResult}
+                        status={status}
+                        price={item.price}
+                        onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
+                        updateFollowingAuthors={window.updateFollowingAuthors}
+                      />
+                    );
                   }
-                />
-              )
-            ))
-          )}
+                  return null;
+                })
+              )}
         </div>
 
-        {showReport && !showBuyAC && (
-          <div className="report-modal">
-            <Report
-              author={reportAuthor}
-              price={reportPrice}
-              walletAC={reportWalletAC}
-              userID={reportuserID}
-              activeAccount={reportactiveAccount}
-              onClose={() => setShowReport(false)}
-              onBuyAC={() => {
-                setShowReport(false);
-                setShowBuyAC(true);
-              }}
-            />
-          </div>
-        )}
+  {showReport && !showBuyAC && (
+  <div className="report-modal">
+    <Report
+      author={reportAuthor}
+      price={reportPrice}
+      walletAC={reportWalletAC}
+      userID={reportuserID}
+      activeAccount={reportactiveAccount}
+      onClose={() => setShowReport(false)}
+      onBuyAC={() => {
+        setShowReport(false); // Ẩn Report
+        setShowBuyAC(true);   // Hiển thị BuyAC
+      }}
+    />
+  </div>
+)}
 
-        {showBuyAC && (
-          <div className="report-modal">
-            <BuyAC
-              userID={reportuserID}
-              walletAC={reportWalletAC}
-              onClose={() => setShowBuyAC(false)}
-            />
-          </div>
-        )}
+{showBuyAC && (
+  <div className="report-modal">
+    <BuyAC 
+      userID={reportuserID} 
+      walletAC={reportWalletAC} 
+      onClose={() => setShowBuyAC(false)}
+    />
+  </div>
+)}
+
       </main>
       <Footer />
     </div>
