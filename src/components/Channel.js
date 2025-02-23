@@ -60,6 +60,8 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
     }
   }, [isFollowing, author, updateFollowingAuthors]);
 
+  const roundedProfitRank = Math.round(profitRank);
+
   return (
     <div className="course">
       <div className="pic-container">
@@ -90,18 +92,18 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
         ></p>
         <div className="status-line">
           <div className="status-background"></div>
-          <div className="status-progress" style={{ width: `${profitRank}%` }}></div>
+          <div className="status-progress" style={{ width: `${roundedProfitRank}%` }}></div>
           {profitRank > 80 ? (
             <span className="status-text-complete" style={{ right: '0%', top: '-25px' }}>
-              WPR: {profitRank}%
+              WPR: {roundedProfitRank}%
             </span>
           ) : profitRank < 20 ? (
-            <span className="status-text" style={{ left: '3%', top: '-25px' }}>
-              WPR: {profitRank}%
+            <span className="status-text" style={{ left: '7%', top: '-25px' }}>
+              WPR: {roundedProfitRank}%
             </span>
           ) : (
             <span className="status-text" style={{ left: `${profitRank}%`, top: '-25px' }}>
-              WPR: {profitRank}%
+              WPR: {roundedProfitRank}%
             </span>
           )}
         </div>
