@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Signal from "../components/Signal";
@@ -43,6 +43,7 @@ function Earn() {
   const [followingAuthors, setFollowingAuthors] = useState([]);
   const [page, setPage] = useState(1);
   const [signalHasMore, setSignalHasMore] = useState(true);
+  const [channelHasMore, setChannelHasMore] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(true);
 
@@ -58,23 +59,29 @@ function Earn() {
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = window.innerHeight;
 
-      // Kiểm tra hướng cuộn để ẩn/hiện footer
       setIsFooterVisible(scrollTop <= lastScrollTop.current);
       lastScrollTop.current = scrollTop;
 
-      // Kiểm tra khi cuộn đến gần cuối trang
-      if (scrollTop + clientHeight >= scrollHeight - 200 && signalHasMore && !isFetching && dataType === "Signals") {
-        setPage((prevPage) => {
-          const nextPage = prevPage + 1;
-          fetchMoreSignals(nextPage);
-          return nextPage;
-        });
+      if (scrollTop + clientHeight >= scrollHeight - 200 && !isFetching) {
+        if (dataType === "Signals" && signalHasMore) {
+          setPage((prevPage) => {
+            const nextPage = prevPage + 1;
+            fetchMoreSignals(nextPage);
+            return nextPage;
+          });
+        } else if (dataType === "Channels" && channelHasMore) {
+          setPage((prevPage) => {
+            const nextPage = prevPage + 1;
+            fetchMoreChannels(nextPage);
+            return nextPage;
+          });
+        }
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [signalHasMore, isFetching, dataType]); // Thêm dataType vào dependencies
+  }, [signalHasMore, channelHasMore, isFetching, dataType]);
 
   const handleReportClick = (author, price) => {
     if (!userData) {
@@ -123,26 +130,63 @@ function Earn() {
     }
   };
 
+  const fetchMoreChannels = async (pageToFetch) => {
+    if (!channelHasMore || isFetching) return;
+    setIsFetching(true);
+
+    try {
+      const response = await fetch(`http://your-api-endpoint/authors?page=${pageToFetch}&limit=10`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      const newData = await response.json();
+      const normalizedNewData = (newData.data || []).map((item) => ({
+        dataType: "Channels",
+        author: item.author,
+        avatar: item.avatar,
+        description: item.description || "No description available.",
+        wpr: item.wpr,
+        totalSignals: item.totalSignals,
+        totalResult: item.totalResult,
+        price: item.price || 0,
+      }));
+      setAllData((prevData) => [...prevData, ...normalizedNewData]);
+      setChannelHasMore(newData.meta.hasMore);
+      sessionStorage.setItem("channelData", JSON.stringify([...allData, ...normalizedNewData]));
+    } catch (error) {
+      console.error("Error fetching more channels:", error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   const lastSignalElementRef = useCallback(
     (node) => {
-      if (isFetching || !node || !userData || dataType !== "Signals") return;
+      if (isFetching || !node || !userData) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && signalHasMore) {
-            setPage((prevPage) => {
-              const nextPage = prevPage + 1;
-              fetchMoreSignals(nextPage);
-              return nextPage;
-            });
+          if (entries[0].isIntersecting) {
+            if (dataType === "Signals" && signalHasMore) {
+              setPage((prevPage) => {
+                const nextPage = prevPage + 1;
+                fetchMoreSignals(nextPage);
+                return nextPage;
+              });
+            } else if (dataType === "Channels" && channelHasMore) {
+              setPage((prevPage) => {
+                const nextPage = prevPage + 1;
+                fetchMoreChannels(nextPage);
+                return nextPage;
+              });
+            }
           }
         },
         { threshold: 0.1 }
       );
       observer.current.observe(node);
     },
-    [isFetching, signalHasMore, userData, dataType] // Thêm dataType vào dependencies
+    [isFetching, signalHasMore, channelHasMore, userData, dataType]
   );
 
   // Tải dữ liệu ban đầu và reset khi chuyển tab
@@ -173,11 +217,20 @@ function Earn() {
       setGroupID(activeAccount.telegramgroup_id || 0);
     }
 
+    // Reset dữ liệu khi chuyển tab
+    setAllData([]);
+    setPage(1);
+    setLoading(true);
+
     let data = [];
     if (dataType === "Signals" || dataType === "Results") {
       data = JSON.parse(cachedSignalData || "[]");
+      setSignalHasMore(JSON.parse(sessionStorage.getItem("signalHasMore") || "true"));
+      setChannelHasMore(true); // Reset channelHasMore khi không ở tab Channels
     } else if (dataType === "Channels") {
       data = JSON.parse(cachedChannelData || "[]");
+      setChannelHasMore(JSON.parse(sessionStorage.getItem("channelHasMore") || "true"));
+      setSignalHasMore(true); // Reset signalHasMore khi không ở tab Signals
     }
 
     const normalizedData = data.map((item) => ({
@@ -186,8 +239,6 @@ function Earn() {
     }));
     const limitedData = normalizedData.slice(0, 10);
     setAllData(limitedData);
-    setSignalHasMore(JSON.parse(sessionStorage.getItem("signalHasMore") || "true"));
-    setPage(1); // Reset page về 1 khi chuyển tab
     setLoading(false);
   }, [dataType]);
 
@@ -202,8 +253,7 @@ function Earn() {
   };
 
   const filteredData = allData.filter((item) => {
-    const isMatchingType =
-      dataType === "All" || item.dataType === "Signals" || item.dataType === "Channels";
+    const isMatchingType = item.dataType === dataType;
     const isMatchingCatalogue = activeCatalogue === "All" || item.catalogues === activeCatalogue;
 
     if (activeTab === "results") {
@@ -323,6 +373,7 @@ function Earn() {
                 return (
                   <Channel
                     key={item.author || `channel-${index}`}
+                    ref={isLastElement ? lastSignalElementRef : null}
                     author={item.author}
                     avatar={item.avatar}
                     description={item.description}
@@ -343,10 +394,10 @@ function Earn() {
             <div
               style={{
                 position: "fixed",
-              bottom: "20px", // Cách đáy trang 20px
-              left: "50%",
-              transform: "translateX(-50%)", // Canh giữa ngang
-              zIndex: 1000, // Đảm bảo nằm trên nội dung
+                bottom: "20px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 1000,
               }}
             >
               <div
@@ -394,7 +445,7 @@ function Earn() {
           </div>
         )}
       </main>
-      <Footer />
+      <Footer isVisible={isFooterVisible} />
     </div>
   );
 }
