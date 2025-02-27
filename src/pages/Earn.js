@@ -30,7 +30,9 @@ function Earn() {
   const [groupId, setGroupID] = useState({});
   const [freeTradingList, setFreeTradingList] = useState([]);
   const [dataType, setDataType] = useState("Signals");
-  const [allData, setAllData] = useState([]);
+  const [signalData, setSignalData] = useState([]); // Dữ liệu cho Live Signals
+  const [resultData, setResultData] = useState([]); // Dữ liệu cho Results
+  const [channelData, setChannelData] = useState([]); // Dữ liệu cho Channels
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [showReport, setShowReport] = useState(false);
@@ -41,8 +43,11 @@ function Earn() {
   const [reportuserID, setReportuserID] = useState(null);
   const [reportactiveAccount, setReportActiveAccount] = useState(null);
   const [followingAuthors, setFollowingAuthors] = useState([]);
-  const [page, setPage] = useState(1);
+  const [signalPage, setSignalPage] = useState(1);
+  const [resultPage, setResultPage] = useState(1);
+  const [channelPage, setChannelPage] = useState(1);
   const [signalHasMore, setSignalHasMore] = useState(true);
+  const [resultHasMore, setResultHasMore] = useState(true);
   const [channelHasMore, setChannelHasMore] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(true);
@@ -51,6 +56,8 @@ function Earn() {
   const [direction, setDirection] = useState(1);
   const observer = useRef();
   const lastScrollTop = useRef(0);
+
+  const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
 
   // Xử lý cuộn toàn cục
   useEffect(() => {
@@ -63,25 +70,19 @@ function Earn() {
       lastScrollTop.current = scrollTop;
 
       if (scrollTop + clientHeight >= scrollHeight - 200 && !isFetching) {
-        if (dataType === "Signals" && signalHasMore) {
-          setPage((prevPage) => {
-            const nextPage = prevPage + 1;
-            fetchMoreSignals(nextPage);
-            return nextPage;
-          });
-        } else if (dataType === "Channels" && channelHasMore) {
-          setPage((prevPage) => {
-            const nextPage = prevPage + 1;
-            fetchMoreChannels(nextPage);
-            return nextPage;
-          });
+        if (activeTab === "signal" && signalHasMore) {
+          setSignalPage((prevPage) => prevPage + 1);
+        } else if (activeTab === "results" && resultHasMore) {
+          setResultPage((prevPage) => prevPage + 1);
+        } else if (activeTab === "channel" && channelHasMore) {
+          setChannelPage((prevPage) => prevPage + 1);
         }
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [signalHasMore, channelHasMore, isFetching, dataType]);
+  }, [isFetching, activeTab, signalHasMore, resultHasMore, channelHasMore]);
 
   const handleReportClick = (author, price) => {
     if (!userData) {
@@ -103,98 +104,154 @@ function Earn() {
     navigate(`/${dataType}/${Id}`, { state: { userId } });
   };
 
-  const fetchMoreSignals = async (pageToFetch) => {
-    if (!signalHasMore || isFetching) return;
+  // Hàm tải dữ liệu bổ sung với cập nhật sessionStorage
+  const fetchMoreData = async (page, type) => {
+    if (isFetching || !userData || !userData.userID) return;
     setIsFetching(true);
-
-    if (!userData || !userData.userID) {
-      console.error("userData is null or missing userID");
-      setIsFetching(false);
-      return;
-    }
-
-    const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
+  
     try {
-      const newData = await preloadData(apiKey, userData.userID, pageToFetch, 10);
-      const normalizedNewData = (newData.signalData || []).map((item) => ({
-        ...item,
-        done_at: item.done_at === "0000-00-00 00:00:00" ? null : item.done_at,
-      }));
-      setAllData((prevData) => [...prevData, ...normalizedNewData]);
-      setSignalHasMore(newData.signalHasMore);
-      sessionStorage.setItem("signalData", JSON.stringify([...allData, ...normalizedNewData]));
-    } catch (error) {
-      console.error("Error fetching more signals:", error);
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
-  const fetchMoreChannels = async (pageToFetch) => {
-    if (!channelHasMore || isFetching) return;
-    setIsFetching(true);
-
-    try {
-      const response = await fetch(`http://your-api-endpoint/authors?page=${pageToFetch}&limit=10`, {
-        headers: { "Content-Type": "application/json" },
+      let newData;
+      if (type === "signal") {
+        newData = await preloadData(apiKey, userData.userID, page, 10, "null");
+      } else if (type === "results") {
+        newData = await preloadData(apiKey, userData.userID, page, 10, "not_null");
+      } else if (type === "channel") {
+        newData = await preloadData(apiKey, userData.userID, page, 10);
+      }
+  
+      const normalizedNewData = type === "channel"
+        ? (newData.channelData || []).map(item => ({
+            dataType: "Channels",
+            author: item.author,
+            avatar: item.avatar,
+            description: item.description || "No description available.",
+            wpr: item.wpr,
+            totalSignals: item.totalSignals,
+            totalResult: item.totalResult,
+            price: item.price || 0,
+            created_at: item.created_at || new Date().toISOString(),
+            id: item.id, // Trường id của channel
+          }))
+        : (newData.signalData || []).map(item => ({
+            ...item,
+            done_at: item.done_at === "0000-00-00 00:00:00" ? null : item.done_at,
+            id: item.id, // Trường id của signal
+          }));
+  
+      const currentData = type === "signal" ? signalData : type === "results" ? resultData : channelData;
+  
+      // Lọc bỏ các dữ liệu trùng lặp dựa trên id của signal và id của channel
+      const filteredNewData = normalizedNewData.filter(item => {
+        return !currentData.some(existingItem => existingItem.id === item.id);
       });
-      const newData = await response.json();
-      const normalizedNewData = (newData.data || []).map((item) => ({
-        dataType: "Channels",
-        author: item.author,
-        avatar: item.avatar,
-        description: item.description || "No description available.",
-        wpr: item.wpr,
-        totalSignals: item.totalSignals,
-        totalResult: item.totalResult,
-        price: item.price || 0,
-      }));
-      setAllData((prevData) => [...prevData, ...normalizedNewData]);
-      setChannelHasMore(newData.meta.hasMore);
-      sessionStorage.setItem("channelData", JSON.stringify([...allData, ...normalizedNewData]));
+  
+      if (type === "signal") {
+        setSignalData((prevData) => {
+          const updatedData = [...prevData, ...filteredNewData].sort((a, b) =>
+            new Date(b.created_at) - new Date(a.created_at)
+          );
+          sessionStorage.setItem("signalData", JSON.stringify(updatedData));
+          return updatedData;
+        });
+        setSignalHasMore(newData.signalHasMore || filteredNewData.length === 10);
+      } else if (type === "results") {
+        setResultData((prevData) => {
+          const updatedData = [...prevData, ...filteredNewData].sort((a, b) =>
+            new Date(b.created_at) - new Date(a.created_at)
+          );
+          sessionStorage.setItem("resultData", JSON.stringify(updatedData));
+          return updatedData;
+        });
+        setResultHasMore(newData.signalHasMore || filteredNewData.length === 10);
+      } else if (type === "channel") {
+        setChannelData((prevData) => {
+          const updatedData = [...prevData, ...filteredNewData].sort((a, b) =>
+            new Date(b.created_at) - new Date(a.created_at)
+          );
+          sessionStorage.setItem("channelData", JSON.stringify(updatedData));
+          return updatedData;
+        });
+        setChannelHasMore(newData.channelHasMore || filteredNewData.length === 10);
+      }
     } catch (error) {
-      console.error("Error fetching more channels:", error);
+      console.error(`Lỗi khi tải thêm dữ liệu ${type}:`, error);
     } finally {
       setIsFetching(false);
     }
   };
+  
+  
 
-  const lastSignalElementRef = useCallback(
-    (node) => {
-      if (isFetching || !node || !userData) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            if (dataType === "Signals" && signalHasMore) {
-              setPage((prevPage) => {
-                const nextPage = prevPage + 1;
-                fetchMoreSignals(nextPage);
-                return nextPage;
-              });
-            } else if (dataType === "Channels" && channelHasMore) {
-              setPage((prevPage) => {
-                const nextPage = prevPage + 1;
-                fetchMoreChannels(nextPage);
-                return nextPage;
-              });
-            }
-          }
-        },
-        { threshold: 0.1 }
-      );
-      observer.current.observe(node);
-    },
-    [isFetching, signalHasMore, channelHasMore, userData, dataType]
-  );
-
-  // Tải dữ liệu ban đầu và reset khi chuyển tab
+  // Tải dữ liệu ban đầu từ sessionStorage hoặc API
   useEffect(() => {
-    const cachedUserData = sessionStorage.getItem("userData");
+    if (!userData || !userData.userID) return;
+
+    setLoading(true);
+
     const cachedSignalData = sessionStorage.getItem("signalData");
+    const cachedResultData = sessionStorage.getItem("resultData");
     const cachedChannelData = sessionStorage.getItem("channelData");
 
+    const loadInitialData = async () => {
+      if (cachedSignalData) {
+        const normalizedSignalData = JSON.parse(cachedSignalData).map(item => ({
+          ...item,
+          done_at: item.done_at === "0000-00-00 00:00:00" ? null : item.done_at,
+        })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setSignalData(normalizedSignalData);
+      } else {
+        await fetchMoreData(1, "signal");
+      }
+
+      if (cachedResultData) {
+        const normalizedResultData = JSON.parse(cachedResultData).map(item => ({
+          ...item,
+          done_at: item.done_at === "0000-00-00 00:00:00" ? null : item.done_at,
+        })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setResultData(normalizedResultData);
+      } else {
+        await fetchMoreData(1, "results");
+      }
+
+      if (cachedChannelData) {
+        const normalizedChannelData = JSON.parse(cachedChannelData).map(item => ({
+          dataType: "Channels",
+          author: item.author,
+          avatar: item.avatar,
+          description: item.description || "No description available.",
+          wpr: item.wpr,
+          totalSignals: item.totalSignals,
+          totalResult: item.totalResult,
+          price: item.price || 0,
+          created_at: item.created_at || new Date().toISOString(),
+        })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        setChannelData(normalizedChannelData);
+      } else {
+        await fetchMoreData(1, "channel");
+      }
+
+      setLoading(false);
+    };
+
+    loadInitialData();
+  }, [userData]);
+
+  // Tải dữ liệu bổ sung khi thay đổi trang
+  useEffect(() => {
+    if (signalPage > 1) fetchMoreData(signalPage, "signal");
+  }, [signalPage]);
+
+  useEffect(() => {
+    if (resultPage > 1) fetchMoreData(resultPage, "results");
+  }, [resultPage]);
+
+  useEffect(() => {
+    if (channelPage > 1) fetchMoreData(channelPage, "channel");
+  }, [channelPage]);
+
+  // Tải userData từ sessionStorage
+  useEffect(() => {
+    const cachedUserData = sessionStorage.getItem("userData");
     if (cachedUserData) {
       const userData = JSON.parse(cachedUserData);
       setUserData(userData);
@@ -216,31 +273,7 @@ function Earn() {
       setAccountMT5(activeAccount.accountMT5 || "");
       setGroupID(activeAccount.telegramgroup_id || 0);
     }
-
-    // Reset dữ liệu khi chuyển tab
-    setAllData([]);
-    setPage(1);
-    setLoading(true);
-
-    let data = [];
-    if (dataType === "Signals" || dataType === "Results") {
-      data = JSON.parse(cachedSignalData || "[]");
-      setSignalHasMore(JSON.parse(sessionStorage.getItem("signalHasMore") || "true"));
-      setChannelHasMore(true); // Reset channelHasMore khi không ở tab Channels
-    } else if (dataType === "Channels") {
-      data = JSON.parse(cachedChannelData || "[]");
-      setChannelHasMore(JSON.parse(sessionStorage.getItem("channelHasMore") || "true"));
-      setSignalHasMore(true); // Reset signalHasMore khi không ở tab Signals
-    }
-
-    const normalizedData = data.map((item) => ({
-      ...item,
-      done_at: item.done_at === "0000-00-00 00:00:00" ? null : item.done_at,
-    }));
-    const limitedData = normalizedData.slice(0, 10);
-    setAllData(limitedData);
-    setLoading(false);
-  }, [dataType]);
+  }, []);
 
   useEffect(() => {
     window.updateFollowingAuthors = (author) => {
@@ -252,7 +285,7 @@ function Earn() {
     setFreeTradingList((prevList) => [...prevList, signalID]);
   };
 
-  const filteredData = allData.filter((item) => {
+  const filteredData = (activeTab === "signal" ? signalData : activeTab === "results" ? resultData : channelData).filter((item) => {
     const isMatchingType = item.dataType === dataType;
     const isMatchingCatalogue = activeCatalogue === "All" || item.catalogues === activeCatalogue;
 
@@ -344,7 +377,6 @@ function Earn() {
                 return (
                   <Signal
                     key={item.signalID || `signal-${index}`}
-                    ref={isLastElement ? lastSignalElementRef : null}
                     avatar={item.avatar}
                     TP1={item.tpSigPrice1}
                     TP2={item.tpSigPrice2}
@@ -373,7 +405,6 @@ function Earn() {
                 return (
                   <Channel
                     key={item.author || `channel-${index}`}
-                    ref={isLastElement ? lastSignalElementRef : null}
                     author={item.author}
                     avatar={item.avatar}
                     description={item.description}
@@ -445,7 +476,7 @@ function Earn() {
           </div>
         )}
       </main>
-      <Footer isVisible={isFooterVisible} />
+      <Footer />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import "swiper/swiper-bundle.css";
 import "./Home.css";
 import avatar from "../components/assets/avatar.gif";
 import Loading from "../components/loading";
-import { preloadData } from "./api"; // Import từ file API
+import { preloadData } from "./api";
 import { sendTelegramMessage } from "../components/TelegramNotification";
 
 const announData = [
@@ -22,15 +22,12 @@ const announData = [
 ];
 
 const formatDate = (dateString) => {
-  if (!dateString) return ""; // Xử lý trường hợp dateString là null hoặc undefined
-
+  if (!dateString) return "";
   const date = new Date(dateString);
-
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
-
   return `${hours}:${minutes} - ${day}/${month}`;
 };
 
@@ -38,14 +35,16 @@ function Home() {
   const [activeTab, setActiveTab] = useState(1);
   const [announText, setAnnounText] = useState(announData[0]);
   const [currentAnnounIndex, setCurrentAnnounIndex] = useState(0);
-  const [newsData, setNewsData] = useState([]);
+  const [newsData, setNewsData] = useState([]); // Dữ liệu cho Tin tức
+  const [tadaTVData, setTadaTVData] = useState([]); // Dữ liệu cho TadaTV
   const [channelData, setChannelData] = useState([]);
   const [signalData, setSignalData] = useState([]);
+  const [resultData, setResultData] = useState([]);
   const [quizData, setQuizData] = useState([]);
   const [courseData, setCourseData] = useState([]);
   const [charityData, setCharityData] = useState([]);
   const [giftData, setGiftData] = useState([]);
-  const [walletAC, setWalletAC] = useState(0); // State cho walletAC
+  const [walletAC, setWalletAC] = useState(0);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
@@ -57,91 +56,105 @@ function Home() {
 
   // Lấy ID từ URL hoặc gán mặc định
   useEffect(() => {
-  const checkTelegramData = () => {
-    if (window.Telegram && window.Telegram.WebApp) {
-      // Báo cho Telegram biết rằng Web App đã sẵn sàng
-      window.Telegram.WebApp.ready();
-
-      // Lấy dữ liệu người dùng từ initDataUnsafe
-      const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
-
-      if (telegramData) {
-        const telegramId = telegramData.id;
-        setTelegramId(telegramId || 9999); // Nếu không có id, dùng giá trị mặc định
+    const checkTelegramData = () => {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
+        const id = 9999;
+        if (telegramData) {
+          const telegramId = telegramData.id;
+          setTelegramId(telegramId || id);
+        } else {
+          setTelegramId(id);
+        }
       } else {
-        setTelegramId(9999); // Nếu không có dữ liệu từ Web App, đặt giá trị mặc định
+        const queryParams = new URLSearchParams(window.location.search);
+        const telegramIdFromUrl = queryParams.get("telegramId");
+        setTelegramId(telegramIdFromUrl || id);
       }
-    } else {
-      const queryParams = new URLSearchParams(window.location.search);
-      const telegramIdFromUrl = queryParams.get("telegramId");
-      setTelegramId(telegramIdFromUrl || 9999); // Nếu không có telegramId từ URL, dùng giá trị mặc định
-    }
-  };
-
-  checkTelegramData();
-}, []);
-
-
+    };
+    checkTelegramData();
+  }, []);
 
   // Lấy dữ liệu từ API
   useEffect(() => {
-  if (!telegramId) return; // Chỉ fetch dữ liệu khi có telegramId
+    if (!telegramId) return;
 
-  const fetchData = async () => {
-    const cachedNewsData = sessionStorage.getItem("newsData");
-    const cachedChannelData = sessionStorage.getItem("channelData");
-    const cachedQuizData = sessionStorage.getItem("quizData");
-    const cachedCourseData = sessionStorage.getItem("courseData");
-    const cachedCharityData = sessionStorage.getItem("charityData");
-    const cachedGiftData = sessionStorage.getItem("giftData");
-    const cachedUserData = sessionStorage.getItem("userData");
-    const cachedSignalData = sessionStorage.getItem("signalData");
+    const fetchData = async () => {
+      const cachedNewsData = sessionStorage.getItem("newsData");
+      const cachedTadaTVData = sessionStorage.getItem("tadaTVData"); // Thêm key cho TadaTV
+      const cachedChannelData = sessionStorage.getItem("channelData");
+      const cachedQuizData = sessionStorage.getItem("quizData");
+      const cachedCourseData = sessionStorage.getItem("courseData");
+      const cachedCharityData = sessionStorage.getItem("charityData");
+      const cachedGiftData = sessionStorage.getItem("giftData");
+      const cachedUserData = sessionStorage.getItem("userData");
+      const cachedSignalData = sessionStorage.getItem("signalData");
+      const cachedResultData = sessionStorage.getItem("resultData");
 
-    if (
-      cachedNewsData &&
-      cachedChannelData &&
-      cachedQuizData &&
-      cachedCourseData &&
-      cachedCharityData &&
-      cachedGiftData &&
-      cachedSignalData &&
-      cachedUserData
-    ) {
-      setNewsData(JSON.parse(cachedNewsData));
-      setChannelData(JSON.parse(cachedChannelData));
-      setSignalData(JSON.parse(cachedSignalData));
-      setQuizData(JSON.parse(cachedQuizData));
-      setCourseData(JSON.parse(cachedCourseData));
-      setUserData(JSON.parse(cachedUserData));
-      setCharityData(JSON.parse(cachedCharityData));
-      setGiftData(JSON.parse(cachedGiftData));
-      setIsLoading(false);
-    } else {
-      const preload = await preloadData(apiKey, telegramId); // Sử dụng telegramId từ URL
-      setNewsData(preload.newsData);
-      setChannelData(preload.channelData);
-      setSignalData(preload.signalData);
-      setQuizData(preload.quizData);
-      setCourseData(preload.courseData);
-      setCharityData(preload.charityData);
-      setGiftData(preload.giftData);
-      setUserData(preload.userData);
+      if (
+        cachedNewsData &&
+        cachedTadaTVData &&
+        cachedChannelData &&
+        cachedQuizData &&
+        cachedCourseData &&
+        cachedCharityData &&
+        cachedGiftData &&
+        cachedSignalData &&
+        cachedResultData &&
+        cachedUserData
+      ) {
+        setNewsData(JSON.parse(cachedNewsData));
+        setTadaTVData(JSON.parse(cachedTadaTVData)); // Khởi tạo từ sessionStorage
+        setChannelData(JSON.parse(cachedChannelData));
+        setSignalData(JSON.parse(cachedSignalData));
+        setResultData(JSON.parse(cachedResultData));
+        setQuizData(JSON.parse(cachedQuizData));
+        setCourseData(JSON.parse(cachedCourseData));
+        setUserData(JSON.parse(cachedUserData));
+        setCharityData(JSON.parse(cachedCharityData));
+        setGiftData(JSON.parse(cachedGiftData));
+        setIsLoading(false);
+      } else {
+        // Lấy dữ liệu Signals cho Live Signals (done_at = null)
+        const signalPreload = await preloadData(apiKey, telegramId, 1, 10, 'null');
+        // Lấy dữ liệu Signals cho Results (done_at != null)
+        const resultPreload = await preloadData(apiKey, telegramId, 1, 10, 'not_null');
+        // Lấy dữ liệu Tin tức
+        const newsPreload = await preloadData(apiKey, telegramId, 1, 10, null, "Tin tức");
+        // Lấy dữ liệu TadaTV
+        const tadaTVPreload = await preloadData(apiKey, telegramId, 1, 10, null, "TadaTV");
+        // Lấy dữ liệu còn lại (bao gồm Channels)
+        const preload = await preloadData(apiKey, telegramId, 1, 10);
 
-      // Lưu vào sessionStorage
-      sessionStorage.setItem("newsData", JSON.stringify(preload.newsData));
-      sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
-      sessionStorage.setItem("signalData", JSON.stringify(preload.signalData));
-      sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
-      sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
-      sessionStorage.setItem("userData", JSON.stringify(preload.userData));
-      sessionStorage.setItem("charityData", JSON.stringify(preload.charityData));
-      sessionStorage.setItem("giftData", JSON.stringify(preload.giftData));
-      setIsLoading(false);
-    }
-  };
+        setNewsData(newsPreload.newsData);
+        setTadaTVData(tadaTVPreload.newsData); // Lưu dữ liệu TadaTV
+        setChannelData(preload.channelData);
+        setSignalData(signalPreload.signalData);
+        setResultData(resultPreload.signalData);
+        setQuizData(preload.quizData);
+        setCourseData(preload.courseData);
+        setCharityData(preload.charityData);
+        setGiftData(preload.giftData);
+        setUserData(preload.userData);
 
-  fetchData();
-}, [telegramId, apiKey]); // Thêm telegramId vào dependency array
+        // Lưu vào sessionStorage
+        sessionStorage.setItem("newsData", JSON.stringify(newsPreload.newsData));
+        sessionStorage.setItem("tadaTVData", JSON.stringify(tadaTVPreload.newsData)); // Lưu TadaTV riêng
+        sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
+        sessionStorage.setItem("signalData", JSON.stringify(signalPreload.signalData));
+        sessionStorage.setItem("resultData", JSON.stringify(resultPreload.signalData));
+        sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
+        sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
+        sessionStorage.setItem("userData", JSON.stringify(preload.userData));
+        sessionStorage.setItem("charityData", JSON.stringify(preload.charityData));
+        sessionStorage.setItem("giftData", JSON.stringify(preload.giftData));
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [telegramId, apiKey]);
 
   // Lấy danh sách followingAuthors từ activeAccount
   useEffect(() => {
@@ -170,7 +183,6 @@ function Home() {
     [userData]
   );
 
-  // Hàm xử lý khi nhấn vào một bản tin
   const handleItemClick = (newsId) => {
     navigate(`/Tin tức/${newsId}`, { state: { userId: userData?.userID } });
   };
@@ -203,14 +215,14 @@ function Home() {
                   const isFollowing = followingAuthors.includes(item.author);
                   const status = isFollowing ? 1 : 0;
                   return (
-                    <SwiperSlide key={item.id}>
+                    <SwiperSlide key={item.author || item.id}>
                       <Channel
                         author={item.author}
                         avatar={item.avatar}
                         description={item.description}
-                        profitRank={item.profitRank}
+                        profitRank={item.wpr}
                         totalSignals={item.totalSignals}
-                        totalPips={item.totalPips}
+                        totalPips={item.totalResult}
                         status={status}
                         price={item.price}
                         onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
