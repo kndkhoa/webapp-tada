@@ -19,18 +19,9 @@ const TradingAnalysis = ({ trading_accounts, accountMT5 }) => {
       </div>
     );
   }
-
-  // Lấy incomeCharts từ Trading Account, nếu không có thì mặc định là mảng rỗng
-  const lotData = currentAccount.incomeCharts || [];
-
-  // Tính các biến:
-  const totalTrades = lotData.length;
-  const profitableTrades = lotData.filter(
-    (item) => Number(item.income_amount) > 0
-  ).length;
-  const losingTrades = lotData.filter(
-    (item) => Number(item.income_amount) < 0
-  ).length;
+  const profitableTrades = currentAccount['R+'] || 0;
+  const losingTrades = currentAccount['R-'] || 0;
+  const totalTrades = (currentAccount['R+'] || 0) + (currentAccount['R-'] || 0);
 
   return (
     <div className="incomechart-content-container">
@@ -47,21 +38,21 @@ const TradingAnalysis = ({ trading_accounts, accountMT5 }) => {
               <img src={trading1Icon} alt="Balance Icon" className="balance-icon" />
               <div className="balance-title">Total Trades</div>
             </div>
-            <span className="balance-amount">{totalTrades}</span>
+            <span className="balance-amount">{totalTrades} R</span>
           </div>
           <div className="balance-list">
             <div className="balance-left">
               <img src={trading2Icon} alt="Balance Icon" className="balance-icon" />
               <div className="balance-title">Profitable Trades</div>
             </div>
-            <span className="balance-amount">{profitableTrades}</span>
+            <span className="balance-amount">{profitableTrades} R</span>
           </div>
           <div className="balance-list-end">
             <div className="balance-left">
               <img src={trading3Icon} alt="Balance Icon" className="balance-icon" />
               <div className="balance-title">Losing Trades</div>
             </div>
-            <span className="balance-amount">{losingTrades}</span>
+            <span className="balance-amount">{losingTrades} R</span>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import chartIcon from './assets/icons/chart.png';
 import moneygrowthIcon from './assets/icons/money-growth.png';
 import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 
-const Channel = ({ author, avatar, description, profitRank, totalPips, totalSignals, price, status, onReportClick, updateFollowingAuthors }) => {
+const Channel = ({ author, channel_id, avatar, description, profitRank, totalR, totalSignals, price, status, onReportClick, updateFollowingAuthors }) => {
   const BASE_URL = "http://admin.tducoin.com/public/storage/";
   const picUrl = `${BASE_URL}${avatar}`;
 
@@ -31,12 +31,11 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
     }
   };
 
-  // Kiểm tra xem tác giả có trong danh sách theo dõi hay không từ sessionStorage
+  // Kiểm tra xem kênh có trong danh sách booking_channels hay không từ sessionStorage
   const checkIfFollowing = () => {
     const storedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
-    const activeAccount = storedUserData.trading_accounts?.find(account => account.status === 1);  // Tìm tài khoản đang hoạt động (status === 1)
-    const followingChannels = activeAccount?.following_channels || [];  // Lấy danh sách kênh theo dõi từ tài khoản đang hoạt động
-    return followingChannels.some(channel => channel.author === author);  // Kiểm tra nếu tác giả có trong danh sách theo dõi
+    const bookingChannels = storedUserData?.booking_channels || [];  // Lấy danh sách booking_channels từ data
+    return bookingChannels.some(channel => channel.author === author && channel.channel_id === channel_id);  // Kiểm tra nếu author và channel_id khớp
   };
 
   useEffect(() => {
@@ -51,7 +50,7 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
       clearInterval(interval);  // Dọn dẹp interval khi component unmount
       document.removeEventListener("click", handleOutsideClick);  // Dọn dẹp sự kiện click
     };
-  }, [author]);  // Chạy lại khi tác giả thay đổi
+  }, [author, channel_id]);  // Chạy lại khi author hoặc channel_id thay đổi
 
   // Nếu user đã theo dõi channel (status = 1), gọi updateFollowingAuthors để cập nhật lại danh sách theo dõi trong Earn
   useEffect(() => {
@@ -130,10 +129,10 @@ const Channel = ({ author, avatar, description, profitRank, totalPips, totalSign
             </div>
             <div className="channel-icon-container" onClick={() => toggleTooltip("moneyGrowth")}>
               <img src={moneygrowthIcon} alt="Money Growth Icon" className="channel-icon" />
-              <span>{totalPips || 0}</span>
+              <span>{totalR || 0}</span>
               {tooltipVisible.moneyGrowth && (
                 <div className="channel-tooltip">
-                  Total Pips
+                  Total R
                 </div>
               )}
             </div>

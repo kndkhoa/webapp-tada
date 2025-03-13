@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Thêm hook useNavigate
-import TelegramNotification, { sendTadaServer1Message } from './TelegramNotification'; 
+import { sendTelegramMessage, sendSignal } from "./TelegramNotification";
 import upIcon from "./assets/icons/up.png";
 import downIcon from "./assets/icons/down.png";
 import profitsIcon from "./assets/icons/profits.png";
@@ -24,9 +24,10 @@ const Signal = React.forwardRef(({
   status,
   freetrading,
   autoCopy,
+  apikeyBot,
+  groupId,
   done_at,
   R_result,
-  port_id,
   onUpdateFreeTrading
 }, ref) => {
   const navigate = useNavigate(); // Sử dụng hook useNavigate
@@ -59,6 +60,9 @@ const Signal = React.forwardRef(({
   // Gửi tin nhắn đến Telegram nếu autoCopy = 0 và người dùng nhấn vào nút
   const handleTelegramNotification = async () => {
     if (autoCopy === 0) {
+      // Gửi tin vào group Free Trading
+      sendSignal(`${signalID} - ${apikeyBot}`, groupId);
+
       // ✅ Gửi POST request lên API
       const apiUrl = "https://admin.tducoin.com/api/signal/addfreetrading";
       const apiKey = "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE";
@@ -82,9 +86,6 @@ const Signal = React.forwardRef(({
         if (!response.ok) {
           sendTelegramMessage("❌ Lỗi khi gọi API:", await response.text());
         }
-
-        lastConfigString = await response.text();
-        await sendTadaServer1Message(`${lastConfigString},port_id:${port_id}`);
 
         // ✅ Kiểm tra userData trước khi cập nhật
         if (!userData || !userData.trading_accounts) {
@@ -154,11 +155,6 @@ const Signal = React.forwardRef(({
       buttonClass = "signal-header-button1";
     }
   }
-
-  // Xử lý khi nhấn vào nút Customize
-  const handleCustomizeClick = () => {
-    navigate(`/signaldetail/${id}?autoCopy=${autoCopy}`);
-  };
 
   return (
     <div ref={ref} className="signal-container">
@@ -253,14 +249,6 @@ const Signal = React.forwardRef(({
             </div>
           )}
           {/* Nút Mainternaire nằm dưới dropdown */}
-          {done_at === null &&<button className="signal-mainternaire-button" onClick={handleCustomizeClick}>
-            Customize
-            <img 
-              src={profitsIcon} 
-              alt="Profits Icon" 
-              className="signal-mainternaire-icon"
-            />
-          </button>}
         </div>
       )}
 
@@ -268,9 +256,6 @@ const Signal = React.forwardRef(({
       <div className="signal-footer">
         <div className="signal-text-footer">
           <div><b>Opened:</b> {created_at}</div>
-        </div>
-        <div className="signal-text-footer">
-          {done_at !== null && <div><b>Closed:</b> {done_at}</div>}
         </div>
       </div>
     </div>

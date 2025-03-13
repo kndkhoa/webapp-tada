@@ -14,15 +14,17 @@
   z-index: 1000;
 
   /* Thêm chuyển động ẩn/hiện */
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out; /* Thêm visibility */
 }
 
 .footer.hidden {
   transform: translateY(100%);
+  visibility: hidden; /* Ẩn khi footer không visible */
 }
 
 .footer.visible {
   transform: translateY(0);
+  visibility: visible; /* Hiện khi footer cần hiển thị */
 }
 
 .footer-button {
