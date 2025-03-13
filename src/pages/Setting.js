@@ -163,7 +163,6 @@ function Setting() {
             />
           </div>
         )}
-
         {showReportSwap && (
           <div className="report-modal">
             <Swap
@@ -175,7 +174,7 @@ function Setting() {
             />
           </div>
         )}
-
+        
         {/* Nội dung chính */}
         {!isMenuSelected ? (
           <SettingMenu onMenuSelect={handleMenuSelect} />

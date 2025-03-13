@@ -38,6 +38,7 @@ function Earn() {
   const [showReport, setShowReport] = useState(false);
   const [showBuyAC, setShowBuyAC] = useState(false);
   const [reportAuthor, setReportAuthor] = useState(null);
+  const [reportChannelID, setReportChannelID] = useState(null);
   const [reportPrice, setReportPrice] = useState(null);
   const [reportWalletAC, setReportWalletAC] = useState(null);
   const [reportuserID, setReportuserID] = useState(null);
@@ -51,6 +52,7 @@ function Earn() {
   const [channelHasMore, setChannelHasMore] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(true);
+  const [portId, setPortId] = useState(null);
 
   const navigate = useNavigate();
   const [direction, setDirection] = useState(1);
@@ -84,13 +86,14 @@ function Earn() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isFetching, activeTab, signalHasMore, resultHasMore, channelHasMore]);
 
-  const handleReportClick = (author, price) => {
+  const handleReportClick = (author, price, channel_id) => {
     if (!userData) {
       console.error("userData chưa được tải!");
       return;
     }
     const activeAccount = userData?.trading_accounts?.find((account) => account.status === 1);
     setReportAuthor(author);
+    setReportChannelID(channel_id);
     setReportPrice(price);
     setReportWalletAC(userData.wallet_AC);
     setReportuserID(userData.userID);
@@ -180,8 +183,6 @@ function Earn() {
     }
   };
   
-  
-
   // Tải dữ liệu ban đầu từ sessionStorage hoặc API
   useEffect(() => {
     if (!userData || !userData.userID) return;
@@ -216,6 +217,7 @@ function Earn() {
       if (cachedChannelData) {
         const normalizedChannelData = JSON.parse(cachedChannelData).map(item => ({
           dataType: "Channels",
+          id: item.id,
           author: item.author,
           avatar: item.avatar,
           description: item.description || "No description available.",
@@ -249,7 +251,7 @@ function Earn() {
     if (channelPage > 1) fetchMoreData(channelPage, "channel");
   }, [channelPage]);
 
-  // Tải userData từ sessionStorage
+  // Tải userData từ sessionStorage và lắng nghe cập nhật
   useEffect(() => {
     const cachedUserData = sessionStorage.getItem("userData");
     if (cachedUserData) {
@@ -269,10 +271,34 @@ function Earn() {
       setFreeTradingList(freeTradingSignals);
       setFollowingAuthors(followingAuthors);
       setAutoCopyData(autoCopyMapping);
-      setApikeyBot(activeAccount.apikeyBot || "");
       setAccountMT5(activeAccount.accountMT5 || "");
-      setGroupID(activeAccount.telegramgroup_id || 0);
+      setPortId(activeAccount?.port_id || null);
     }
+
+    // Lắng nghe cập nhật userData từ sessionStorage
+    const handleStorageUpdate = () => {
+      const updatedUserData = JSON.parse(sessionStorage.getItem("userData"));
+      if (updatedUserData) {
+        setUserData(updatedUserData);
+
+        const activeAccount = updatedUserData.trading_accounts?.find((account) => account.status === 1);
+        const followingAuthors = activeAccount?.following_channels?.map((channel) => channel.author) || [];
+        const autoCopyMapping = {};
+        activeAccount.following_channels?.forEach((channel) => {
+          autoCopyMapping[channel.author] = channel.autoCopy ?? 0;
+        });
+        const freeTradingSignals = activeAccount?.freetrading?.map((ft) => ft.signalID) || [];
+
+        setFreeTradingList(freeTradingSignals);
+        setFollowingAuthors(followingAuthors);
+        setAutoCopyData(autoCopyMapping);
+        setAccountMT5(activeAccount.accountMT5 || "");
+        setPortId(activeAccount?.port_id || null);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageUpdate);
+    return () => window.removeEventListener("storage", handleStorageUpdate);
   }, []);
 
   useEffect(() => {
@@ -370,12 +396,14 @@ function Earn() {
             filteredData.map((item, index) => {
               const isLastElement = index === filteredData.length - 1;
               const isFollowing = followingAuthors.includes(item.author);
-              const status = isFollowing ? 1 : 0;
+              const isBooked = userData.booking_channels?.some((channel) => channel.author === item.author) || false;
+              const status = isBooked ? 1 : 0; // Trạng thái dựa trên booking_channels
               const autoCopy = autoCopyData[item.author] ?? 0;
               const freeTradingStatus = freeTradingList.includes(item.signalID) ? 1 : 0;
               if (item.dataType === "Signals") {
                 return (
                   <Signal
+                    id={item.id}
                     key={item.signalID || `signal-${index}`}
                     avatar={item.avatar}
                     TP1={item.tpSigPrice1}
@@ -386,15 +414,14 @@ function Earn() {
                     margin={item.symbol}
                     command={item.isBuy}
                     result={item.R_result}
-                    apikeyBot={apikeyBot}
                     accountMT5={accountMT5}
                     freetrading={freeTradingStatus}
-                    groupId={groupId}
                     author={item.author}
                     signalID={item.signalID}
                     userID={userData.userID}
-                    status={status}
+                    status={status} // Cập nhật status dựa trên booking
                     autoCopy={autoCopy}
+                    port_id={portId}
                     R_result={item.R_result}
                     created_at={formatDate(item.created_at)}
                     done_at={item.done_at ? formatDate(item.done_at) : null}
@@ -405,15 +432,16 @@ function Earn() {
                 return (
                   <Channel
                     key={item.author || `channel-${index}`}
+                    channel_id={item.id}
                     author={item.author}
                     avatar={item.avatar}
                     description={item.description}
                     profitRank={item.wpr}
                     totalSignals={item.totalSignals}
-                    totalPips={item.totalResult}
-                    status={status}
+                    totalR={item.totalResult}
+                    status={status} 
                     price={item.price}
-                    onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
+                    onReportClick={status === 0 ? () => handleReportClick(item.author, item.price, item.id) : undefined}
                     updateFollowingAuthors={window.updateFollowingAuthors}
                   />
                 );
@@ -457,6 +485,7 @@ function Earn() {
           <div className="report-modal">
             <Report
               author={reportAuthor}
+              channel_id={reportChannelID}
               price={reportPrice}
               walletAC={reportWalletAC}
               userID={reportuserID}

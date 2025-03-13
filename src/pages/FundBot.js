@@ -134,12 +134,14 @@ function FundBot() {
                       <Strategy
                         userID={userData.userID}
                         accountMT5={activeAccount?.accountMT5 || ""}
+                        port_id={activeAccount?.port_id || ""}
                         trading_accounts={userData.trading_accounts}
                         onUserDataUpdate={handleUserDataUpdate}
                       />
                       <ControllerMore
                         userID={userData.userID}
                         accountMT5={activeAccount?.accountMT5 || ""}
+                        port_id={activeAccount?.port_id || ""}
                         onUserDataUpdate={handleUserDataUpdate}
                       />
                     </div>
@@ -148,7 +150,7 @@ function FundBot() {
                     <div>
                       {userData.trading_accounts.length > 0 ? (
                         userData.trading_accounts
-                        .filter(account => account.apikeyBot !== null && account.apikeyBot !== undefined) // Lọc những tài khoản có apikeyBot khác null hoặc undefined
+                        .filter(account => account.port_id !== null && account.port_id !== undefined) // Lọc những tài khoản có apikeyBot khác null hoặc undefined
                         .map((account, index) => (
                           <ControllerAccount
                             key={index}
@@ -185,8 +187,8 @@ function FundBot() {
         )}
         {showBuyAC && (
           <div className="report-modal">
-          <BuyAC 
-            userID={userData.userID} 
+          <BuyAC
+            userID={userData.userID}
             walletAC={userData.wallet_AC}
             onClose={() => setShowBuyAC(false)}
           />

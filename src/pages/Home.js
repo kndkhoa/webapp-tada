@@ -76,7 +76,7 @@ function Home() {
     checkTelegramData();
   }, []);
 
-  // Lấy dữ liệu từ API
+  // Lấy dữ liệu từ API và lắng nghe cập nhật sessionStorage
   useEffect(() => {
     if (!telegramId) return;
 
@@ -154,6 +154,21 @@ function Home() {
     };
 
     fetchData();
+
+    // Lắng nghe cập nhật userData từ sessionStorage
+    const handleStorageUpdate = () => {
+      const updatedUserData = JSON.parse(sessionStorage.getItem("userData"));
+      if (updatedUserData) {
+        setUserData(updatedUserData);
+        const activeAccount = updatedUserData.trading_accounts?.find(account => account.status === 1);
+        const followingAuthors = activeAccount?.following_channels?.map(channel => channel.author) || [];
+        setFollowingAuthors(followingAuthors);
+        setWalletAC(updatedUserData.wallet_AC || 0);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageUpdate);
+    return () => window.removeEventListener("storage", handleStorageUpdate);
   }, [telegramId, apiKey]);
 
   // Lấy danh sách followingAuthors từ activeAccount
@@ -187,6 +202,11 @@ function Home() {
     navigate(`/Tin tức/${newsId}`, { state: { userId: userData?.userID } });
   };
 
+  const handleReportClick = (author, price) => {
+    // Chưa có xử lý cụ thể trong file gốc, giữ nguyên để tương thích
+    console.log(`Report clicked for ${author} with price ${price}`);
+  };
+
   return (
     <div className="home">
       {isLoading && <Loading />}
@@ -212,8 +232,8 @@ function Home() {
                 pagination={{ clickable: true, dynamicBullets: true }}
               >
                 {channelData.map((item) => {
-                  const isFollowing = followingAuthors.includes(item.author);
-                  const status = isFollowing ? 1 : 0;
+                  const isBooked = userData.booking_channels?.some((channel) => channel.author === item.author) || false;
+                  const status = isBooked ? 1 : 0; // Trạng thái dựa trên booking_channels
                   return (
                     <SwiperSlide key={item.author || item.id}>
                       <Channel
@@ -223,7 +243,7 @@ function Home() {
                         profitRank={item.wpr}
                         totalSignals={item.totalSignals}
                         totalPips={item.totalResult}
-                        status={status}
+                        status={status} // Cập nhật status dựa trên booking
                         price={item.price}
                         onReportClick={status === 0 ? () => handleReportClick(item.author, item.price) : undefined}
                         updateFollowingAuthors={window.updateFollowingAuthors}
