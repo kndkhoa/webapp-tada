@@ -10,10 +10,10 @@ import KhoTang from './pages/KhoTang';
 import Earn from './pages/Earn';
 import QuaThuong from './pages/QuaThuong';
 import NewsDetail from './pages/NewsDetail';
-import SignalChart from './pages/SignalChart';
 import TadaTVDetail from './pages/TadaTVDetail';
 import CourseDetail from './pages/CourseDetail';
 import QuizDetail from './pages/QuizDetail';
+import SignalDetail from './pages/SignalDetail';
 import QuizStarting from './pages/QuizStarting';
 import QuaThuongDetail from './pages/QuaThuongDetail';
 import Setting from './pages/Setting';
@@ -31,9 +31,9 @@ const App = () => {
             <Route path="/dautruong" element={<DauTruong />} />
             <Route path="/khotang" element={<KhoTang />} />
             <Route path="/earn" element={<Earn />} />
+            <Route path="/signaldetail/:id" element={<SignalDetail />} />
             <Route path="/quathuong" element={<QuaThuong />} />
             <Route path="/Tin tức/:id" element={<NewsDetail />} />
-            <Route path="/chart" element={<SignalChart />} />
             <Route path="/tadatv/:id" element={<TadaTVDetail />} />
             <Route path="/Courses/:id" element={<CourseDetail />} />
             <Route path="/quiz/:id" element={<QuizDetail />} />
