@@ -372,49 +372,51 @@ function Earn() {
           </button>
         </div>
 
-        <div className="filter-buttons">
-          <button
-            className={`filter-button ${activeCatalogue === "All" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("All")}
-          >
-            All
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Crypto" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Crypto")}
-          >
-            Crypto
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Forex" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Forex")}
-          >
-            Forex
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Metal" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Metal")}
-          >
-            Metal
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Stock" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Stock")}
-          >
-            Stock
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Goods" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Goods")}
-          >
-            Goods
-          </button>
-          <button
-            className={`filter-button ${activeCatalogue === "Index" ? "active" : ""}`}
-            onClick={() => handleCatalogueClick("Index")}
-          >
-            Index
-          </button>
+        <div className="filter-buttons-container">
+          <div className="filter-buttons">
+            <button
+              className={`filter-button ${activeCatalogue === "All" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("All")}
+            >
+              All
+            </button>
+            <button
+              className={`filter-button ${activeCatalogue === "Crypto" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("Crypto")}
+            >
+              Crypto
+            </button>
+            <button
+              className={`filter-button ${activeCatalogue === "Forex" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("Forex")}
+            >
+              Forex
+            </button>
+            <button
+              className={`filter-button ${activeCatalogue === "Metal" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("Metal")}
+            >
+              Metal
+            </button>
+            <button
+              className={`filter-button ${activeCatalogue === "Stock" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("Stock")}
+            >
+              Stock
+            </button>
+            <button
+              className={`filter-button ${activeCatalogue === "Goods" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("Goods")}
+            >
+              Goods
+            </button>
+            <button
+              className={`filter-button ${activeCatalogue === "Index" ? "active" : ""}`}
+              onClick={() => handleCatalogueClick("Index")}
+            >
+              Index
+            </button>
+          </div>
         </div>
 
         <div className="content-container">

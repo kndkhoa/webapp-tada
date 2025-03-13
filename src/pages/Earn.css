@@ -36,3 +36,26 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+
+  .filter-buttons-container {
+    width: 95%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* Hỗ trợ cuộn mượt trên thiết bị di động */
+    padding: 0px 0px 0px 0px;
+    scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+    -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE/Edge */
+  }
+  
+  .filter-buttons-container::-webkit-scrollbar {
+    display: none; /* Ẩn thanh cuộn trên Chrome, Safari */
+  }
+  
+  .filter-buttons {
+    display: inline-flex;
+    gap: 10px; /* Khoảng cách giữa các nút */
+  }
+  
+  .filter-button {
+    flex-shrink: 0; /* Ngăn các nút co lại */
+  }
