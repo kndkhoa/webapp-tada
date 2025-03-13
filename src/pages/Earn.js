@@ -63,6 +63,16 @@ function Earn() {
 
   // Xử lý cuộn toàn cục
   useEffect(() => {
+    const handleWalletUpdate = () => {
+      const updatedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
+      setUserData(updatedUserData); // Cập nhật userData, bao gồm booking_channels
+    };
+
+    window.addEventListener("walletUpdated", handleWalletUpdate);
+    return () => window.removeEventListener("walletUpdated", handleWalletUpdate);
+  }, []);
+  
+  useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight;
