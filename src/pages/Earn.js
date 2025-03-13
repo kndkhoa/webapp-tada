@@ -71,7 +71,7 @@ function Earn() {
     window.addEventListener("walletUpdated", handleWalletUpdate);
     return () => window.removeEventListener("walletUpdated", handleWalletUpdate);
   }, []);
-  
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -392,10 +392,28 @@ function Earn() {
             Forex
           </button>
           <button
+            className={`filter-button ${activeCatalogue === "Metal" ? "active" : ""}`}
+            onClick={() => handleCatalogueClick("Metal")}
+          >
+            Metal
+          </button>
+          <button
             className={`filter-button ${activeCatalogue === "Stock" ? "active" : ""}`}
             onClick={() => handleCatalogueClick("Stock")}
           >
             Stock
+          </button>
+          <button
+            className={`filter-button ${activeCatalogue === "Goods" ? "active" : ""}`}
+            onClick={() => handleCatalogueClick("Goods")}
+          >
+            Goods
+          </button>
+          <button
+            className={`filter-button ${activeCatalogue === "Index" ? "active" : ""}`}
+            onClick={() => handleCatalogueClick("Index")}
+          >
+            Index
           </button>
         </div>
 
