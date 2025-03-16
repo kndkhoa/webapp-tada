@@ -272,16 +272,18 @@ function Earn() {
       const followingAuthors = activeAccount?.following_channels?.map((channel) => channel.author) || [];
 
       const autoCopyMapping = {};
-      activeAccount.following_channels?.forEach((channel) => {
-        autoCopyMapping[channel.author] = channel.autoCopy ?? 0;
-      });
+      if (activeAccount?.following_channels) {
+        activeAccount.following_channels.forEach((channel) => {
+          autoCopyMapping[channel.author] = channel.autoCopy ?? 0;
+        });
+      }
 
       const freeTradingSignals = activeAccount?.freetrading?.map((ft) => ft.signalID) || [];
 
       setFreeTradingList(freeTradingSignals);
       setFollowingAuthors(followingAuthors);
       setAutoCopyData(autoCopyMapping);
-      setAccountMT5(activeAccount.accountMT5 || "");
+      setAccountMT5(activeAccount?.accountMT5 || "");
       setPortId(activeAccount?.port_id || null);
     }
 
@@ -294,15 +296,17 @@ function Earn() {
         const activeAccount = updatedUserData.trading_accounts?.find((account) => account.status === 1);
         const followingAuthors = activeAccount?.following_channels?.map((channel) => channel.author) || [];
         const autoCopyMapping = {};
-        activeAccount.following_channels?.forEach((channel) => {
-          autoCopyMapping[channel.author] = channel.autoCopy ?? 0;
-        });
+        if (activeAccount?.following_channels) {
+          activeAccount.following_channels.forEach((channel) => {
+            autoCopyMapping[channel.author] = channel.autoCopy ?? 0;
+          });
+        }
         const freeTradingSignals = activeAccount?.freetrading?.map((ft) => ft.signalID) || [];
 
         setFreeTradingList(freeTradingSignals);
         setFollowingAuthors(followingAuthors);
         setAutoCopyData(autoCopyMapping);
-        setAccountMT5(activeAccount.accountMT5 || "");
+        setAccountMT5(activeAccount?.accountMT5 || "");
         setPortId(activeAccount?.port_id || null);
       }
     };
