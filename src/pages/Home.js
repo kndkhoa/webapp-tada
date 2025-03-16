@@ -49,6 +49,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [telegramId, setTelegramId] = useState(null);
   const [followingAuthors, setFollowingAuthors] = useState([]);
+  const [error, setError] = useState(null); // Thêm state để hiển thị lỗi
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ function Home() {
       if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
-        const id = 9999;
+        const id = 1143286230;
         if (telegramData) {
           const telegramId = telegramData.id;
           setTelegramId(telegramId || id);
@@ -81,8 +82,9 @@ function Home() {
     if (!telegramId) return;
 
     const fetchData = async () => {
+      // Kiểm tra dữ liệu trong sessionStorage
       const cachedNewsData = sessionStorage.getItem("newsData");
-      const cachedTadaTVData = sessionStorage.getItem("tadaTVData"); // Thêm key cho TadaTV
+      const cachedTadaTVData = sessionStorage.getItem("tadaTVData");
       const cachedChannelData = sessionStorage.getItem("channelData");
       const cachedQuizData = sessionStorage.getItem("quizData");
       const cachedCourseData = sessionStorage.getItem("courseData");
@@ -105,7 +107,7 @@ function Home() {
         cachedUserData
       ) {
         setNewsData(JSON.parse(cachedNewsData));
-        setTadaTVData(JSON.parse(cachedTadaTVData)); // Khởi tạo từ sessionStorage
+        setTadaTVData(JSON.parse(cachedTadaTVData));
         setChannelData(JSON.parse(cachedChannelData));
         setSignalData(JSON.parse(cachedSignalData));
         setResultData(JSON.parse(cachedResultData));
@@ -116,40 +118,39 @@ function Home() {
         setGiftData(JSON.parse(cachedGiftData));
         setIsLoading(false);
       } else {
-        // Lấy dữ liệu Signals cho Live Signals (done_at = null)
-        const signalPreload = await preloadData(apiKey, telegramId, 1, 10, 'null');
-        // Lấy dữ liệu Signals cho Results (done_at != null)
-        const resultPreload = await preloadData(apiKey, telegramId, 1, 10, 'not_null');
-        // Lấy dữ liệu Tin tức
-        const newsPreload = await preloadData(apiKey, telegramId, 1, 10, null, "Tin tức");
-        // Lấy dữ liệu TadaTV
-        const tadaTVPreload = await preloadData(apiKey, telegramId, 1, 10, null, "TadaTV");
-        // Lấy dữ liệu còn lại (bao gồm Channels)
-        const preload = await preloadData(apiKey, telegramId, 1, 10);
+        try {
+          // Chỉ gọi preloadData một lần duy nhất
+          const preload = await preloadData(apiKey, telegramId, 1, 10);
 
-        setNewsData(newsPreload.newsData);
-        setTadaTVData(tadaTVPreload.newsData); // Lưu dữ liệu TadaTV
-        setChannelData(preload.channelData);
-        setSignalData(signalPreload.signalData);
-        setResultData(resultPreload.signalData);
-        setQuizData(preload.quizData);
-        setCourseData(preload.courseData);
-        setCharityData(preload.charityData);
-        setGiftData(preload.giftData);
-        setUserData(preload.userData);
+          // Lọc dữ liệu từ preload để gán vào các state tương ứng
+          setNewsData(preload.newsData.filter(item => item.dataType === "Tin tức"));
+          setTadaTVData(preload.newsData.filter(item => item.dataType === "TadaTV"));
+          setChannelData(preload.channelData);
+          setSignalData(preload.signalData.filter(item => !item.done_at)); // Live Signals (done_at = null)
+          setResultData(preload.signalData.filter(item => item.done_at)); // Results (done_at != null)
+          setQuizData(preload.quizData);
+          setCourseData(preload.courseData);
+          setCharityData(preload.charityData);
+          setGiftData(preload.giftData);
+          setUserData(preload.userData);
 
-        // Lưu vào sessionStorage
-        sessionStorage.setItem("newsData", JSON.stringify(newsPreload.newsData));
-        sessionStorage.setItem("tadaTVData", JSON.stringify(tadaTVPreload.newsData)); // Lưu TadaTV riêng
-        sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
-        sessionStorage.setItem("signalData", JSON.stringify(signalPreload.signalData));
-        sessionStorage.setItem("resultData", JSON.stringify(resultPreload.signalData));
-        sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
-        sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
-        sessionStorage.setItem("userData", JSON.stringify(preload.userData));
-        sessionStorage.setItem("charityData", JSON.stringify(preload.charityData));
-        sessionStorage.setItem("giftData", JSON.stringify(preload.giftData));
-        setIsLoading(false);
+          // Lưu vào sessionStorage
+          sessionStorage.setItem("newsData", JSON.stringify(preload.newsData.filter(item => item.dataType === "Tin tức")));
+          sessionStorage.setItem("tadaTVData", JSON.stringify(preload.newsData.filter(item => item.dataType === "TadaTV")));
+          sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
+          sessionStorage.setItem("signalData", JSON.stringify(preload.signalData.filter(item => !item.done_at)));
+          sessionStorage.setItem("resultData", JSON.stringify(preload.signalData.filter(item => item.done_at)));
+          sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
+          sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
+          sessionStorage.setItem("userData", JSON.stringify(preload.userData));
+          sessionStorage.setItem("charityData", JSON.stringify(preload.charityData));
+          sessionStorage.setItem("giftData", JSON.stringify(preload.giftData));
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -210,7 +211,8 @@ function Home() {
   return (
     <div className="home">
       {isLoading && <Loading />}
-      {!isLoading && (
+      {error && <div className="error-message">{error}</div>}
+      {!isLoading && !error && (
         <>
           <Header userId={userData?.userID} />
           <div className="rectangle-container">
