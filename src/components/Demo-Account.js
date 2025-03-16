@@ -32,8 +32,9 @@ const DemoAccount = ({ userID, onClose }) => {
           accountMT5: `demo-${userID}`,
           passwordMT5: `demo-${userID}`,
           addressServer: "demoserver.tadaup.com",
-          balance: 200000,
+          balance: 20000,
           apikeyBot: "demo-apikey",
+          port_id: 1111,
           status: 1
         }),
       });
