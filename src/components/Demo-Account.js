@@ -53,7 +53,7 @@ const DemoAccount = ({ userID, onClose }) => {
             accountMT5: `demo-${userID}`,
             passwordMT5: `demo-${userID}`,
             addressServer: "demoserver.tadaup.com",
-            balance: 200000,
+            balance: 20000,
             apikeyBot: "demo-apikey",
             status: 1,
           }
@@ -88,7 +88,7 @@ const DemoAccount = ({ userID, onClose }) => {
             </div>
           ) : (
             <div className="buyac-details">
-              <p>Enter a username to create a demo account with <b>$200,000</b></p>
+              <p>Enter a username to create a demo account with <b>$20,000</b></p>
               <input 
                 type="text" 
                 value={username} 
