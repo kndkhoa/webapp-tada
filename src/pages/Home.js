@@ -61,7 +61,7 @@ function Home() {
       if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
-        const id = 1143286230;
+        const id = 9999;
         if (telegramData) {
           const telegramId = telegramData.id;
           setTelegramId(telegramId || id);

@@ -9,7 +9,7 @@ import BuyAC from "../components/BuyAC";
 import { ReloadSkeleton, PreloadImage } from "../components/waiting";
 import "./KhoTang.css";
 import "./Earn.css";
-import { preloadData } from "./api";
+import { fetchMoreSignals, fetchMoreChannels } from "./api"; // Chỉ cần import các hàm tải thêm
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -125,11 +125,11 @@ function Earn() {
     try {
       let newData;
       if (type === "signal") {
-        newData = await preloadData(apiKey, userData.userID, page, 10, "null");
+        newData = await fetchMoreSignals(apiKey, page, 10, "null");
       } else if (type === "results") {
-        newData = await preloadData(apiKey, userData.userID, page, 10, "not_null");
+        newData = await fetchMoreSignals(apiKey, page, 10, "not_null");
       } else if (type === "channel") {
-        newData = await preloadData(apiKey, userData.userID, page, 10);
+        newData = await fetchMoreChannels(apiKey, page, 10);
       }
   
       const normalizedNewData = type === "channel"
