@@ -125,14 +125,15 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
   }, [authorDropdowns]);
 
   const strategyOptions = [
-    "Risk 1 : Reward 6 - Profit 10% - Lost 15 Orders",
-    "Risk 1 : Reward 1 - Profit 6% - Lost 4 Orders",
-    "Risk 1 : Reward 1 - Profit 3% - Lost 5 Orders",
-    "Risk 1 : Reward 2 - Profit 30% - Lost 3 Orders",
-    "Risk 1 : Reward 2 - Profit 15% - Lost 5 Orders",
+    "Risk 1 : Reward 2 - Profit 1% - Lost 12 Orders",
     "Risk 1 : Reward 3 - Profit 1% - Lost 15 Orders",
-    "Risk 1 : Reward 10 - Profit 17% - Lost 20 Orders",
     "Risk 1 : Reward 20 - Profit 6% - Lost 50 Orders",
+    "Risk 1 : Reward 6 - Profit 10% - Lost 15 Orders",
+    "Risk 1 : Reward 1 - Profit 3% - Lost 5 Orders",
+    "Risk 1 : Reward 4 - Profit 4% - Lost 15 Orders",
+    "Risk 1 : Reward 10 - Profit 17% - Lost 20 Orders",
+    "Risk 1 : Reward 2 - Profit 15% - Lost 5 Orders",
+    "Risk 1 : Reward 2 - Profit 30% - Lost 3 Orders",
   ];
 
   const getStrategyIndex = (strategy) => {
