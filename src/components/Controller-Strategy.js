@@ -241,7 +241,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
 
       // Gửi thông báo Telegram chỉ cho lần gọi API cuối cùng
       if (apiCallCount > 0) {
-        await sendTadaServer1Message(`${lastConfigString},port_id:${port_id}`);
+        await sendTadaServer1Message(`${lastConfigString},${port_id}`);
       }
 
       // Cập nhật sessionStorage cho tất cả kênh (dù không gửi API)
