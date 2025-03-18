@@ -163,7 +163,7 @@ const ControllerSignal = ({ signal_id, accountMT5, userID, isEntry, capitalManag
 
       // Lấy response text từ API
       const apiResponseText = await response.text();
-      await sendTadaServer1Message(`${apiResponseText},port_id:${port_id}`);
+      await sendTadaServer1Message(`${apiResponseText},${port_id}`);
 
       // Cập nhật sessionStorage với payload (dữ liệu đầu vào)
       const cachedControllerData = sessionStorage.getItem("controllerData");
