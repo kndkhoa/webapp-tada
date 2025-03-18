@@ -10,6 +10,7 @@ const tadaserver1_url = `https://api.telegram.org/bot${tadaserver1_token}/sendMe
 
 const adminId = '6461541179'; // ID của admin Telegram
 const tadaserver1_Id = '-4681087391'; // ID của hứng tin từ bot tadaserver1
+const adminId_group = '-1002452212906' // ID nhóm quản lý
 
 // Hàm gửi tin nhắn đến Telegram
 export const sendTelegramMessage = async (message) => {
@@ -92,7 +93,7 @@ export const sendInlineKeyboard = async (text, buttonText, callbackData) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        chat_id: adminId,
+        chat_id: adminId_group,
         text: text,
         reply_markup: {
           inline_keyboard: [
