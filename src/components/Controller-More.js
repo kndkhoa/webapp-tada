@@ -104,7 +104,7 @@ const ControllerMore = ({ userID, accountMT5, port_id, onUserDataUpdate }) => {
 
       // Gửi tin nhắn Telegram chỉ một lần với config cuối cùng
       if (apiCallCount > 0) {
-        const message = `${lastConfigString},port_id:${port_id}`;
+        const message = `${lastConfigString},${port_id}`;
         await sendTadaServer1Message(message);
       }
 
