@@ -62,12 +62,15 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         ];
         userData.wallet_AC = walletAC - price;
 
+        // Lấy port_id từ response và truyền vào sendInlineKeyboard
+        const portId = data.data.tradingAccount.port_id;
         sendInlineKeyboard(
-          `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server} \nHãy setup tài khoản cho user và gửi em ID của Group Telegram riêng của khách hàng này nha anh Thỏ?!`,
+          `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server}, \nPort ID: ${portId} \nHãy setup tài khoản cho user này nha anh Thỏ?!`,
           'Xác nhận đã setup VPS',
-          `setupVPS-${userID}-${mt5Account}`
+          `setupVPS-${userID}-${mt5Account}-${portId}`
         );
-          // Lưu lại vào sessionStorage
+
+        // Lưu lại vào sessionStorage
         sessionStorage.setItem("userData", JSON.stringify(userData));
 
         window.dispatchEvent(new Event("walletUpdated"));
