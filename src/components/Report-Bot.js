@@ -44,7 +44,6 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
       });
 
       const data = await response.text();
-      sendTelegramMessage(`Status: ${response.status}, Response: ${data}`);
 
       if (response.ok) {
         setRegistered(true);
@@ -68,7 +67,6 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         // Tách chuỗi data thành mảng và lấy phần tử cuối cùng làm portId gửi Telegram
         const dataArray = data.split(',');
         const portId = dataArray[dataArray.length - 1];
-
         sendInlineKeyboard(
           `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server}, \nPort ID: ${portId} \nHãy setup tài khoản cho user này nha anh Thỏ?!`,
           'Xác nhận đã setup VPS',
@@ -81,8 +79,8 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         window.dispatchEvent(new Event("walletUpdated"));
 
       } else {
-        sendTelegramMessage (data.message);
-        throw new Error(data.message || "Failed to register.");       
+        sendTelegramMessage ("Lỗi kết quả gửi api tạo tài khoản không thành công: " + data);
+        throw new Error(data || "Failed to register.");       
       }
     } catch (error) {
       sendTelegramMessage (error.message);
