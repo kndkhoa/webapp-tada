@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import avatar from './assets/avatar.gif'; // Đường dẫn đến ảnh avatar
 import './Report.css'; // Import CSS riêng
-import { sendInlineKeyboard } from './TelegramNotification';
+import { sendTelegramMessage, sendInlineKeyboard } from './TelegramNotification';
 
 const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClose }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); // Trạng thái chờ API
   const [registered, setRegistered] = useState(false); // Trạng thái đăng ký thành công
-  const [responseData, setResponseData] = useState(null); // Dữ liệu API trả về
   const [error, setError] = useState(null); // Trạng thái lỗi
   const [showMT5Form, setShowMT5Form] = useState(false); // Trạng thái hiển thị form MT5
   const [mt5Account, setMT5Account] = useState(''); // State cho account MT5
@@ -45,28 +44,31 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
 
       if (response.ok) {
         setRegistered(true);
-        setResponseData(data.data); // Lưu dữ liệu API trả về để hiển thị
 
-        // 🔥 Cập nhật sessionStorage ngay sau khi tạo tài khoản trading
+        // 🔥 SỬA #2: Cập nhật sessionStorage từ tham số đầu vào thay vì response
         const storedUserData = sessionStorage.getItem("userData");
         let userData = storedUserData ? JSON.parse(storedUserData) : { trading_accounts: [] };
 
-        // Đảm bảo `trading_accounts` tồn tại và thêm tài khoản mới
+        // Đảm bảo `trading_accounts` tồn tại và thêm tài khoản mới từ state
         userData.trading_accounts = [
           ...userData.trading_accounts,
           {
-            accountMT5: mt5Account,
-            passwordMT5: mt5Password, // Thêm password MT5
-            addressServer: mt5Server, // Thêm address server
+            accountMT5: mt5Account, // Lấy từ state
+            passwordMT5: mt5Password, // Lấy từ state
+            addressServer: mt5Server, // Lấy từ state
           }
         ];
         userData.wallet_AC = walletAC - price;
 
-        // Lấy string từ response và truyền vào sendInlineKeyboard
+
+        // Tách chuỗi data thành mảng và lấy phần tử cuối cùng làm portId gửi Telegram
+        const dataArray = data.split(',');
+        const portId = dataArray[dataArray.length - 1];
+
         sendInlineKeyboard(
           `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server}, \nPort ID: ${portId} \nHãy setup tài khoản cho user này nha anh Thỏ?!`,
           'Xác nhận đã setup VPS',
-          `setupVPS,${data}`
+          `setupVPS,${data}` // Dùng chuỗi data trực tiếp
         );
 
         // Lưu lại vào sessionStorage
@@ -75,19 +77,19 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         window.dispatchEvent(new Event("walletUpdated"));
 
       } else {
-        <TelegramNotification message={data.message} />
+        sendTelegramMessage (data.message);
         throw new Error(data.message || "Failed to register.");       
       }
     } catch (error) {
       setError(error.message);
-      <TelegramNotification message={error.message} />
+      sendTelegramMessage (error.message);
     }
 
     setLoading(false);
   };
 
   // Nếu đã đăng ký thành công, thay đổi nội dung component (trừ avatar và tên author)
-  if (registered && responseData) {
+  if (registered) {
     return (
       <>
         <div className="overlay"></div>
