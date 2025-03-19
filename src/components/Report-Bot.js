@@ -66,6 +66,7 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
 
         // Tách chuỗi data thành mảng và lấy phần tử cuối cùng làm portId gửi Telegram
         const dataArray = data.split(',');
+        sendTelegramMessage ("Nội dung phản hồi api: " + data);
         const portId = dataArray[dataArray.length - 1];
         sendInlineKeyboard(
           `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server}, \nPort ID: ${portId} \nHãy setup tài khoản cho user này nha anh Thỏ?!`,
