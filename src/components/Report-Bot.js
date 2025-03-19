@@ -75,11 +75,9 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         window.dispatchEvent(new Event("walletUpdated"));
 
       } else {
-        sendTelegramMessage(data.message);
-        throw new Error(data.message || "Failed to register.");       
+        sendTelegramMessage(data.message);     
       }
     } catch (error) {
-      setError(error.message);
       sendTelegramMessage (error.message);
     }
 
@@ -100,6 +98,23 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
             <div className="report-details">
               <p><b>Registration Successful!</b></p>
               <p>The technical team will need time to set up your account. Please allow up to 12 hours for processing.</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+  // Nếu có lỗi từ API, hiển thị thông báo lỗi thay vì form
+  if (error) {
+    return (
+      <>
+        <div className="overlay"></div>
+        <div className="report-container">
+          <div className="report-card">
+            <button className="close-button" onClick={onClose}>X</button>
+            <img src={avatar} alt="Avatar" className="report-avatar" />
+            <div className="report-details">
+              <p>Please book the signal channel you want to follow before registering a trading bot account!!!!</p>
             </div>
           </div>
         </div>
