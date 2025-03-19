@@ -28,7 +28,7 @@ const BuyAC = ({ userID, walletAC, onClose }) => {
 
     // Gửi thông báo Telegram khi người dùng nhấn Confirm
     sendInlineKeyboard(
-      `Có user ID là ${userID} đăng ký mua ${acAmount} AC, tương đương ${usdtAmount}. Hãy theo dõi tài khoản hệ thống có nhận được tiền chưa nha chị Thảo?!`,
+      `Có user ID là ${userID} đăng ký mua ${acAmount} AC, tương đương ${usdtAmount} USDT. Hãy theo dõi tài khoản hệ thống có nhận được tiền chưa nha chị Thảo?!`,
       'Xác nhận nạp tiền thành công',
       `buyAC-${userID}-${acAmount}`
     );
