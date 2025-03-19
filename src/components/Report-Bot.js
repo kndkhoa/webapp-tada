@@ -41,7 +41,7 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         }),
       });
 
-      const data = await response.json();
+      const data = await response.text();
 
       if (response.ok) {
         setRegistered(true);
@@ -62,12 +62,11 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         ];
         userData.wallet_AC = walletAC - price;
 
-        // Lấy port_id từ response và truyền vào sendInlineKeyboard
-        const portId = data.data.tradingAccount.port_id;
+        // Lấy string từ response và truyền vào sendInlineKeyboard
         sendInlineKeyboard(
           `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server}, \nPort ID: ${portId} \nHãy setup tài khoản cho user này nha anh Thỏ?!`,
           'Xác nhận đã setup VPS',
-          `setupVPS-${userID}-${mt5Account}-${portId}`
+          `setupVPS,${data}`
         );
 
         // Lưu lại vào sessionStorage
