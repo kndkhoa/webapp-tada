@@ -4,7 +4,7 @@ import "./Controller-Strategy.css";
 import botsettingIcon from "./assets/icons/bot-setting.png";
 import upIcon from "./assets/icons/up.png";
 import downIcon from "./assets/icons/down.png";
-import TelegramNotification, { sendTadaServer1Message } from './TelegramNotification'; // Import thêm sendTadaServer1Message
+import TelegramNotification, { sendTadaServer1Message } from './TelegramNotification';
 
 const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onUserDataUpdate }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -18,7 +18,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
   const [authorDropdowns, setAuthorDropdowns] = useState({});
   const [selectedAuthorStrategies, setSelectedAuthorStrategies] = useState({});
   const [bookingChannels, setBookingChannels] = useState([]);
-  const [initialState, setInitialState] = useState({}); // Lưu trạng thái ban đầu để so sánh thay đổi
+  const [initialState, setInitialState] = useState({});
 
   const dropdownRef = useRef(null);
   const channelsDropdownRef = useRef(null);
@@ -38,7 +38,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
   useEffect(() => {
     if (currentAccount) {
       setIsAutoBotOn(followingChannels.some((channel) => channel.autoCopy === 1));
-      setIsStrategyManagementOn(capitalManagement !== "None" && followingChannels.some((channel) => channel.capitalManagement > 0));
+      setIsStrategyManagementOn(capitalManagement !== "None" && followingChannels.some((channel) => channel.capitalManagement >= 0));
       setSelectedStrategy(capitalManagement);
       setNumericValue(currentAccount.orderSL || "");
       const initialChannels = followingChannels
@@ -51,16 +51,15 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
       followingChannels.forEach(channel => {
         if (channel.autoCopy === 1) {
           initialDropdowns[channel.author] = false;
-          initialStrategies[channel.author] = channel.capitalManagement > 0 ? strategyOptions[channel.capitalManagement - 1] : "";
+          initialStrategies[channel.author] = channel.capitalManagement >= 0 ? strategyOptions[channel.capitalManagement] : "";
         }
       });
       setAuthorDropdowns(initialDropdowns);
       setSelectedAuthorStrategies(initialStrategies);
 
-      // Lưu trạng thái ban đầu để so sánh thay đổi
       setInitialState({
         isAutoBotOn: followingChannels.some((channel) => channel.autoCopy === 1),
-        isStrategyManagementOn: capitalManagement !== "None" && followingChannels.some((channel) => channel.capitalManagement > 0),
+        isStrategyManagementOn: capitalManagement !== "None" && followingChannels.some((channel) => channel.capitalManagement >= 0),
         selectedChannels: initialChannels,
         selectedAuthorStrategies: { ...initialStrategies },
         numericValue: currentAccount.orderSL || "",
@@ -138,18 +137,16 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
 
   const getStrategyIndex = (strategy) => {
     const index = strategyOptions.indexOf(strategy);
-    return index !== -1 ? index + 1 : 0;
+    return index !== -1 ? index : -1; // Trả về -1 nếu không tìm thấy
   };
 
   const handleSave = async () => {
     try {
-      // Kiểm tra khi tắt Capital Management
       if (!isStrategyManagementOn && (!numericValue || parseInt(numericValue) <= 0)) {
         alert("Giá trị Stop Loss phải là số dương lớn hơn 0.");
         return;
       }
 
-      // So sánh trạng thái hiện tại với trạng thái ban đầu để xác định thay đổi
       const changedChannels = [];
       bookingChannels.forEach(channel => {
         const author = channel.author;
@@ -160,7 +157,6 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
         const initialAutoBot = initialState.isAutoBotOn;
         const initialManagement = initialState.isStrategyManagementOn;
         
-        // Kiểm tra nếu có thay đổi ở autoCopy, capitalManagement hoặc SLUSD
         if (
           (initialAutoBot !== isAutoBotOn) ||
           (wasSelectedInitially !== isSelectedNow) ||
@@ -174,13 +170,12 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
 
       if (changedChannels.length === 0) {
         setIsModified(false);
-        return; // Không có thay đổi, không cần gọi API
+        return;
       }
 
-      let lastConfigString = ""; // Lưu config của lần gọi API cuối cùng
-      let apiCallCount = 0; // Đếm số lần gọi API
+      let lastConfigString = "";
+      let apiCallCount = 0;
 
-      // Gửi API tuần tự cho từng kênh có thay đổi
       for (const author of changedChannels) {
         const existingChannel = followingChannels.find(ch => ch.author === author);
         const bookingChannel = bookingChannels.find(ch => ch.author === author);
@@ -189,22 +184,26 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
         
         if (!channelId) {
           console.error(`Không tìm thấy channel_id cho author ${author}`);
-          continue; // Bỏ qua nếu không tìm thấy channel_id
+          continue;
         }
 
         const isSelected = selectedChannels.includes(author);
+        const capitalManagementValue = isStrategyManagementOn
+          ? (isSelected ? getStrategyIndex(selectedAuthorStrategies[author] || "") : -1)
+          : -1; // Chỉ gán -1 khi tắt nút Capital Management
+        const entryTypeValue = capitalManagementValue >= 0 ? 1 : 2;
+
         const payload = {
           userID: userID,
           accountMT5: accountMT5,
           channel_id: channelId,
-          capitalManagement: isStrategyManagementOn && isSelected
-            ? getStrategyIndex(selectedAuthorStrategies[author] || "")
-            : 0,
+          capitalManagement: capitalManagementValue,
+          entryType: entryTypeValue,
           SLUSD: isStrategyManagementOn ? 0 : (!isStrategyManagementOn && numericValue ? numericValue : (existingChannel?.SLUSD || 0)),
           autoCopy: isAutoBotOn && isSelected ? 1 : 0,
         };
 
-        console.log(`Gửi API cho ${author} (lần ${apiCallCount + 1}):`, payload); // Debug payload
+        console.log(`Gửi API cho ${author} (lần ${apiCallCount + 1}):`, payload);
 
         const response = await fetch(
           "https://admin.tducoin.com/api/signal/channelcontroller",
@@ -218,7 +217,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
           }
         );
 
-        apiCallCount++; // Tăng số lần gọi API
+        apiCallCount++;
 
         if (!response.ok) {
           const errorResponse = await response.json();
@@ -236,16 +235,13 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
           throw new Error(`API thất bại cho kênh ${channelId}`);
         }
 
-        // Lấy dữ liệu trả về từ API (chuỗi config)
         lastConfigString = await response.text();
       }
 
-      // Gửi thông báo Telegram chỉ cho lần gọi API cuối cùng
       if (apiCallCount > 0) {
         await sendTadaServer1Message(`${lastConfigString},${port_id}`);
       }
 
-      // Cập nhật sessionStorage cho tất cả kênh (dù không gửi API)
       const cachedUserData = JSON.parse(sessionStorage.getItem("userData")) || {};
       const allChannels = bookingChannels.map(channel => channel.author);
       const newFollowingChannels = allChannels.map(author => {
@@ -253,16 +249,18 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
         const bookingChannel = bookingChannels.find(ch => ch.author === author);
         const channelId = existingChannel ? existingChannel.channel_id : (bookingChannel ? bookingChannel.channel_id : null);
         const isSelected = selectedChannels.includes(author);
+        const capitalManagementValue = isStrategyManagementOn
+          ? (isSelected ? getStrategyIndex(selectedAuthorStrategies[author] || "") : -1)
+          : -1;
+        const entryTypeValue = capitalManagementValue >= 0 ? 1 : 2;
 
         return {
           channel_id: channelId,
           accountMT5: accountMT5,
           isEntry: existingChannel?.isEntry || false,
-          entryType: existingChannel?.entryType || "",
+          entryType: entryTypeValue,
           isReverse: existingChannel?.isReverse || false,
-          capitalManagement: isStrategyManagementOn && isSelected
-            ? getStrategyIndex(selectedAuthorStrategies[author] || "")
-            : 0,
+          capitalManagement: capitalManagementValue,
           SLUSD: isStrategyManagementOn ? 0 : (!isStrategyManagementOn && numericValue ? numericValue : (existingChannel?.SLUSD || 0)),
           author: author,
           autoCopy: isAutoBotOn && isSelected ? 1 : 0,
@@ -297,7 +295,6 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
         onUserDataUpdate(updatedUserData.trading_accounts);
       }
 
-      // Cập nhật trạng thái ban đầu sau khi lưu thành công
       setInitialState({
         isAutoBotOn,
         isStrategyManagementOn,
@@ -430,7 +427,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
             <div
               className={`strategy-switch ${isStrategyManagementOn ? "on" : "off"}`}
               onClick={() => {
-                setIsAutoBotOn(true); // Bật Following Channels khi bật Capital Management
+                setIsAutoBotOn(true);
                 setIsStrategyManagementOn(!isStrategyManagementOn);
                 setIsModified(true);
                 if (!isStrategyManagementOn) {
