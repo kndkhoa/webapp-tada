@@ -83,7 +83,7 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
         throw new Error(data || "Failed to register.");       
       }
     } catch (error) {
-      sendTelegramMessage (error.message);
+      sendTelegramMessage ("Lỗi trong tiến trình gọi api tại tài khoản, lưu sessionStorage và gửi thông báo: " + error.message);
       setError(error.message);
     }
 
