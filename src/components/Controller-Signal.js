@@ -38,8 +38,8 @@ const ControllerSignal = ({ signal_id, accountMT5, userID, isEntry, capitalManag
   // Khởi tạo state ban đầu từ props chỉ khi component mount lần đầu
   useEffect(() => {
     if (capitalManagement !== undefined && capitalManagement !== null) {
-      setIsStrategyManagementOn(capitalManagement > 0);
-      setSelectedStrategy(capitalManagement > 0 ? strategyOptions[capitalManagement - 1] : "");
+      setIsStrategyManagementOn(capitalManagement >= 0);
+      setSelectedStrategy(capitalManagement >= 0 ? strategyOptions[capitalManagement] : "");
     }
     if (SLUSD !== undefined && SLUSD !== null) {
       setNumericValue(SLUSD.toString());
@@ -57,12 +57,12 @@ const ControllerSignal = ({ signal_id, accountMT5, userID, isEntry, capitalManag
     followingChannels.forEach(channel => {
       if (channel.autoCopy === 1) {
         initialDropdowns[channel.author] = false;
-        initialStrategies[channel.author] = channel.capitalManagement > 0 ? strategyOptions[channel.capitalManagement - 1] : "";
+        initialStrategies[channel.author] = channel.capitalManagement >= 0 ? strategyOptions[channel.capitalManagement] : "";
       }
     });
     setAuthorDropdowns(initialDropdowns);
     setSelectedAuthorStrategies(initialStrategies);
-  }, [capitalManagement, SLUSD, isEntry]); // Thêm dependencies để cập nhật khi props thay đổi
+  }, [capitalManagement, SLUSD, isEntry]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -121,7 +121,7 @@ const ControllerSignal = ({ signal_id, accountMT5, userID, isEntry, capitalManag
 
   const getStrategyIndex = (strategy) => {
     const index = strategyOptions.indexOf(strategy);
-    return index !== -1 ? index + 1 : 0;
+    return index !== -1 ? index : -1; // Trả về -1 nếu không tìm thấy
   };
 
   const handleSave = async () => {
@@ -133,12 +133,15 @@ const ControllerSignal = ({ signal_id, accountMT5, userID, isEntry, capitalManag
       }
 
       // Tạo payload từ dữ liệu đã thay đổi (dữ liệu đầu vào)
+      const capitalManagementValue = isStrategyManagementOn ? getStrategyIndex(selectedStrategy) : -1;
+      const entryTypeValue = capitalManagementValue >= 0 ? 1 : 2;
       const payload = {
         userID: userID,
         accountMT5: accountMT5,
         signal_id: signal_id,
         isEntry: isEntryOn ? 1 : 0,
-        capitalManagement: isStrategyManagementOn ? getStrategyIndex(selectedStrategy) : 0,
+        capitalManagement: capitalManagementValue,
+        entryType: entryTypeValue,
         SLUSD: isStrategyManagementOn ? 0 : (!isStrategyManagementOn && numericValue ? parseInt(numericValue) : 0),
       };
 
@@ -192,8 +195,8 @@ const ControllerSignal = ({ signal_id, accountMT5, userID, isEntry, capitalManag
       }
 
       // Cập nhật state để phản ánh giao diện
-      setIsStrategyManagementOn(payload.capitalManagement > 0);
-      setSelectedStrategy(payload.capitalManagement > 0 ? strategyOptions[payload.capitalManagement - 1] : "");
+      setIsStrategyManagementOn(payload.capitalManagement >= 0);
+      setSelectedStrategy(payload.capitalManagement >= 0 ? strategyOptions[payload.capitalManagement] : "");
       setNumericValue(payload.SLUSD ? payload.SLUSD.toString() : "");
       setIsEntryOn(payload.isEntry === 1); // Cập nhật isEntryOn từ payload
 
