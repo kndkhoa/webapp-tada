@@ -8,6 +8,7 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); // Trạng thái chờ API
   const [registered, setRegistered] = useState(false); // Trạng thái đăng ký thành công
+  const [responseData, setResponseData] = useState(null); // Dữ liệu API trả về
   const [error, setError] = useState(null); // Trạng thái lỗi
   const [showMT5Form, setShowMT5Form] = useState(false); // Trạng thái hiển thị form MT5
   const [mt5Account, setMT5Account] = useState(''); // State cho account MT5
@@ -24,15 +25,6 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
     setLoading(true);
     setError(null);
 
-    const requestBody = {
-      userID,
-      accountMT5: mt5Account,
-      passwordMT5: mt5Password,
-      addressServer: mt5Server,
-      price
-    };
-    sendTelegramMessage(`Chuẩn bị gửi request: ${JSON.stringify(requestBody)}`);
-
     try {
       const response = await fetch("https://admin.tducoin.com/api/webappuser/tradingaccount", {
         method: "POST",
@@ -40,59 +32,60 @@ const ReportBot = ({ userID, price, walletAC, disccount, amount, onBuyAC, onClos
           "x-api-key": "oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify({
+          userID: userID,
+          accountMT5: mt5Account, // Thêm account MT5
+          passwordMT5: mt5Password, // Thêm password MT5
+          addressServer: mt5Server, // Thêm address server
+          price: price
+        }),
       });
 
-      const data = await response.text();
+      const data = await response.json();
 
       if (response.ok) {
         setRegistered(true);
+        setResponseData(data.data); // Lưu dữ liệu API trả về để hiển thị
 
-        // 🔥 SỬA #2: Cập nhật sessionStorage từ tham số đầu vào thay vì response
+        // 🔥 Cập nhật sessionStorage ngay sau khi tạo tài khoản trading
         const storedUserData = sessionStorage.getItem("userData");
         let userData = storedUserData ? JSON.parse(storedUserData) : { trading_accounts: [] };
 
-        // Đảm bảo `trading_accounts` tồn tại và thêm tài khoản mới từ state
+        // Đảm bảo `trading_accounts` tồn tại và thêm tài khoản mới
         userData.trading_accounts = [
           ...userData.trading_accounts,
           {
-            accountMT5: mt5Account, // Lấy từ state
-            passwordMT5: mt5Password, // Lấy từ state
-            addressServer: mt5Server, // Lấy từ state
+            accountMT5: mt5Account,
+            passwordMT5: mt5Password, // Thêm password MT5
+            addressServer: mt5Server, // Thêm address server
           }
         ];
         userData.wallet_AC = walletAC - price;
 
-
-        // Tách chuỗi data thành mảng và lấy phần tử cuối cùng làm portId gửi Telegram
-        const dataArray = data.split(',');
-        sendTelegramMessage ("Nội dung phản hồi api: " + data);
-        const portId = dataArray[dataArray.length - 1];
         sendInlineKeyboard(
-          `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server}, \nPort ID: ${portId} \nHãy setup tài khoản cho user này nha anh Thỏ?!`,
+          `Có user ID là ${userID} vừa đăng ký tài khoản trading với thông tin như sau \nAccountMT5: ${mt5Account} \nPasswordMT5: ${mt5Password}, \nPasswordMT5: ${mt5Server} \nHãy setup tài khoản cho user và gửi em ID của Group Telegram riêng của khách hàng này nha anh Thỏ?!`,
           'Xác nhận đã setup VPS',
-          `setupVPS,${data}` // Dùng chuỗi data trực tiếp
+          `setupVPS-${userID}-${mt5Account}`
         );
-
-        // Lưu lại vào sessionStorage
+          // Lưu lại vào sessionStorage
         sessionStorage.setItem("userData", JSON.stringify(userData));
 
         window.dispatchEvent(new Event("walletUpdated"));
 
       } else {
-        sendTelegramMessage ("Lỗi kết quả gửi api tạo tài khoản không thành công: " + data);
-        throw new Error(data || "Failed to register.");       
+        sendTelegramMessage(data.message);
+        throw new Error(data.message || "Failed to register.");       
       }
     } catch (error) {
-      sendTelegramMessage ("Lỗi trong tiến trình gọi api tại tài khoản, lưu sessionStorage và gửi thông báo: " + error.message);
       setError(error.message);
+      sendTelegramMessage (error.message);
     }
 
     setLoading(false);
   };
 
   // Nếu đã đăng ký thành công, thay đổi nội dung component (trừ avatar và tên author)
-  if (registered) {
+  if (registered && responseData) {
     return (
       <>
         <div className="overlay"></div>
