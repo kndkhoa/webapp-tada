@@ -181,7 +181,7 @@ function Setting() {
         ) : (
           <div>
             {selectedMenu === "profile" && <Profile user={user} onBack={handleBack} />}
-            {selectedMenu === "affiliate" && <Affiliate onBack={handleBack} />}
+            {selectedMenu === "affiliate" && <Affiliate user={userData.userID} onBack={handleBack} />}
             {selectedMenu === "language" && <Language onBack={handleBack} />}
             {selectedMenu === "terms" && <Terms onBack={handleBack} />}
             {selectedMenu === "about" && <About onBack={handleBack} />}
