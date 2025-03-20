@@ -4,7 +4,7 @@ import "./Setting-Format.css";
 import "./Affiliate.css";
 import { ReloadSkeleton } from "../components/waiting"; // Chỉ giữ ReloadSkeleton để đơn giản
 
-function AffiliateProfit({ onBack }) {
+function AffiliateProfit({ user, onBack }) {
   const [selectedMember, setSelectedMember] = useState(null); // Track the selected member
   const [members, setMembers] = useState([]); // Store the list of members
   const [isLoading, setIsLoading] = useState(true); // Track loading state
@@ -14,7 +14,7 @@ function AffiliateProfit({ onBack }) {
   const fetchMembers = async () => {
     try {
       setIsLoading(true); // Bắt đầu loading
-      const response = await fetch('https://admin.tducoin.com/api/webappuser/affiliatemembers/9999', {
+      const response = await fetch(`https://admin.tducoin.com/api/webappuser/affiliatemembers/${user}`, {
         headers: {
           'x-api-key': 'oqKbBxKcEn9l4IXE4EqS2sgNzXPFvE',
           'Content-Type': 'application/json',
