@@ -328,7 +328,7 @@ const ControllerStrategy = ({ userID, accountMT5, trading_accounts, port_id, onU
         {/* Auto Bot */}
         <div className="signal-body-item">
           <span className="icon">🤖</span>
-          <span className="text">Followng Channels</span>
+          <span className="text">Following Channels</span>
           <div className="strategy-toggle">
             <div
               className={`strategy-switch ${isAutoBotOn ? "on" : "off"}`}
