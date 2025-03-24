@@ -61,7 +61,7 @@ function Home() {
       if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.ready();
         const telegramData = window.Telegram.WebApp.initDataUnsafe?.user;
-        const id = 9999;
+        const id = 35076483;
         if (telegramData) {
           const telegramId = telegramData.id;
           setTelegramId(telegramId || id);
@@ -126,8 +126,8 @@ function Home() {
           setNewsData(preload.newsData.filter(item => item.dataType === "Tin tức"));
           setTadaTVData(preload.newsData.filter(item => item.dataType === "TadaTV"));
           setChannelData(preload.channelData);
-          setSignalData(preload.signalData.filter(item => !item.done_at)); // Live Signals (done_at = null)
-          setResultData(preload.signalData.filter(item => item.done_at)); // Results (done_at != null)
+          setSignalData(preload.signalData); // Live Signals (done_at = null)
+          setResultData(preload.resultData); // Results (done_at != null)
           setQuizData(preload.quizData);
           setCourseData(preload.courseData);
           setCharityData(preload.charityData);
@@ -138,8 +138,8 @@ function Home() {
           sessionStorage.setItem("newsData", JSON.stringify(preload.newsData.filter(item => item.dataType === "Tin tức")));
           sessionStorage.setItem("tadaTVData", JSON.stringify(preload.newsData.filter(item => item.dataType === "TadaTV")));
           sessionStorage.setItem("channelData", JSON.stringify(preload.channelData));
-          sessionStorage.setItem("signalData", JSON.stringify(preload.signalData.filter(item => !item.done_at)));
-          sessionStorage.setItem("resultData", JSON.stringify(preload.signalData.filter(item => item.done_at)));
+          sessionStorage.setItem("signalData", JSON.stringify(preload.signalData));
+          sessionStorage.setItem("resultData", JSON.stringify(preload.resultData));
           sessionStorage.setItem("quizData", JSON.stringify(preload.quizData));
           sessionStorage.setItem("courseData", JSON.stringify(preload.courseData));
           sessionStorage.setItem("userData", JSON.stringify(preload.userData));
