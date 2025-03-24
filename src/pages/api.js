@@ -3,6 +3,7 @@ const API_BASE_URL = "https://admin.tducoin.com/api";
 
 const fetchData = async (url, apiKey, method = "GET") => {
   try {
+    console.log("fetchData - Sending request to:", url, "with apiKey:", apiKey); // Log để debug
     const response = await fetch(url, {
       method,
       headers: {
@@ -10,10 +11,18 @@ const fetchData = async (url, apiKey, method = "GET") => {
         "Content-Type": "application/json",
       },
     });
-    return await response.json();
+
+    if (!response.ok) {
+      const errorText = await response.text(); // Lấy nội dung lỗi từ response
+      throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log("fetchData - Response:", data); // Log để debug
+    return data;
   } catch (err) {
-    console.error(`Error fetching ${url}:`, err);
-    return {};
+    console.error(`fetchData - Error fetching ${url}:`, err.message);
+    return null; // Trả về null thay vì {} để dễ xử lý lỗi
   }
 };
 
@@ -25,6 +34,8 @@ export const preloadData = async (apiKey, userId, page = 1, limit = 10, doneAt =
     return {
       signalData: data?.data?.signalData || [],
       signalHasMore: data?.meta?.signalData?.hasMore || false,
+      resultData: data?.data?.resultData || [],
+      resultHasMore: data?.meta?.resultData?.hasMore || false,
       channelData: data?.data?.channelData || [],
       channelHasMore: data?.meta?.channelData?.hasMore || false,
       quizData: data?.data?.quizData || [],
@@ -44,6 +55,8 @@ export const preloadData = async (apiKey, userId, page = 1, limit = 10, doneAt =
     return {
       signalData: [],
       signalHasMore: false,
+      resultData: [],
+      resultHasMore: false,
       channelData: [],
       channelHasMore: false,
       quizData: [],
@@ -91,24 +104,56 @@ export const fetchMoreQuiz = async (apiKey, page = 1, limit = 10) => {
   };
 };
 
-// Tải thêm News
 export const fetchMoreNews = async (apiKey, page = 1, limit = 10, dataType = null) => {
-  const url = `${API_BASE_URL}/news?page=${page}&limit=${limit}${dataType ? `&dataType=${dataType}` : ''}`;
-  const data = await fetchData(url, apiKey);
-  return {
-    newsData: data?.data || [],
-    newsHasMore: data?.meta?.hasMore || false,
-  };
+  try {
+    const url = `${API_BASE_URL}/news?page=${page}&limit=${limit}${dataType ? `&dataType=${dataType}` : ''}`;
+    const data = await fetchData(url, apiKey);
+    
+    if (!data || !data.data || typeof data.meta?.hasMore !== "boolean") {
+      console.error("fetchMoreNews - Invalid data structure:", data);
+      return {
+        newsData: [],
+        newsHasMore: false,
+      };
+    }
+
+    return {
+      newsData: data.data,
+      newsHasMore: data.meta.hasMore,
+    };
+  } catch (error) {
+    console.error("fetchMoreNews - Failed to fetch:", error.message);
+    return {
+      newsData: [],
+      newsHasMore: false,
+    };
+  }
 };
 
-// Tải thêm Course
 export const fetchMoreCourses = async (apiKey, userId, page = 1, limit = 10) => {
-  const url = `${API_BASE_URL}/course/${userId}?page=${page}&limit=${limit}`;
-  const data = await fetchData(url, apiKey);
-  return {
-    courseData: data?.data || [],
-    courseHasMore: data?.meta?.hasMore || false,
-  };
+  try {
+    const url = `${API_BASE_URL}/courses/${userId}?page=${page}&limit=${limit}`;
+    const data = await fetchData(url, apiKey);
+
+    if (!data || !data.data || typeof data.meta?.hasMore !== "boolean") {
+      console.error("fetchMoreCourses - Invalid data structure:", data);
+      return {
+        data: [],
+        meta: { hasMore: false },
+      };
+    }
+
+    return {
+      data: data.data,
+      meta: { hasMore: data.meta.hasMore },
+    };
+  } catch (error) {
+    console.error("fetchMoreCourses - Failed to fetch:", error.message);
+    return {
+      data: [],
+      meta: { hasMore: false },
+    };
+  }
 };
 
 // Tải thêm Charity
