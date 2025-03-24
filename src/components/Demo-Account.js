@@ -54,8 +54,8 @@ const DemoAccount = ({ userID, onClose }) => {
             passwordMT5: `demo-${userID}`,
             addressServer: "demoserver.tadaup.com",
             balance: 20000,
-            apikeyBot: "demo-apikey",
-            status: 1,
+            IP: "1.1.1.1",
+            status: 1
           }
         ];
         userData.name = username;
